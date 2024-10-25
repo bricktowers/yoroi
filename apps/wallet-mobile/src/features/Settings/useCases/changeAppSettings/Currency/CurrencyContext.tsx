@@ -1,4 +1,5 @@
 import {parseSafe, useAsyncStorage} from '@yoroi/common'
+import {App} from '@yoroi/types'
 import React from 'react'
 import {useMutation, UseMutationOptions, useQuery, useQueryClient} from 'react-query'
 
@@ -37,19 +38,25 @@ const useCurrency = () => {
   const storage = useAsyncStorage()
   const query = useQuery<CurrencySymbol, Error>({
     queryKey: ['currencySymbol'],
-    queryFn: async () => {
-      const currencySymbol = await storage.join('appSettings/').getItem('currencySymbol', parseCurrencySymbol)
-
-      if (currencySymbol != null) {
-        const stillSupported = Object.values(supportedCurrencies).includes(currencySymbol)
-        if (stillSupported) return currencySymbol
-      }
-
-      return defaultCurrency
-    },
+    queryFn: () => getCurrencySymbol(storage),
   })
 
   return query.data ?? defaultCurrency
+}
+
+export const getCurrencySymbol = async (storage: App.Storage) => {
+  const currencySymbol = await storage.join('appSettings/').getItem('currencySymbol', parseCurrencySymbol)
+
+  if (currencySymbol != null) {
+    const stillSupported = Object.values(supportedCurrencies).includes(currencySymbol)
+    if (stillSupported) return currencySymbol
+  }
+
+  return defaultCurrency
+}
+
+export const formatCurrency = (value: number, currency: CurrencySymbol) => {
+  return `${value.toFixed(configCurrencies[currency].decimals)} ${currency}`
 }
 
 const useSaveCurrency = ({onSuccess, ...options}: UseMutationOptions<void, Error, CurrencySymbol> = {}) => {

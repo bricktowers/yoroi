@@ -5,6 +5,7 @@ import {PermissionsAndroid} from 'react-native'
 
 import {notificationManager} from './notification-manager'
 import {parseNotificationId} from './notifications'
+import {usePrimaryTokenPriceChangedNotification} from './primary-token-price-changed-notification'
 import {useTransactionReceivedNotifications} from './transaction-received-notification'
 
 let initialized = false
@@ -39,4 +40,5 @@ const init = () => {
 export const useInitNotifications = ({enabled}: {enabled: boolean}) => {
   React.useEffect(() => (enabled ? init() : undefined), [enabled])
   useTransactionReceivedNotifications({enabled})
+  usePrimaryTokenPriceChangedNotification({enabled})
 }
