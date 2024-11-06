@@ -28,6 +28,15 @@ export const useStrings = () => {
     json: intl.formatMessage(messages.json),
     metadata: intl.formatMessage(messages.metadata),
     policyId: intl.formatMessage(messages.policyId),
+    poolId: intl.formatMessage(messages.poolId),
+    poolHash: intl.formatMessage(messages.poolHash),
+    poolSize: intl.formatMessage(messages.poolSize),
+    poolTaxFix: intl.formatMessage(messages.poolTaxFix),
+    poolTaxRatio: intl.formatMessage(messages.poolTaxRatio),
+    poolPledge: intl.formatMessage(messages.poolPledge),
+    poolRoa: intl.formatMessage(messages.poolRoa),
+    poolShare: intl.formatMessage(messages.poolShare),
+    poolSaturation: intl.formatMessage(messages.poolSaturation),
     fingerprint: intl.formatMessage(messages.fingerprint),
     name: intl.formatMessage(messages.name),
     tokenSupply: intl.formatMessage(messages.tokenSupply),
@@ -35,6 +44,7 @@ export const useStrings = () => {
     description: intl.formatMessage(messages.description),
     details: intl.formatMessage(messages.details),
     tokenDetailsTitle: intl.formatMessage(messages.tokenDetailsTitle),
+    poolDetailsTitle: intl.formatMessage(messages.poolDetailsTitle),
     registerStakingKey: intl.formatMessage(messages.registerStakingKey),
     selectAbstain: intl.formatMessage(messages.selectAbstain),
     selectNoConfidence: intl.formatMessage(messages.selectNoConfidence),
@@ -137,6 +147,42 @@ const messages = defineMessages({
     id: 'txReview.tokenDetails.policyId.label',
     defaultMessage: '!!!Policy ID',
   },
+  poolId: {
+    id: 'txReview.poolDetails.poolId.label',
+    defaultMessage: '!!!Pool ID',
+  },
+  poolHash: {
+    id: 'txReview.poolDetails.poolHash.label',
+    defaultMessage: '!!!Hash',
+  },
+  poolSize: {
+    id: 'txReview.poolDetails.poolSize.label',
+    defaultMessage: '!!!Pool size',
+  },
+  poolRoa: {
+    id: 'txReview.poolDetails.poolRoa.label',
+    defaultMessage: '!!!ROA 30d',
+  },
+  poolShare: {
+    id: 'txReview.poolDetails.poolShare.label',
+    defaultMessage: '!!!Share',
+  },
+  poolSaturation: {
+    id: 'txReview.poolDetails.poolSaturation.label',
+    defaultMessage: '!!!Saturation',
+  },
+  poolTaxFix: {
+    id: 'txReview.poolDetails.taxFix.label',
+    defaultMessage: '!!!Tax fix',
+  },
+  poolTaxRatio: {
+    id: 'txReview.poolDetails.taxRatio.label',
+    defaultMessage: '!!!Tax ratio',
+  },
+  poolPledge: {
+    id: 'txReview.poolDetails.pledge.label',
+    defaultMessage: '!!!Pledge',
+  },
   fingerprint: {
     id: 'txReview.tokenDetails.fingerprint.label',
     defaultMessage: '!!!Fingerprint',
@@ -164,6 +210,10 @@ const messages = defineMessages({
   tokenDetailsTitle: {
     id: 'txReview.tokenDetails.title',
     defaultMessage: '!!!Asset Details',
+  },
+  poolDetailsTitle: {
+    id: 'txReview.poolDetails.title',
+    defaultMessage: '!!!Pool Details',
   },
   registerStakingKey: {
     id: 'txReview.operations.registerStakingKey',
