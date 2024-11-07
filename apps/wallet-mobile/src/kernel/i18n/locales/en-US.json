@@ -1256,6 +1256,7 @@
   "txReview.tokenDetails.overViewTab.description.label": "Description",
   "txReview.tokenDetails.overViewTab.details.label": "Details on",
   "txReview.tokenDetails.title": "Asset Details",
+  "txReview.walletBalance.title": "Wallet balance",
   "txReview.poolDetails.title": "Pool Details",
   "txReview.operations.registerStakingKey": "Register staking key deposit",
   "txReview.operations.deregisterStakingKey": "Deregister staking key",
@@ -1270,5 +1271,7 @@
   "txReview.submittedTxButton": "Go to transactions",
   "txReview.failedTxTitle": "Transaction failed",
   "txReview.failedTxText": "Your transaction has not been processed properly due to technical issues",
-  "txReview.failedTxButton": "Go to transactions"
+  "txReview.failedTxButton": "Go to transactions",
+  "txReview.walletBalanceTokens.title": "Tokens",
+  "txReview.walletBalanceNFTs.title": "NFTs"
 }

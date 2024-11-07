@@ -44,6 +44,9 @@ export const useStrings = () => {
     description: intl.formatMessage(messages.description),
     details: intl.formatMessage(messages.details),
     tokenDetailsTitle: intl.formatMessage(messages.tokenDetailsTitle),
+    walletBalanceTitle: intl.formatMessage(messages.walletBalanceTitle),
+    walletBalanceTokensTitle: intl.formatMessage(messages.walletBalanceTokensTitle),
+    walletBalanceNFTsTitle: intl.formatMessage(messages.walletBalanceNFTsTitle),
     poolDetailsTitle: intl.formatMessage(messages.poolDetailsTitle),
     registerStakingKey: intl.formatMessage(messages.registerStakingKey),
     selectAbstain: intl.formatMessage(messages.selectAbstain),
@@ -210,6 +213,18 @@ const messages = defineMessages({
   tokenDetailsTitle: {
     id: 'txReview.tokenDetails.title',
     defaultMessage: '!!!Asset Details',
+  },
+  walletBalanceTitle: {
+    id: 'txReview.walletBalance.title',
+    defaultMessage: '!!!Wallet balance',
+  },
+  walletBalanceTokensTitle: {
+    id: 'txReview.walletBalanceTokens.title',
+    defaultMessage: '!!!Tokens',
+  },
+  walletBalanceNFTsTitle: {
+    id: 'txReview.walletBalanceNFTs.title',
+    defaultMessage: '!!!NFTs',
   },
   poolDetailsTitle: {
     id: 'txReview.poolDetails.title',
