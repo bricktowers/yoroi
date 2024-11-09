@@ -29,7 +29,7 @@ export const formatMetadata = async (
     const metadata674 = await generalTransactionMetadata?.get(await csl.BigNum.fromStr('674'))
     if (metadata674) {
       const decodedMetadata = await csl.decodeMetadatumToJsonStr(metadata674, MetadataJsonSchema.BasicConversions)
-      const msg = JSON.parse(decodedMetadata)?.msg ?? ''
+      const msg = [parseMsg(JSON.parse(decodedMetadata)?.msg ?? [''])]
       metadata = {msg}
     }
 
@@ -40,6 +40,18 @@ export const formatMetadata = async (
   } finally {
     release()
   }
+}
+
+const parseMsg = (msg: Array<string>) => {
+  if (msg.length > 1) {
+    const message = msg.join('')
+    try {
+      return JSON.parse(message)
+    } catch {
+      return message
+    }
+  }
+  return msg[0]
 }
 
 export const useFormattedMetadata = ({
