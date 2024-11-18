@@ -1,6 +1,6 @@
-import {Notification, Notifications} from 'react-native-notifications'
 import {mountAsyncStorage} from '@yoroi/common'
 import {Notifications as NotificationTypes} from '@yoroi/types'
+import {Notification, Notifications} from 'react-native-notifications'
 
 import {formatCurrency, getCurrencySymbol} from '../../../Settings/useCases/changeAppSettings/Currency/CurrencyContext'
 

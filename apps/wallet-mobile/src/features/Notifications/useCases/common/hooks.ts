@@ -1,7 +1,7 @@
-import {Notifications, Registered, RegistrationError} from 'react-native-notifications'
-import {NotificationBackgroundFetchResult} from 'react-native-notifications'
 import React from 'react'
 import {PermissionsAndroid} from 'react-native'
+import {Notifications, Registered, RegistrationError} from 'react-native-notifications'
+import {NotificationBackgroundFetchResult} from 'react-native-notifications'
 
 import {notificationManager} from './notification-manager'
 import {parseNotificationId} from './notifications'
@@ -56,5 +56,5 @@ const usePushNotifications = ({enabled}: {enabled: boolean}) => {
     Notifications.events().registerRemoteNotificationsRegistrationFailed((event: RegistrationError) => {
       console.error('Failed to register for remote notifications', event)
     })
-  }, [])
+  }, [enabled])
 }
