@@ -1,5 +1,5 @@
-import {Notifications} from '@jamsinclair/react-native-notifications'
-import {NotificationBackgroundFetchResult} from '@jamsinclair/react-native-notifications'
+import {Notifications, Registered, RegistrationError} from 'react-native-notifications'
+import {NotificationBackgroundFetchResult} from 'react-native-notifications'
 import React from 'react'
 import {PermissionsAndroid} from 'react-native'
 
@@ -43,4 +43,18 @@ export const useInitNotifications = ({enabled}: {enabled: boolean}) => {
   useTransactionReceivedNotifications({enabled})
   usePrimaryTokenPriceChangedNotification({enabled})
   useRewardsUpdatedNotifications({enabled})
+  usePushNotifications({enabled})
+}
+
+const usePushNotifications = ({enabled}: {enabled: boolean}) => {
+  React.useEffect(() => {
+    if (!enabled) return
+    Notifications.events().registerRemoteNotificationsRegistered((event: Registered) => {
+      // TODO: Send the token to my server so it could send back push notifications...
+      console.log('Device Token Received', event.deviceToken)
+    })
+    Notifications.events().registerRemoteNotificationsRegistrationFailed((event: RegistrationError) => {
+      console.error('Failed to register for remote notifications', event)
+    })
+  }, [])
 }
