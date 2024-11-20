@@ -46,7 +46,7 @@ export const displayNotificationEvent = async (notificationEvent: NotificationTy
   }
 }
 
-const sendNotification = (options: {title: string; body: string; id: number}) => {
+export const sendNotification = (options: {title: string; body: string; id: number}) => {
   const notification = new Notification({
     title: options.title,
     body: options.body,
