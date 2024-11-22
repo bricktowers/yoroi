@@ -1,13 +1,10 @@
 import messaging from '@react-native-firebase/messaging'
-import {isRecord, isString} from '@yoroi/common'
-import {createTypeGuardFromSchema, isKeyOf} from '@yoroi/common/src'
 import React from 'react'
 import {PermissionsAndroid} from 'react-native'
 import {NotificationBackgroundFetchResult, Notifications} from 'react-native-notifications'
-import {z} from 'zod'
 
 import {notificationManager} from './notification-manager'
-import {parseNotificationId, sendNotification} from './notifications'
+import {generateNotificationId, parseNotificationId, sendNotification} from './notifications'
 import {usePrimaryTokenPriceChangedNotification} from './primary-token-price-changed-notification'
 import {useRewardsUpdatedNotifications} from './rewards-updated-notification'
 import {useTransactionReceivedNotifications} from './transaction-received-notification'
@@ -18,25 +15,35 @@ const init = () => {
   if (initialized) return
   initialized = true
   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
-  Notifications.events().registerNotificationReceivedForeground((_notification, completion) => {
-    completion({alert: true, sound: true, badge: true})
+
+  const unsubscribeFromForegroundMessage = messaging().onMessage((remoteMessage) => {
+    const {notification} = remoteMessage
+    if (notification && notification.title && notification.body) {
+      sendNotification({
+        title: notification.title,
+        body: notification.body,
+        id: generateNotificationId(),
+      })
+      // TODO: Save notification to local storage
+      console.log('FCM Message Notification:', remoteMessage.notification)
+    }
   })
 
-  Notifications.events().registerNotificationReceivedBackground((_notification, completion) => {
-    completion(NotificationBackgroundFetchResult.NEW_DATA)
-  })
-
-  Notifications.events().registerNotificationOpened((notification, completion) => {
-    const payloadId = notification.identifier || notification.payload.id
-    const id = parseNotificationId(payloadId)
-    notificationManager.events.markAsRead(id)
-    completion()
-  })
+  const notificationOpenedSubscription = Notifications.events().registerNotificationOpened(
+    (notification, completion) => {
+      const payloadId = notification.identifier || notification.payload.id
+      const id = parseNotificationId(payloadId)
+      notificationManager.events.markAsRead(id)
+      completion()
+    },
+  )
 
   notificationManager.hydrate()
 
   return () => {
     notificationManager.destroy()
+    notificationOpenedSubscription.remove()
+    unsubscribeFromForegroundMessage()
   }
 }
 
@@ -55,24 +62,9 @@ const usePushNotifications = ({enabled}: {enabled: boolean}) => {
   }, [enabled])
 }
 
-messaging().setBackgroundMessageHandler((remoteMessage) => {
-  const data = remoteMessage.data as unknown
-  if (!isRecord(data) || !isKeyOf('custom', data) || !isString(data.custom)) return Promise.resolve()
-
-  try {
-    const custom = JSON.parse(data.custom) as unknown
-    if (!isValidNotificationData(custom)) return Promise.resolve()
-    sendNotification({title: custom.title, id: 123, body: custom.body})
-  } catch (e) {
-    console.error(e)
+messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+  if (remoteMessage.notification) {
+    // Automatically shown by the OS
+    console.log('FCM Message Notification in background:', remoteMessage.notification)
   }
-
-  return Promise.resolve()
 })
-
-const isValidNotificationData = createTypeGuardFromSchema(
-  z.object({
-    title: z.string(),
-    body: z.string(),
-  }),
-)
