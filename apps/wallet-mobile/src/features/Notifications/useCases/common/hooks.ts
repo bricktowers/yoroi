@@ -1,13 +1,14 @@
 import messaging from '@react-native-firebase/messaging'
 import React from 'react'
 import {PermissionsAndroid} from 'react-native'
-import {NotificationBackgroundFetchResult, Notifications} from 'react-native-notifications'
+import {Notifications} from 'react-native-notifications'
 
 import {notificationManager} from './notification-manager'
 import {generateNotificationId, parseNotificationId, sendNotification} from './notifications'
 import {usePrimaryTokenPriceChangedNotification} from './primary-token-price-changed-notification'
 import {useRewardsUpdatedNotifications} from './rewards-updated-notification'
 import {useTransactionReceivedNotifications} from './transaction-received-notification'
+import {logger} from '../../../../kernel/logger/logger'
 
 let initialized = false
 
@@ -24,8 +25,8 @@ const init = () => {
         body: notification.body,
         id: generateNotificationId(),
       })
-      // TODO: Save notification to local storage
-      console.log('FCM Message Notification:', remoteMessage.notification)
+
+      logger.info('FCM Message Notification in foreground: ', {notification})
     }
   })
 
@@ -62,9 +63,10 @@ const usePushNotifications = ({enabled}: {enabled: boolean}) => {
   }, [enabled])
 }
 
-messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+messaging().setBackgroundMessageHandler((remoteMessage) => {
   if (remoteMessage.notification) {
     // Automatically shown by the OS
-    console.log('FCM Message Notification in background:', remoteMessage.notification)
+    logger.info(`FCM Message Notification in background`, {notification: remoteMessage.notification})
   }
+  return Promise.resolve()
 })
