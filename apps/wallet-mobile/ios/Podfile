@@ -23,7 +23,10 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+use_frameworks! :linkage => :static
+
 target 'yoroi' do
+  $RNGoogleMobileAdsAsStaticFramework = true
   use_expo_modules!
   post_integrate do |installer|
     begin
@@ -60,6 +63,8 @@ target 'yoroi' do
   pod 'Permission-LocationAccuracy', :path => "#{permissions_path}/LocationAccuracy"
   pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways"
   pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse"
+  pod 'GoogleUtilities', :modular_headers => true
+
 
   target 'yoroiTests' do
     inherit! :complete
