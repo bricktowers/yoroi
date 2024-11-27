@@ -2,6 +2,7 @@
 #import "AppDelegate.h"
 #import "RNBootSplash.h"
 #import "RNNotifications.h"
+#import <Firebase.h>
 
 #import <React/RCTBundleURLProvider.h>
 
@@ -17,6 +18,7 @@
   // react-native-bootsplash
   UIView *rootView = self.window.rootViewController.view;
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+  [FIRApp configure];
   [RNNotifications startMonitorNotifications];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
