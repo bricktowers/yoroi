@@ -2,14 +2,16 @@ import {CredKind} from '@emurgo/cross-csl-core'
 import {Blockies} from '@yoroi/identicon'
 import {useTheme} from '@yoroi/theme'
 import {Balance} from '@yoroi/types'
+import {Image} from 'expo-image'
 import * as React from 'react'
-import {StyleSheet, Text, TouchableOpacity, useWindowDimensions, View} from 'react-native'
+import {Linking, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View} from 'react-native'
 
 import {Divider} from '../../../../../../components/Divider/Divider'
 import {Icon} from '../../../../../../components/Icon'
 import {Info} from '../../../../../../components/Info/Info'
 import {useModal} from '../../../../../../components/Modal/ModalContext'
 import {Space} from '../../../../../../components/Space/Space'
+import {Warning} from '../../../../../../components/Warning/Warning'
 import {formatTokenWithText} from '../../../../../../yoroi-wallets/utils/format'
 import {Quantities} from '../../../../../../yoroi-wallets/utils/utils'
 import {useSelectedWallet} from '../../../../../WalletManager/common/hooks/useSelectedWallet'
@@ -17,7 +19,7 @@ import {useWalletManager} from '../../../../../WalletManager/context/WalletManag
 import {Accordion} from '../../../../common/Accordion'
 import {CopiableText} from '../../../../common/CopiableText'
 import {useStrings} from '../../../../common/hooks/useStrings'
-import {useOperations} from '../../../../common/operations'
+import {Operations, useOperations} from '../../../../common/operations'
 import {TokenItem} from '../../../../common/TokenItem'
 import {FormattedOutput, FormattedOutputs, FormattedTx} from '../../../../common/types'
 import {WalletBalance} from '../../../../common/WalletBalance'
@@ -27,23 +29,35 @@ export const OverviewTab = ({
   extraOperations,
   receiverCustomTitle,
   details,
+  createdBy,
 }: {
   tx: FormattedTx
   extraOperations?: Array<React.ReactNode>
   receiverCustomTitle?: React.ReactNode
   details?: {title: string; component: React.ReactNode}
+  createdBy?: React.ReactNode
 }) => {
   const {styles} = useStyles()
   const operations = useOperations(tx.certificates)
+  const strings = useStrings()
 
   const notOwnedOutputs = React.useMemo(() => tx.outputs.filter((output) => !output.ownAddress), [tx.outputs])
   const ownedOutputs = React.useMemo(() => tx.outputs.filter((output) => output.ownAddress), [tx.outputs])
+  const componentsDuplicated = operations.components.find((component) => component.duplicated)
 
   return (
     <View style={styles.root}>
       <Space height="lg" />
 
-      <WalletInfoSection tx={tx} />
+      {componentsDuplicated && (
+        <>
+          <Warning title={strings.operationsLogWarningTitle} content={strings.operationsLogWarningText} />
+
+          <Space height="lg" />
+        </>
+      )}
+
+      <WalletInfoSection tx={tx} createdBy={createdBy} />
 
       <Divider verticalSpace="lg" />
 
@@ -61,14 +75,14 @@ export const OverviewTab = ({
 
       {notOwnedOutputs.length > 1 && <MultiExternalPartiesSection outputs={notOwnedOutputs} />}
 
-      <OperationsSection operations={operations.components} extraOperations={extraOperations} />
+      <OperationsSection operations={operations} extraOperations={extraOperations} />
 
       <Details details={details} />
     </View>
   )
 }
 
-const WalletInfoSection = ({tx}: {tx: FormattedTx}) => {
+const WalletInfoSection = ({tx, createdBy}: {tx: FormattedTx; createdBy?: React.ReactNode}) => {
   const {styles} = useStyles()
   const strings = useStrings()
   const {wallet, meta} = useSelectedWallet()
@@ -103,6 +117,14 @@ const WalletInfoSection = ({tx}: {tx: FormattedTx}) => {
       </View>
 
       <Space height="sm" />
+
+      {createdBy != null && (
+        <>
+          {createdBy}
+
+          <Space height="sm" />
+        </>
+      )}
 
       <FeeInfoItem fee={tx.fee.label} />
     </>
@@ -194,7 +216,7 @@ const MyWalletTokens = ({
 
         <Space fill />
 
-        <TokenItem tokenInfo={wallet.portfolioPrimaryTokenInfo} label={totalPrimaryTokenSpentLabel} />
+        <TokenItem tokenInfo={wallet.portfolioPrimaryTokenInfo} label={`-${totalPrimaryTokenSpentLabel}`} />
 
         {notPrimaryTokenSent.map((token, index) => (
           <TokenItem key={index} tokenInfo={token.tokenInfo} label={token.label} isPrimaryToken={false} />
@@ -244,7 +266,11 @@ const OneExternalPartySection = ({
 
         {receiverCustomTitle ?? (
           <CopiableText textToCopy={address}>
-            <Text style={[styles.addressText, styles.receiverSectionAddress]} numberOfLines={1} ellipsizeMode="middle">
+            <Text
+              style={[styles.addressText, styles.externalPartiesSectionAddress]}
+              numberOfLines={1}
+              ellipsizeMode="middle"
+            >
               {address}
             </Text>
 
@@ -338,11 +364,16 @@ const OperationsSection = ({
   operations,
   extraOperations,
 }: {
-  operations: Array<React.ReactNode>
+  operations: Operations
   extraOperations?: Array<React.ReactNode>
 }) => {
   const strings = useStrings()
-  if (extraOperations == null && operations?.length === 0) return null
+  if (extraOperations == null && operations.components?.length === 0) return null
+
+  const componentsNotDuplicated = operations.components
+    .filter((component) => !component.duplicated)
+    .map(({component}) => component)
+  const componentDuplicated = operations.components.filter((component) => component.duplicated)
 
   return (
     <View>
@@ -351,7 +382,40 @@ const OperationsSection = ({
       <Accordion label={strings.operationsLabel}>
         <Space height="lg" />
 
-        {[...operations, ...(extraOperations ?? [])].map((operation, index) => {
+        {[...componentsNotDuplicated, ...(extraOperations ?? [])].map((operation, index) => {
+          if (index === 0) return operation
+
+          return (
+            <>
+              <Space height="sm" />
+
+              {operation}
+            </>
+          )
+        })}
+
+        {componentDuplicated.length > 0 && (
+          <Details
+            details={{title: strings.operationsLogTitle, component: <OperationsModal operations={operations} />}}
+          />
+        )}
+      </Accordion>
+    </View>
+  )
+}
+
+const OperationsModal = ({operations}: {operations: Operations}) => {
+  const strings = useStrings()
+  const components = operations.components.map(({component}) => component)
+
+  return (
+    <View>
+      <Warning title={strings.operationsLogWarningTitle} content={strings.operationsLogWarningText} />
+
+      <Accordion label={strings.operationsLabel}>
+        <Space height="lg" />
+
+        {components.map((operation, index) => {
           if (index === 0) return operation
 
           return (
@@ -374,7 +438,13 @@ const Details = ({details}: {details?: {title: string; component: React.ReactNod
   if (details == null) return null
 
   const handleOnPress = () => {
-    openModal(details.title ?? '', <View style={styles.details}>{details.component}</View>, 550)
+    openModal(
+      details.title ?? '',
+      <ScrollView bounces={false} style={styles.details}>
+        {details.component}
+      </ScrollView>,
+      400,
+    )
   }
 
   return (
@@ -384,6 +454,27 @@ const Details = ({details}: {details?: {title: string; component: React.ReactNod
       <View style={styles.detailsRow}>
         <TouchableOpacity onPress={handleOnPress} activeOpacity={0.5}>
           <Text style={styles.detailsButton}>{details?.title}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+}
+
+export const CreatedByInfoItem = ({logo, url}: {logo?: string; url: string}) => {
+  const {styles} = useStyles()
+  const strings = useStrings()
+
+  return (
+    <View style={styles.infoItem}>
+      <Text style={styles.infoLabel}>{strings.createdBy}</Text>
+
+      <View style={styles.plate}>
+        {logo != null && <Image source={{uri: logo}} style={styles.logo} />}
+
+        <Space width="xs" />
+
+        <TouchableOpacity onPress={() => Linking.openURL(url)}>
+          <Text style={styles.link}>{url.replace(/^https?:\/\//, '').replace(/\/+$/, '')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -429,8 +520,8 @@ const useStyles = () => {
       color: color.text_gray_medium,
     },
     tokenSectionLabel: {
-      ...atoms.body_2_md_regular,
-      color: color.gray_900,
+      ...atoms.body_1_lg_medium,
+      color: color.text_gray_medium,
     },
     tokenItems: {
       ...atoms.flex_wrap,
@@ -451,7 +542,7 @@ const useStyles = () => {
       width: 24,
       height: 24,
     },
-    receiverSectionAddress: {
+    externalPartiesSectionAddress: {
       maxWidth: 260,
     },
     addressText: {
@@ -460,7 +551,6 @@ const useStyles = () => {
       color: color.text_gray_medium,
     },
     detailsRow: {
-      ...atoms.flex_1,
       ...atoms.flex_row,
       ...atoms.justify_end,
     },
@@ -470,6 +560,14 @@ const useStyles = () => {
     detailsButton: {
       ...atoms.body_2_md_medium,
       color: color.text_primary_medium,
+    },
+    link: {
+      color: color.text_primary_medium,
+      ...atoms.body_2_md_medium,
+    },
+    logo: {
+      width: 24,
+      height: 24,
     },
   })
 

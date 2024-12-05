@@ -163,6 +163,414 @@ export const onlyAdaOneReceiver: FormattedTx = {
     isPrimary: true,
   },
   certificates: null,
+  mint: null,
+  referenceInputs: [],
+}
+
+export const onlyAdaOneReceiverReferenceInputs: FormattedTx = {
+  inputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '10.618074 ADA',
+          quantity: '10618074',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1qykrmfm7qmhpvmt6xkapegwun67wf75pcghm7p3a78gmm470ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwqrqg5yh',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+      txIndex: 0,
+      txHash: '968c8b93fa086cb09fca400d2fe11b52e3b551a0527840c2dbb02796379467ca',
+    },
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '2.000000 ADA',
+          quantity: '2000000',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q9r502tqdksvqmhs3lwlxx5f5cz0c92cftqqludl3r0urtk0ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwql6sl74',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+      txIndex: 0,
+      txHash: 'ee2a6b1ca4887e5d0827225ab1351418ce17c551ee4f59f68e901a9f6a2a51a8',
+    },
+  ],
+  outputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '10.000000 ADA',
+          quantity: '10000000',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q8a3kt40xel75qeknwcsa75jevg9nljf64vjxfdmz24p00d84fs97ylhclpxmu3ej5dyy8wjjl54tk8tjynnwag83a2q90y4sx',
+      addressKind: 0,
+      rewardAddress: 'stake1uxn65czlz0mu0snd7gue2xjzrhff0624mr4ezfehw5rc74qrjwn0v',
+      ownAddress: false,
+    },
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '2.443465 ADA',
+          quantity: '2443465',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q9eggas5e4l0jzhhhxfds0q3rr3243zrydgyvm4myh6mu770ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwq0nyf7t',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+    },
+  ],
+  fee: {
+    tokenInfo: {
+      id: '.',
+      nature: Portfolio.Token.Nature.Primary,
+      type: Portfolio.Token.Type.FT,
+      application: Portfolio.Token.Application.Coin,
+      status: Portfolio.Token.Status.Valid,
+      fingerprint: '',
+      decimals: 6,
+      name: 'ADA',
+      ticker: 'ADA',
+      symbol: '₳',
+      reference: '',
+      tag: '',
+      website: 'https://www.cardano.org/',
+      originalImage: '',
+      description: 'Cardano',
+    },
+    name: 'ADA',
+    label: '0.174609 ADA',
+    quantity: '174609',
+    isPrimary: true,
+  },
+  certificates: null,
+  mint: null,
+  referenceInputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '10.618074 ADA',
+          quantity: '10618074',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1qykrmfm7qmhpvmt6xkapegwun67wf75pcghm7p3a78gmm470ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwqrqg5yh',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+      txIndex: 0,
+      txHash: '968c8b93fa086cb09fca400d2fe11b52e3b551a0527840c2dbb02796379467ca',
+    },
+  ],
+}
+
+export const onlyAdaOneReceiverMint: FormattedTx = {
+  inputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '10.618074 ADA',
+          quantity: '10618074',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1qykrmfm7qmhpvmt6xkapegwun67wf75pcghm7p3a78gmm470ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwqrqg5yh',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+      txIndex: 0,
+      txHash: '968c8b93fa086cb09fca400d2fe11b52e3b551a0527840c2dbb02796379467ca',
+    },
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '2.000000 ADA',
+          quantity: '2000000',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q9r502tqdksvqmhs3lwlxx5f5cz0c92cftqqludl3r0urtk0ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwql6sl74',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+      txIndex: 0,
+      txHash: 'ee2a6b1ca4887e5d0827225ab1351418ce17c551ee4f59f68e901a9f6a2a51a8',
+    },
+  ],
+  outputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '10.000000 ADA',
+          quantity: '10000000',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q8a3kt40xel75qeknwcsa75jevg9nljf64vjxfdmz24p00d84fs97ylhclpxmu3ej5dyy8wjjl54tk8tjynnwag83a2q90y4sx',
+      addressKind: 0,
+      rewardAddress: 'stake1uxn65czlz0mu0snd7gue2xjzrhff0624mr4ezfehw5rc74qrjwn0v',
+      ownAddress: false,
+    },
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '2.443465 ADA',
+          quantity: '2443465',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q9eggas5e4l0jzhhhxfds0q3rr3243zrydgyvm4myh6mu770ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwq0nyf7t',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+    },
+  ],
+  fee: {
+    tokenInfo: {
+      id: '.',
+      nature: Portfolio.Token.Nature.Primary,
+      type: Portfolio.Token.Type.FT,
+      application: Portfolio.Token.Application.Coin,
+      status: Portfolio.Token.Status.Valid,
+      fingerprint: '',
+      decimals: 6,
+      name: 'ADA',
+      ticker: 'ADA',
+      symbol: '₳',
+      reference: '',
+      tag: '',
+      website: 'https://www.cardano.org/',
+      originalImage: '',
+      description: 'Cardano',
+    },
+    name: 'ADA',
+    label: '0.174609 ADA',
+    quantity: '174609',
+    isPrimary: true,
+  },
+  certificates: null,
+  mint: [
+    [
+      {
+        id: '9204963f0066a9d53480566825449c9e422c4f085f95f4ca0b489ff6.5465737441626364',
+        nature: Portfolio.Token.Nature.Secondary,
+        type: Portfolio.Token.Type.NFT,
+        application: Portfolio.Token.Application.General,
+        status: Portfolio.Token.Status.Valid,
+        tag: '',
+        reference: '',
+        fingerprint: 'asset1azhn55w9907qpnrh6hf04h9ztx589z2m94d5sy',
+        name: 'TestAbcd',
+        decimals: 0,
+        website: '',
+        ticker: '',
+        symbol: '',
+        description: '',
+        originalImage: 'https://ipfs.io/ipfs/QmNzUxafVyqXkSW4vTzeh2JfjcwCvsA3KjpdGT635k33Ap',
+      },
+      '1',
+    ],
+    [
+      {
+        id: 'af4a3e1a8b2557d181f3f611c9769a4a38477cd5acef4024fbc751bf.43617264616e6f42726f202331363231',
+        nature: Portfolio.Token.Nature.Secondary,
+        type: Portfolio.Token.Type.NFT,
+        application: Portfolio.Token.Application.General,
+        status: Portfolio.Token.Status.Valid,
+        tag: '',
+        reference: '',
+        fingerprint: 'asset1wheh5wk0tk83kxjts79e4fk0z3f3lpqdwkrgr3',
+        name: 'CardanoBro #1621',
+        decimals: 0,
+        website: '',
+        ticker: '',
+        symbol: '',
+        description: '',
+        originalImage: 'https://ipfs.io/ipfs/QmYNof7Xj6ydsebhFF7qYnLXrU3kt68D1u2yb8JrQMuFkM/0',
+      },
+      '1',
+    ],
+  ],
+  referenceInputs: [],
 }
 
 export const multiAssetOneReceiver: FormattedTx = {
@@ -479,6 +887,8 @@ export const multiAssetOneReceiver: FormattedTx = {
     isPrimary: true,
   },
   certificates: null,
+  mint: null,
+  referenceInputs: [],
 }
 
 const onlyAdaMultiReceiver: FormattedTx = {
@@ -697,6 +1107,8 @@ const onlyAdaMultiReceiver: FormattedTx = {
     isPrimary: true,
   },
   certificates: null,
+  mint: null,
+  referenceInputs: [],
 }
 
 const multiAssetMultiReceiver: FormattedTx = {
@@ -938,12 +1350,252 @@ const multiAssetMultiReceiver: FormattedTx = {
     isPrimary: true,
   },
   certificates: null,
+  mint: null,
+  referenceInputs: [],
 }
+
+const operationsWarning: FormattedTx = {
+  inputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '8.221903 ADA',
+          quantity: '8221903',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q9r502tqdksvqmhs3lwlxx5f5cz0c92cftqqludl3r0urtk0ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwql6sl74',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+      txIndex: 1,
+      txHash: '1a2070bd83bbbe8b8d5146a06d5eeb00631ed236bb79f5f54451d1e0e777943a',
+    },
+  ],
+  outputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '8.048702 ADA',
+          quantity: '8048702',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q9r502tqdksvqmhs3lwlxx5f5cz0c92cftqqludl3r0urtk0ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwql6sl74',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+    },
+  ],
+  fee: {
+    tokenInfo: {
+      id: '.',
+      nature: Portfolio.Token.Nature.Primary,
+      type: Portfolio.Token.Type.FT,
+      application: Portfolio.Token.Application.Coin,
+      status: Portfolio.Token.Status.Valid,
+      fingerprint: '',
+      decimals: 6,
+      name: 'ADA',
+      ticker: 'ADA',
+      symbol: '₳',
+      reference: '',
+      tag: '',
+      website: 'https://www.cardano.org/',
+      originalImage: '',
+      description: 'Cardano',
+    },
+    name: 'ADA',
+    label: '0.173201 ADA',
+    quantity: '173201',
+    isPrimary: true,
+  },
+  certificates: [
+    {
+      type: 'StakeDelegation',
+      value: {
+        stake_credential: {
+          Key: 'cf085cc39aa4ff52de1ea606ee581aac1dab8166d6830e7a9b6cecdc',
+        },
+        pool_keyhash: '2a8294ad7538b15353b9ffd81e26dafe846ffc3f6b9e331d4c1dc030',
+      },
+    },
+    {
+      type: 'StakeRegistration',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        coin: null,
+      },
+    },
+    {
+      type: 'StakeDelegation',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        pool_keyhash: 'dbda39c8d064ff9801e376f8350efafe67c07e9e9244dd613aee5125',
+      },
+    },
+    {
+      type: 'StakeRegistration',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        coin: null,
+      },
+    },
+    {
+      type: 'StakeDelegation',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        pool_keyhash: 'dbda39c8d064ff9801e376f8350efafe67c07e9e9244dd613aee5125',
+      },
+    },
+    {
+      type: 'StakeRegistration',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        coin: null,
+      },
+    },
+    {
+      type: 'StakeDelegation',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        pool_keyhash: 'dbda39c8d064ff9801e376f8350efafe67c07e9e9244dd613aee5125',
+      },
+    },
+    {
+      type: 'StakeRegistration',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        coin: null,
+      },
+    },
+    {
+      type: 'StakeDelegation',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        pool_keyhash: 'dbda39c8d064ff9801e376f8350efafe67c07e9e9244dd613aee5125',
+      },
+    },
+    {
+      type: 'StakeRegistration',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        coin: null,
+      },
+    },
+    {
+      type: 'StakeDelegation',
+      value: {
+        stake_credential: {
+          Key: 'a7aa605f13f7c7c26df239951a421dd297e955d8eb91273775078f54',
+        },
+        pool_keyhash: 'dbda39c8d064ff9801e376f8350efafe67c07e9e9244dd613aee5125',
+      },
+    },
+  ],
+  mint: null,
+  referenceInputs: [
+    {
+      assets: [
+        {
+          tokenInfo: {
+            id: '.',
+            nature: Portfolio.Token.Nature.Primary,
+            type: Portfolio.Token.Type.FT,
+            application: Portfolio.Token.Application.Coin,
+            status: Portfolio.Token.Status.Valid,
+            fingerprint: '',
+            decimals: 6,
+            name: 'ADA',
+            ticker: 'ADA',
+            symbol: '₳',
+            reference: '',
+            tag: '',
+            website: 'https://www.cardano.org/',
+            originalImage: '',
+            description: 'Cardano',
+          },
+          name: 'ADA',
+          label: '8.221903 ADA',
+          quantity: '8221903',
+          isPrimary: true,
+        },
+      ],
+      address:
+        'addr1q9r502tqdksvqmhs3lwlxx5f5cz0c92cftqqludl3r0urtk0ppwv8x4ylafdu84xqmh9sx4vrk4czekksv884xmvanwql6sl74',
+      addressKind: 0,
+      rewardAddress: 'stake1u88sshxrn2j075k7r6nqdmjcr2kpm2upvmtgxrn6ndkwehqyy4w9s',
+      ownAddress: true,
+      txIndex: 1,
+      txHash: '1a2070bd83bbbe8b8d5146a06d5eeb00631ed236bb79f5f54451d1e0e777943a',
+    },
+  ],
+}
+
 export const mocks = {
   formattedTxs: {
     onlyAdaOneReceiver,
     multiAssetOneReceiver,
     onlyAdaMultiReceiver,
     multiAssetMultiReceiver,
+    onlyAdaOneReceiverMint,
+    onlyAdaOneReceiverReferenceInputs,
+    operationsWarning,
   },
 }

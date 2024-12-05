@@ -58,6 +58,8 @@ export type FormattedTx = {
   outputs: FormattedOutputs
   fee: FormattedFee
   certificates: FormattedCertificate[] | null
+  mint: Array<[Portfolio.Token.Info, string]> | null
+  referenceInputs: FormattedInputs
 }
 
 export type FormattedMetadata = {
@@ -80,26 +82,26 @@ type Transformed<T> = {
 export type FormattedCertificate = Transformed<CertificateJSON>
 
 export const CertificateType = {
-  StakeRegistration: 'StakeRegistration',
-  StakeDeregistration: 'StakeDeregistration',
-  StakeDelegation: 'StakeDelegation',
-  PoolRegistration: 'PoolRegistration',
-  PoolRetirement: 'PoolRetirement',
-  GenesisKeyDelegation: 'GenesisKeyDelegation',
-  MoveInstantaneousRewardsCert: 'MoveInstantaneousRewardsCert',
-  CommitteeHotAuth: 'CommitteeHotAuth',
-  CommitteeColdResign: 'CommitteeColdResign',
-  DRepDeregistration: 'DRepDeregistration',
-  DRepRegistration: 'DRepRegistration',
-  DRepUpdate: 'DRepUpdate',
-  StakeAndVoteDelegation: 'StakeAndVoteDelegation',
-  StakeRegistrationAndDelegation: 'StakeRegistrationAndDelegation',
-  StakeVoteRegistrationAndDelegation: 'StakeVoteRegistrationAndDelegation',
-  VoteDelegation: 'VoteDelegation',
-  VoteRegistrationAndDelegation: 'VoteRegistrationAndDelegation',
+  StakeRegistration: 'StakeRegistration', //
+  StakeDeregistration: 'StakeDeregistration', //
+  StakeDelegation: 'StakeDelegation', //
+  PoolRegistration: 'PoolRegistration', //
+  PoolRetirement: 'PoolRetirement', //
+  GenesisKeyDelegation: 'GenesisKeyDelegation', //
+  MoveInstantaneousRewardsCert: 'MoveInstantaneousRewardsCert', //
+  CommitteeHotAuth: 'CommitteeHotAuth', //
+  CommitteeColdResign: 'CommitteeColdResign', //
+  DRepDeregistration: 'DRepDeregistration', //
+  DRepRegistration: 'DRepRegistration', //
+  DRepUpdate: 'DRepUpdate', //
+  VoteDelegation: 'VoteDelegation', //
+  StakeAndVoteDelegation: 'StakeAndVoteDelegation', // NO
+  StakeRegistrationAndDelegation: 'StakeRegistrationAndDelegation', // NO
+  StakeVoteRegistrationAndDelegation: 'StakeVoteRegistrationAndDelegation', // NO
+  VoteRegistrationAndDelegation: 'VoteRegistrationAndDelegation', // NO
 } as const
 
-export type CerificateType = (typeof CertificateType)[keyof typeof CertificateType]
+export type CertificateType = (typeof CertificateType)[keyof typeof CertificateType]
 
 // Makes sure CertificateType lists all the certificates in CertificateJSON
-export type AssertAllImplementedCertTypes = AssertEqual<CerificateType, keyof UnionToIntersection<CertificateJSON>>
+export type AssertAllImplementedCertTypes = AssertEqual<CertificateType, keyof UnionToIntersection<CertificateJSON>>

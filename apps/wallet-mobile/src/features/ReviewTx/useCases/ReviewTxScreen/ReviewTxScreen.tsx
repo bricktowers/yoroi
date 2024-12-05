@@ -1,21 +1,18 @@
 import * as React from 'react'
 
 import {ReviewTxRoutes, useUnsafeParams} from '../../../../kernel/navigation'
-import {isEmptyString} from '../../../../kernel/utils'
 import {useFormattedMetadata} from '../../common/hooks/useFormattedMetadata'
 import {useFormattedTx} from '../../common/hooks/useFormattedTx'
 import {useOnConfirm} from '../../common/hooks/useOnConfirm'
-import {useStrings} from '../../common/hooks/useStrings'
 import {useTxBody} from '../../common/hooks/useTxBody'
 import {useReviewTx} from '../../common/ReviewTxProvider'
 import {ReviewTx} from './ReviewTx/ReviewTx'
 
 export const ReviewTxScreen = () => {
-  const strings = useStrings()
-  const {unsignedTx, cbor} = useReviewTx()
+  const {unsignedTx} = useReviewTx()
   const params = useUnsafeParams<ReviewTxRoutes['review-tx']>()
 
-  if (unsignedTx == null && cbor == null) throw new Error('ReviewTxScreen: missing cbor and unsignedTx')
+  if (unsignedTx == null && params?.cbor == null) throw new Error('ReviewTxScreen: missing cbor and unsignedTx')
 
   const {onConfirm} = useOnConfirm({
     unsignedTx,
@@ -25,17 +22,9 @@ export const ReviewTxScreen = () => {
     onCIP36SupportChange: params?.onCIP36SupportChange,
   })
 
-  const txBody = useTxBody({cbor, unsignedTx})
+  const txBody = useTxBody({cbor: params?.cbor, unsignedTx})
   const formattedTx = useFormattedTx(txBody)
-  const formattedMetadata = useFormattedMetadata({txBody, unsignedTx, cbor})
-
-  const tabsData = [
-    [strings.overviewTab, 'overview'],
-    [strings.utxosTab, 'utxos'],
-  ]
-
-  if (!isEmptyString(formattedMetadata?.hash) && formattedMetadata?.metadata != null)
-    tabsData.push([strings.metadataTab, 'metadata'])
+  const formattedMetadata = useFormattedMetadata({txBody, unsignedTx, cbor: params?.cbor ?? null})
 
   React.useEffect(() => {
     return () => {
@@ -53,8 +42,6 @@ export const ReviewTxScreen = () => {
     onConfirm()
   }
 
-  console.log('formattedTx', JSON.stringify(formattedTx, null, 2))
-
   return (
     <ReviewTx
       formattedTx={formattedTx}
@@ -62,6 +49,7 @@ export const ReviewTxScreen = () => {
       operations={params?.operations}
       details={params?.details}
       receiverCustomTitle={params?.receiverCustomTitle}
+      createdBy={params?.createdBy}
       onConfirm={handleOnConfirm}
     />
   )

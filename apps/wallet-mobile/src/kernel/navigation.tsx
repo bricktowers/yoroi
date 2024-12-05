@@ -154,6 +154,8 @@ export type TxHistoryRoutes = {
   'send-start-tx': undefined
   'send-list-amounts-to-send': undefined
   'send-edit-amount': undefined
+  'send-submitted-tx': undefined
+  'send-failed-tx': undefined
   'send-select-token-from-list': undefined
 } & SwapTokenRoutes &
   ScanRoutes &
@@ -181,6 +183,8 @@ type SwapTokenRoutes = {
   'swap-edit-slippage': undefined
   'swap-select-pool': undefined
   'swap-preprod-notice': undefined
+  'swap-submitted-tx': undefined
+  'swap-failed-tx': undefined
 }
 export type SwapTokenRouteseNavigation = StackNavigationProp<SwapTokenRoutes>
 
@@ -260,6 +264,8 @@ export type BrowserRoutes = {
 export type DashboardRoutes = {
   'staking-dashboard-main': undefined
   'staking-center': NavigatorScreenParams<StakingCenterRoutes>
+  'staking-submitted-tx': undefined
+  'staking-failed-tx': undefined
 }
 
 export type PortfolioRoutes = {
@@ -275,9 +281,11 @@ export type PortfolioRoutes = {
 
 export type ReviewTxRoutes = {
   'review-tx'?: {
+    cbor?: string
     operations?: Array<React.ReactNode>
     receiverCustomTitle?: React.ReactNode
     details?: {title: string; component: React.ReactNode}
+    createdBy?: React.ReactNode
     onConfirm?: () => void
     onCancel?: () => void
     onSuccess?: (signedTx: YoroiSignedTx) => void

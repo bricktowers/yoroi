@@ -12,6 +12,8 @@ export const useStrings = () => {
     utxosTab: intl.formatMessage(messages.utxosTab),
     overviewTab: intl.formatMessage(messages.overviewTab),
     metadataTab: intl.formatMessage(messages.metadataTab),
+    mintTab: intl.formatMessage(messages.mintTab),
+    referenceInputsTab: intl.formatMessage(messages.referenceInputsTab),
     metadataHash: intl.formatMessage(messages.metadataHash),
     metadataJsonLabel: intl.formatMessage(messages.metadataJsonLabel),
     walletLabel: intl.formatMessage(messages.walletLabel),
@@ -49,6 +51,14 @@ export const useStrings = () => {
     walletBalanceNFTsTitle: intl.formatMessage(messages.walletBalanceNFTsTitle),
     poolDetailsTitle: intl.formatMessage(messages.poolDetailsTitle),
     registerStakingKey: intl.formatMessage(messages.registerStakingKey),
+    poolRegistration: intl.formatMessage(messages.poolRegistration),
+    poolRetirement: intl.formatMessage(messages.poolRetirement),
+    moveInstantaneousRewards: intl.formatMessage(messages.moveInstantaneousRewards),
+    committeeHotAuthorization: intl.formatMessage(messages.committeeHotAuthorization),
+    committeeColdResign: intl.formatMessage(messages.committeeColdResign),
+    drepUpdate: intl.formatMessage(messages.drepUpdate),
+    drepRegistration: intl.formatMessage(messages.drepRegistration),
+    drepDeregistration: intl.formatMessage(messages.drepDeregistration),
     selectAbstain: intl.formatMessage(messages.selectAbstain),
     selectNoConfidence: intl.formatMessage(messages.selectNoConfidence),
     delegateVotingToDRep: intl.formatMessage(messages.delegateVotingToDRep),
@@ -60,12 +70,20 @@ export const useStrings = () => {
     submittedTxText: intl.formatMessage(messages.submittedTxText),
     submittedTxButton: intl.formatMessage(messages.submittedTxButton),
     failedTxTitle: intl.formatMessage(messages.failedTxTitle),
+    infraestructureIssueTitle: intl.formatMessage(messages.infraestructureIssueTitle),
+    infraestructureIssueText: intl.formatMessage(messages.infraestructureIssueText),
+    infraestructureIssueButton: intl.formatMessage(messages.infraestructureIssueButton),
     failedTxText: intl.formatMessage(messages.failedTxText),
     failedTxButton: intl.formatMessage(messages.failedTxButton),
     multiExternalPartiesSectionLabel: intl.formatMessage(messages.multiExternalPartiesSectionLabel),
     multiExternalPartiesSectionNotice: intl.formatMessage(messages.multiExternalPartiesSectionNotice),
     receiveLabel: intl.formatMessage(messages.receiveLabel),
     operationsLabel: intl.formatMessage(messages.operationsLabel),
+    policyIdLabel: intl.formatMessage(messages.policyIdLabel),
+    createdBy: intl.formatMessage(messages.createdBy),
+    operationsLogTitle: intl.formatMessage(messages.operationsLogTitle),
+    operationsLogWarningText: intl.formatMessage(messages.operationsLogWarningText),
+    operationsLogWarningTitle: intl.formatMessage(messages.operationsLogWarningTitle),
   }
 }
 
@@ -85,6 +103,14 @@ const messages = defineMessages({
   overviewTab: {
     id: 'txReview.tabLabel.overview',
     defaultMessage: '!!!Overview',
+  },
+  mintTab: {
+    id: 'txReview.tabLabel.mint',
+    defaultMessage: '!!!Mint',
+  },
+  referenceInputsTab: {
+    id: 'txReview.tabLabel.referenceInputs',
+    defaultMessage: '!!!Reference inputs',
   },
   metadataTab: {
     id: 'txReview.tabLabel.metadataTab',
@@ -238,9 +264,41 @@ const messages = defineMessages({
     id: 'txReview.operations.registerStakingKey',
     defaultMessage: '!!!Register staking key deposit',
   },
+  drepRegistration: {
+    id: 'txReview.operations.drepRegistration',
+    defaultMessage: '!!!Register as a DRep deposit',
+  },
+  poolRegistration: {
+    id: 'txReview.operations.poolRegistration',
+    defaultMessage: '!!!Pool registration deposit',
+  },
+  poolRetirement: {
+    id: 'txReview.operations.poolRetirement',
+    defaultMessage: '!!!Pool retirement',
+  },
+  drepUpdate: {
+    id: 'txReview.operations.drepUpdate',
+    defaultMessage: '!!!Drep update',
+  },
+  drepDeregistration: {
+    id: 'txReview.operations.drepDeregistration',
+    defaultMessage: '!!!Deregister as a DRep',
+  },
   deregisterStakingKey: {
     id: 'txReview.operations.deregisterStakingKey',
     defaultMessage: '!!!Deregister staking key',
+  },
+  moveInstantaneousRewards: {
+    id: 'txReview.operations.moveInstantaneousRewards',
+    defaultMessage: '!!!Move instantaneus rewards',
+  },
+  committeeHotAuthorization: {
+    id: 'txReview.operations.committeeHotAuthorization',
+    defaultMessage: '!!!Committee hot authorization',
+  },
+  committeeColdResign: {
+    id: 'txReview.operations.committeeColdResign',
+    defaultMessage: '!!!Committee cold resign',
   },
   rewardsWithdrawalLabel: {
     id: 'txReview.operations.rewardsWithdrawal.label',
@@ -253,6 +311,18 @@ const messages = defineMessages({
   selectAbstain: {
     id: 'txReview.operations.selectAbstain',
     defaultMessage: '!!!Select abstain',
+  },
+  operationsLogTitle: {
+    id: 'txReview.operations.log.title',
+    defaultMessage: '!!!Operations log',
+  },
+  operationsLogWarningTitle: {
+    id: 'txReview.operations.warning.title',
+    defaultMessage: '!!!Unusual operations detected',
+  },
+  operationsLogWarningText: {
+    id: 'txReview.operations.warning.text',
+    defaultMessage: '!!!Please check the operations log before confirming this transaction.',
   },
   selectNoConfidence: {
     id: 'txReview.operations.selectNoConfidence',
@@ -290,6 +360,18 @@ const messages = defineMessages({
     id: 'txReview.failedTxButton',
     defaultMessage: '!!!Go to transactions',
   },
+  infraestructureIssueTitle: {
+    id: 'txReview.infraestructureIssueTitle',
+    defaultMessage: '!!!Something unexpected happened',
+  },
+  infraestructureIssueText: {
+    id: 'txReview.infraestructureIssueText',
+    defaultMessage: '!!!Please go back and try again. If this keep happening, contact our support team.',
+  },
+  infraestructureIssueButton: {
+    id: 'txReview.infraestructureIssueButton',
+    defaultMessage: '!!!Go to transactions',
+  },
   multiExternalPartiesSectionLabel: {
     id: 'txReview.overview.multiExternalPartiesSectionLabel',
     defaultMessage: '!!!Other parties',
@@ -306,5 +388,13 @@ const messages = defineMessages({
   operationsLabel: {
     id: 'txReview.operationsLabel',
     defaultMessage: '!!!Operations',
+  },
+  policyIdLabel: {
+    id: 'txReview.policyIdLabel',
+    defaultMessage: '!!!Policy ID',
+  },
+  createdBy: {
+    id: 'txReview.createdBy',
+    defaultMessage: '!!!Created by',
   },
 })
