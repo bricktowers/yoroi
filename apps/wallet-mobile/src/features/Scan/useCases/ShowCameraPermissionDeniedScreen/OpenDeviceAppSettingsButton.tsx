@@ -6,5 +6,5 @@ import {useStrings} from '../../common/useStrings'
 
 export const OpenDeviceAppSettingsButton = (props: Omit<ButtonProps, 'title' | 'onPress' | ''>) => {
   const strings = useStrings()
-  return <Button onPress={openSettings} title={strings.openAppSettings} {...props} />
+  return <Button onPress={() => openSettings()} title={strings.openAppSettings} {...props} />
 }

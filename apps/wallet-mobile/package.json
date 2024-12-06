@@ -188,7 +188,7 @@
     "react-native-notifications": "^5.1.0",
     "react-native-pager-view": "^6.2.0",
     "react-native-paper": "4.12.8",
-    "react-native-permissions": "^3.8.0",
+    "react-native-permissions": "^5.2.1",
     "react-native-qrcode-svg": "6.0.6",
     "react-native-quick-base64": "^2.1.2",
     "react-native-randombytes": "3.6.0",
@@ -319,5 +319,14 @@
     "compilerOptions": {
       "module": "commonjs"
     }
-  }
+  },
+  "reactNativePermissionsIOS": [
+    "Notifications",
+    "Bluetooth",
+    "LocationAccuracy",
+    "LocationWhenInUse",
+    "LocationAlways",
+    "FaceID",
+    "Camera"
+  ]
 }

@@ -162,18 +162,6 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
-  - Permission-BluetoothPeripheral (3.8.4):
-    - RNPermissions
-  - Permission-Camera (3.8.4):
-    - RNPermissions
-  - Permission-FaceID (3.8.4):
-    - RNPermissions
-  - Permission-LocationAccuracy (3.8.4):
-    - RNPermissions
-  - Permission-LocationAlways (3.8.4):
-    - RNPermissions
-  - Permission-LocationWhenInUse (3.8.4):
-    - RNPermissions
   - PromisesObjC (2.4.0)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -574,7 +562,7 @@ PODS:
     - React-Core
   - RNLocalize (3.0.2):
     - React-Core
-  - RNPermissions (3.8.4):
+  - RNPermissions (5.2.1):
     - React-Core
   - RNReanimated (3.3.0):
     - DoubleConversion
@@ -664,12 +652,6 @@ DEPENDENCIES:
   - GoogleUtilities
   - hermes-engine (from `../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
-  - Permission-BluetoothPeripheral (from `../../../node_modules/react-native-permissions/ios/BluetoothPeripheral`)
-  - Permission-Camera (from `../../../node_modules/react-native-permissions/ios/Camera`)
-  - Permission-FaceID (from `../../../node_modules/react-native-permissions/ios/FaceID`)
-  - Permission-LocationAccuracy (from `../../../node_modules/react-native-permissions/ios/LocationAccuracy`)
-  - Permission-LocationAlways (from `../../../node_modules/react-native-permissions/ios/LocationAlways`)
-  - Permission-LocationWhenInUse (from `../../../node_modules/react-native-permissions/ios/LocationWhenInUse`)
   - RCT-Folly (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../../node_modules/react-native/Libraries/TypeSafety`)
@@ -812,18 +794,6 @@ EXTERNAL SOURCES:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
-  Permission-BluetoothPeripheral:
-    :path: "../../../node_modules/react-native-permissions/ios/BluetoothPeripheral"
-  Permission-Camera:
-    :path: "../../../node_modules/react-native-permissions/ios/Camera"
-  Permission-FaceID:
-    :path: "../../../node_modules/react-native-permissions/ios/FaceID"
-  Permission-LocationAccuracy:
-    :path: "../../../node_modules/react-native-permissions/ios/LocationAccuracy"
-  Permission-LocationAlways:
-    :path: "../../../node_modules/react-native-permissions/ios/LocationAlways"
-  Permission-LocationWhenInUse:
-    :path: "../../../node_modules/react-native-permissions/ios/LocationWhenInUse"
   RCT-Folly:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -992,12 +962,6 @@ SPEC CHECKSUMS:
   MMKVCore: d26e4d3edd5cb8588c2569222cbd8be4231374e9
   MultiplatformBleAdapter: 5a6a897b006764392f9cef785e4360f54fb9477d
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  Permission-BluetoothPeripheral: 2b88a131074edafd8a46a5cda4ba610ec986d2fb
-  Permission-Camera: 7ec9ee99704766ff9b90198183387a7f5d82b0c1
-  Permission-FaceID: 2e7d5070c6df9315c6ed8de8fb22fed69a762b0d
-  Permission-LocationAccuracy: a38ddb5c5d0b8e656f3c86e4a500f9bb88bc099d
-  Permission-LocationAlways: 8fd5518716c3045f9c4edf77b901126098d79b60
-  Permission-LocationWhenInUse: 24d97eeb25d8ff9f2232e070f792eeb1360ccaf0
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: e9df143e880d0e879e7a498dc06923d728809c79
@@ -1053,7 +1017,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: dec4645026e7401a0899f2846d864403478ff6a5
   RNKeychain: f75b8c8b2f17d3b2aa1f25b4a0ac5b83d947ff8f
   RNLocalize: dbea38dcb344bf80ff18a1757b1becf11f70cae4
-  RNPermissions: f1b49dd05fa9b83993cd05a9ee115247944d8f1a
+  RNPermissions: bd4e8932db57d658a7fd0395bc0ea8a344e28405
   RNReanimated: d6b4b867b6d1ee0798f5fb372708fa4bb8d66029
   RNScreens: 50ffe2fa2342eabb2d0afbe19f7c1af286bc7fb3
   RNSentry: f9e637773502a61c7b455c4ce65bc7008ce22a6e
@@ -1069,6 +1033,6 @@ SPEC CHECKSUMS:
   Yoga: e71803b4c1fff832ccf9b92541e00f9b873119b9
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
-PODFILE CHECKSUM: 2529b590cf7f56c0e2eec06abf8cc4f21620b92d
+PODFILE CHECKSUM: 1558354ff834d5745d243d7f917d3b95f424404a
 
 COCOAPODS: 1.15.2
