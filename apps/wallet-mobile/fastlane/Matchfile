@@ -1,4 +1,4 @@
-git_url("git@github.com:Emurgo/yoroi-certs.git")
+git_url("git@github.com:Emurgo/yoroi-certs3.git")
 
 storage_mode("git")
 
