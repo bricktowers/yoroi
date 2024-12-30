@@ -1,13 +1,15 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native'
+import {useFocusEffect} from '@react-navigation/native'
 import {useTheme} from '@yoroi/theme'
 import React from 'react'
 import {defineMessages, useIntl} from 'react-intl'
 import {StyleSheet, View} from 'react-native'
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {WebView, WebViewMessageEvent} from 'react-native-webview'
+import {useQueryClient} from 'react-query'
 
 import {PleaseWaitModal} from '../../../components/PleaseWaitModal'
 import {Spacer} from '../../../components/Spacer/Spacer'
+import {useReviewTx} from '../../../features/ReviewTx/common/ReviewTxProvider'
 import {useSelectedWallet} from '../../../features/WalletManager/common/hooks/useSelectedWallet'
 import {useWalletManager} from '../../../features/WalletManager/context/WalletManagerProvider'
 import {showErrorDialog} from '../../../kernel/dialogs'
@@ -15,22 +17,25 @@ import {useLanguage} from '../../../kernel/i18n'
 import globalMessages from '../../../kernel/i18n/global-messages'
 import {logger} from '../../../kernel/logger/logger'
 import {useMetrics} from '../../../kernel/metrics/metricsManager'
-import {StakingCenterRouteNavigation} from '../../../kernel/navigation'
-import {NotEnoughMoneyToSendError} from '../../../yoroi-wallets/cardano/types'
+import {useWalletNavigation} from '../../../kernel/navigation'
+import {useNavigateTo} from '../../Dashboard/Dashboard'
 import {useStakingTx} from '../../Dashboard/StakePoolInfos'
 import {PoolDetailScreen} from '../PoolDetails'
 
 export const StakingCenter = () => {
   const intl = useIntl()
-  const navigation = useNavigation<StakingCenterRouteNavigation>()
   const {isDark} = useTheme()
   const {styles} = useStyles()
+  const queryClient = useQueryClient()
 
   const {languageCode} = useLanguage()
   const {wallet, meta} = useSelectedWallet()
   const {walletManager} = useWalletManager()
   const {track} = useMetrics()
   const {plate} = walletManager.checksum(wallet.publicKeyHex)
+  const {navigateToTxReview} = useWalletNavigation()
+  const {unsignedTxChanged} = useReviewTx()
+  const navigateTo = useNavigateTo()
 
   useFocusEffect(
     React.useCallback(() => {
@@ -41,6 +46,16 @@ export const StakingCenter = () => {
   const [selectedPoolId, setSelectedPoolId] = React.useState<string | null>(null)
   const [isContentLoaded, setIsContentLoaded] = React.useState(false)
 
+  const onSuccess = () => {
+    queryClient.resetQueries([wallet.id, 'stakingInfo'])
+    navigateTo.submittedTx()
+  }
+
+  const onError = () => {
+    queryClient.resetQueries([wallet.id, 'stakingInfo'])
+    navigateTo.failedTx()
+  }
+
   const {isLoading} = useStakingTx(
     {wallet, poolId: selectedPoolId ?? undefined, meta},
     {
@@ -49,18 +64,8 @@ export const StakingCenter = () => {
       onSuccess: (yoroiUnsignedTx) => {
         if (selectedPoolId == null) return
 
-        navigation.navigate('delegation-confirmation', {
-          poolId: selectedPoolId,
-          yoroiUnsignedTx,
-        })
-      },
-      onError: (error) => {
-        if (error instanceof NotEnoughMoneyToSendError) {
-          navigation.navigate('delegation-failed-tx')
-        } else {
-          logger.error(error as Error)
-          navigation.navigate('delegation-failed-tx')
-        }
+        unsignedTxChanged(yoroiUnsignedTx)
+        navigateToTxReview({onSuccess, onError})
       },
     },
   )

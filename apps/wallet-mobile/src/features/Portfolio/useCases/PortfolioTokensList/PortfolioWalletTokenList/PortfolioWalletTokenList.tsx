@@ -1,15 +1,15 @@
 import {useFocusEffect} from '@react-navigation/native'
+import {FlashList} from '@shopify/flash-list'
 import {infoExtractName, isPrimaryToken} from '@yoroi/portfolio'
 import {useTheme} from '@yoroi/theme'
 import {Chain, Portfolio} from '@yoroi/types'
 import * as React from 'react'
-import {FlatList, StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, Text, View} from 'react-native'
 
 import {Spacer} from '../../../../../components/Spacer/Spacer'
 import {useMetrics} from '../../../../../kernel/metrics/metricsManager'
 import {makeList} from '../../../../../kernel/utils'
 import {PreprodFaucetBanner} from '../../../../Exchange/common/ShowBuyBanner/PreprodFaucetBanner'
-import {SanchonetFaucetBanner} from '../../../../Exchange/common/ShowBuyBanner/SanchonetFaucetBanner'
 import {useSearch} from '../../../../Search/SearchContext'
 import {useSelectedWallet} from '../../../../WalletManager/common/hooks/useSelectedWallet'
 import {useWalletManager} from '../../../../WalletManager/context/WalletManagerProvider'
@@ -90,7 +90,22 @@ export const PortfolioWalletTokenList = () => {
   }, [isSearching, search, track])
 
   const isPreprod = network === Chain.Network.Preprod
-  const isSancho = network === Chain.Network.Sancho
+
+  const [loadedTokens, setLoadedTokens] = React.useState(getListTokens.slice(0, batchSize))
+  const [currentIndex, setCurrentIndex] = React.useState(batchSize)
+
+  React.useEffect(() => {
+    setLoadedTokens(getListTokens.slice(0, currentIndex + batchSize))
+    setCurrentIndex(currentIndex + batchSize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokensList]) // must be tokensList
+
+  const handleOnEndReached = React.useCallback(() => {
+    if (currentIndex >= getListTokens.length) return
+    const nextBatch = getListTokens.slice(currentIndex, currentIndex + batchSize)
+    setLoadedTokens([...loadedTokens, ...nextBatch])
+    setCurrentIndex(currentIndex + batchSize)
+  }, [currentIndex, getListTokens, loadedTokens])
 
   const renderFooterList = () => {
     if (isSearching) return null
@@ -110,7 +125,7 @@ export const PortfolioWalletTokenList = () => {
         <View>
           <Spacer height={16} />
 
-          {isPreprod ? <PreprodFaucetBanner /> : isSancho ? <SanchonetFaucetBanner /> : <BuyADABanner />}
+          {isPreprod ? <PreprodFaucetBanner /> : <BuyADABanner />}
         </View>
       )
     }
@@ -128,8 +143,8 @@ export const PortfolioWalletTokenList = () => {
 
   return (
     <View style={styles.root}>
-      <FlatList
-        data={getListTokens}
+      <FlashList
+        data={loadedTokens}
         ListHeaderComponent={
           <HeadingList
             isShowBalanceCard={!isSearching}
@@ -143,6 +158,9 @@ export const PortfolioWalletTokenList = () => {
         renderItem={({item}) => <TokenBalanceItem amount={item} />}
         contentContainerStyle={styles.container}
         ListEmptyComponent={() => <TokenEmptyList />}
+        onEndReached={handleOnEndReached}
+        onEndReachedThreshold={0.5}
+        estimatedItemSize={72}
       />
     </View>
   )
@@ -186,6 +204,8 @@ const SkeletonItem = () => {
     </View>
   )
 }
+
+const batchSize = 50
 
 const useStyles = () => {
   const {atoms, color} = useTheme()

@@ -1,24 +1,21 @@
 import {useNavigation} from '@react-navigation/native'
 import {useRef} from 'react'
 
-import {
-  AppRouteNavigation,
-  TxHistoryRouteNavigation,
-  TxHistoryRoutes,
-  useOverridePreviousRoute,
-} from '../../../kernel/navigation'
+import {AppRouteNavigation, TxHistoryRouteNavigation} from '../../../kernel/navigation'
 
 export const useNavigateTo = () => {
   const navigation = useNavigation<TxHistoryRouteNavigation & AppRouteNavigation>()
 
   return useRef({
     selectedTokens: () => navigation.navigate('send-list-amounts-to-send'),
-    addToken: () => navigation.navigate('send-select-token-from-list'),
+    addToken: ({shouldPopPrevious}: {shouldPopPrevious: boolean} = {shouldPopPrevious: false}) => {
+      if (shouldPopPrevious) navigation.pop()
+      navigation.navigate('send-select-token-from-list')
+    },
     startTx: () => navigation.navigate('send-start-tx'),
-    confirmTx: () => navigation.navigate('send-confirm-tx'),
     editAmount: () => navigation.navigate('send-edit-amount'),
     reader: () => navigation.navigate('scan-start', {insideFeature: 'send'}),
-    submittedTx: (txId: string) => navigation.navigate('send-submitted-tx', {txId}),
+    submittedTx: () => navigation.navigate('send-submitted-tx'),
     failedTx: () => navigation.navigate('send-failed-tx'),
     startTxAfterReset: () =>
       navigation.reset({
@@ -48,8 +45,4 @@ export const useNavigateTo = () => {
         ],
       }),
   }).current
-}
-
-export const useOverridePreviousSendTxRoute = (routeName: keyof TxHistoryRoutes) => {
-  useOverridePreviousRoute(routeName)
 }

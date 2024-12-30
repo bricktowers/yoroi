@@ -96,7 +96,7 @@ export const DownloadCatalystAppScreen = () => {
       </ScrollView>
 
       <Actions>
-        <Button shelleyTheme onPress={onNext} title={strings.continueButton} />
+        <Button onPress={onNext} title={strings.continueButton} />
       </Actions>
     </SafeAreaView>
   )
@@ -128,7 +128,7 @@ const WarningModal = () => {
 
       <Space fill />
 
-      <Button shelleyTheme title={strings.iUnderstandButton} onPress={closeModal} textStyles={styles.button} />
+      <Button title={strings.iUnderstandButton} onPress={closeModal} />
 
       {Platform.OS === 'android' && <Space height="lg" />}
     </View>
@@ -198,9 +198,6 @@ const useStyles = () => {
     text: {
       color: color.text_gray_medium,
       ...atoms.body_1_lg_regular,
-    },
-    button: {
-      ...atoms.button_1_lg,
     },
     subTitle: {
       ...atoms.heading_3_medium,

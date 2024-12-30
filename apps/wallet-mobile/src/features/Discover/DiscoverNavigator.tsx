@@ -7,10 +7,9 @@ import {ErrorBoundary} from 'react-error-boundary'
 import {LoadingBoundary} from '../../components/Boundary/Boundary'
 import {SomethingWentWrong} from '../../components/SomethingWentWrong/SomethingWentWrong'
 import {defaultStackNavigationOptions, DiscoverRoutes} from '../../kernel/navigation'
-import {NetworkTag} from '../Settings/ChangeNetwork/NetworkTag'
+import {NetworkTag} from '../Settings/useCases/changeAppSettings/ChangeNetwork/NetworkTag'
 import {BrowserNavigator} from './BrowserNavigator'
 import {useStrings} from './common/useStrings'
-import {ReviewTransaction} from './useCases/ReviewTransaction/ReviewTransaction'
 import {ListSkeleton} from './useCases/SelectDappFromList/ListSkeleton'
 import {SelectDappFromListScreen} from './useCases/SelectDappFromList/SelectDappFromListScreen'
 import {useDappConnectorManager} from './useDappConnectorManager'
@@ -45,12 +44,6 @@ export const DiscoverNavigator = () => {
         </Stack.Screen>
 
         <Stack.Screen name="discover-browser" component={BrowserNavigator} options={{headerShown: false}} />
-
-        <Stack.Screen
-          name="discover-review-tx"
-          component={ReviewTransaction}
-          options={{...defaultStackNavigationOptions(atoms, color), title: strings.transactionReview}}
-        />
       </Stack.Navigator>
     </DappConnectorProvider>
   )

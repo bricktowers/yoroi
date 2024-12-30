@@ -57,7 +57,6 @@ export const ConfirmWithSpendingPassword = ({onSubmit, isLoading, error, onPassw
 
       <Button
         testID="swapButton"
-        shelleyTheme
         title={strings.sign}
         onPress={() => onSubmit?.(spendingPassword)}
         disabled={spendingPassword.length === 0}
@@ -78,6 +77,7 @@ const useStyles = () => {
   const styles = StyleSheet.create({
     root: {
       ...atoms.flex_1,
+      ...atoms.px_lg,
     },
     modalText: {
       paddingHorizontal: 70,

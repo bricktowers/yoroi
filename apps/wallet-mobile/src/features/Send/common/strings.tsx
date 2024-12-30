@@ -253,15 +253,15 @@ const messages = defineMessages({
   },
   submittedTxTitle: {
     id: 'components.send.sendscreen.submittedTxTitle',
-    defaultMessage: '!!!Transaction submitted',
+    defaultMessage: '!!!Transaction signed',
   },
   submittedTxText: {
     id: 'components.send.sendscreen.submittedTxText',
-    defaultMessage: '!!!Check this transaction in the list of wallet transactions',
+    defaultMessage: `!!!It will show up in the transaction list once it's confirmed by the network.`,
   },
   submittedTxButton: {
     id: 'components.send.sendscreen.submittedTxButton',
-    defaultMessage: '!!!Go to transactions',
+    defaultMessage: '!!!Close',
   },
   failedTxTitle: {
     id: 'components.send.sendscreen.failedTxTitle',

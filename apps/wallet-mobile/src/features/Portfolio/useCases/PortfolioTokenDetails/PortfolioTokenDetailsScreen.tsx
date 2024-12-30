@@ -1,3 +1,4 @@
+import {usePortfolioTokenInfo} from '@yoroi/portfolio'
 import {useTheme} from '@yoroi/theme'
 import {App} from '@yoroi/types'
 import * as React from 'react'
@@ -21,8 +22,6 @@ import {PortfolioTokenBalance} from './PortfolioTokenBalance/PortfolioTokenBalan
 import {PortfolioTokenChart} from './PortfolioTokenChart/PortfolioTokenChart'
 import {PortfolioTokenInfo} from './PortfolioTokenInfo/PortfolioTokenInfo'
 
-const HEADER_HEIGHT = 304
-
 export const PortfolioTokenDetailsScreen = () => {
   const strings = useStrings()
   const {detailsTab, setDetailsTab} = usePortfolio()
@@ -30,7 +29,17 @@ export const PortfolioTokenDetailsScreen = () => {
   const [isStickyTab, setIsStickyTab] = React.useState(false)
   const {id: tokenId} = usePortfolioTokenDetailParams()
   const {wallet} = useSelectedWallet()
-  const tokenInfo = wallet.balances.records.get(tokenId)?.info
+  const {tokenInfo} = usePortfolioTokenInfo(
+    {
+      getTokenInfo: wallet.networkManager.tokenManager.api.tokenInfo,
+      id: tokenId,
+      network: wallet.networkManager.network,
+      primaryTokenInfo: wallet.portfolioPrimaryTokenInfo,
+    },
+    {suspense: true},
+  )
+
+  const HEADER_HEIGHT = 304
   const {styles} = useStyles(HEADER_HEIGHT)
 
   if (!tokenInfo) throwLoggedError(new App.Errors.InvalidState('Token info not found, invalid state'))

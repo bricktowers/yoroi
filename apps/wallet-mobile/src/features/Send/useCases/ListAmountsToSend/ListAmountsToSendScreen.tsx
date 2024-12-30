@@ -18,11 +18,14 @@ import {Spacer} from '../../../../components/Spacer/Spacer'
 import globalMessages from '../../../../kernel/i18n/global-messages'
 import {assetsToSendProperties} from '../../../../kernel/metrics/helpers'
 import {useMetrics} from '../../../../kernel/metrics/metricsManager'
-import {YoroiEntry} from '../../../../yoroi-wallets/types/yoroi'
+import {useWalletNavigation} from '../../../../kernel/navigation'
+import {useSaveMemo} from '../../../../yoroi-wallets/hooks'
+import {YoroiEntry, YoroiSignedTx} from '../../../../yoroi-wallets/types/yoroi'
 import {TokenAmountItem} from '../../../Portfolio/common/TokenAmountItem/TokenAmountItem'
+import {useReviewTx} from '../../../ReviewTx/common/ReviewTxProvider'
 import {useSearch} from '../../../Search/SearchContext'
 import {useSelectedWallet} from '../../../WalletManager/common/hooks/useSelectedWallet'
-import {useNavigateTo, useOverridePreviousSendTxRoute} from '../../common/navigation'
+import {useNavigateTo} from '../../common/navigation'
 import {toYoroiEntry} from '../../common/toYoroiEntry'
 import {AddTokenButton} from './AddToken/AddToken'
 import {RemoveAmountButton} from './RemoveAmount'
@@ -30,28 +33,23 @@ import {RemoveAmountButton} from './RemoveAmount'
 export const ListAmountsToSendScreen = () => {
   const {styles} = useStyles()
   const navigateTo = useNavigateTo()
+  const {navigateToTxReview} = useWalletNavigation()
   const strings = useStrings()
   const {clearSearch} = useSearch()
   const navigation = useNavigation()
   const {track} = useMetrics()
-
-  useOverridePreviousSendTxRoute('send-start-tx')
+  const {wallet} = useSelectedWallet()
+  const {unsignedTxChanged} = useReviewTx()
 
   useLayoutEffect(() => {
     navigation.setOptions({headerLeft: () => <ListAmountsNavigateBackButton />})
   }, [navigation])
 
-  const {
-    targets,
-    selectedTargetIndex,
-    tokenSelectedChanged,
-    amountRemoved,
-    unsignedTxChanged: yoroiUnsignedTxChanged,
-  } = useTransfer()
+  const {memo, targets, selectedTargetIndex, tokenSelectedChanged, amountRemoved} = useTransfer()
+  const {saveMemo} = useSaveMemo({wallet})
   const {amounts} = targets[selectedTargetIndex].entry
   const selectedTokensCounter = Object.keys(amounts).length
 
-  const {wallet} = useSelectedWallet()
   const {
     meta: {addressMode},
   } = useSelectedWallet()
@@ -76,18 +74,36 @@ export const ListAmountsToSendScreen = () => {
     // use case: redirect to add token screen if there is no token left
     if (selectedTokensCounter === 1) {
       clearSearch()
-      navigateTo.addToken()
+      navigateTo.addToken({shouldPopPrevious: true})
     }
     amountRemoved(tokenId)
   }
+
+  const sendProperties = React.useMemo(() => assetsToSendProperties({amounts}), [amounts])
+
+  const onSuccess = (signedTx: YoroiSignedTx) => {
+    track.sendSummarySubmitted(sendProperties)
+
+    if (memo.length > 0) {
+      saveMemo({txId: signedTx.signedTx.id, memo: memo.trim()})
+    }
+
+    navigateTo.submittedTx()
+  }
+
+  const onError = () => {
+    track.sendSummarySubmitted(sendProperties)
+    navigateTo.failedTx()
+  }
+
   const onNext = () => {
     track.sendSelectAssetSelected(assetsToSendProperties({amounts}))
     // since the user can't see many targets we just send the first one
     // NOTE: update on multi target support
     createUnsignedTx([toYoroiEntry(targets[selectedTargetIndex].entry)], {
       onSuccess: (yoroiUnsignedTx) => {
-        yoroiUnsignedTxChanged(yoroiUnsignedTx)
-        navigateTo.confirmTx()
+        unsignedTxChanged(yoroiUnsignedTx)
+        navigateToTxReview({onSuccess, onError})
       },
     })
   }
@@ -119,12 +135,7 @@ export const ListAmountsToSendScreen = () => {
 
         <Spacer height={33} />
 
-        <NextButton
-          onPress={onNext}
-          title={strings.next}
-          shelleyTheme
-          disabled={selectedTokensCounter === 0 || isLoading}
-        />
+        <NextButton onPress={onNext} title={strings.next} disabled={selectedTokensCounter === 0 || isLoading} />
       </Actions>
     </SafeAreaView>
   )

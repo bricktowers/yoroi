@@ -2,7 +2,6 @@
 
 import {CardanoAddressedUtxo} from '@emurgo/yoroi-lib'
 import {normalizeToAddress} from '@emurgo/yoroi-lib/dist/internals/utils/addresses'
-import assert from 'assert'
 import {sortBy} from 'lodash'
 
 import {StakingStatus} from '../types/staking'
@@ -65,7 +64,6 @@ export const getDelegationStatus = (
       if (cert.rewardAddress !== rewardAddress) continue
 
       if (cert.kind === 'StakeDelegation') {
-        assert(cert.poolKeyHash != null, 'getDelegationStatus:: StakeDelegation certificate without poolKeyHash')
         status = {
           poolKeyHash: cert.poolKeyHash,
           isRegistered: true,
@@ -109,6 +107,16 @@ const isValidPoolId = async (poolId: string): Promise<boolean> => {
     return true
   } catch (e) {
     return false
+  }
+}
+
+export const getPoolBech32Id = async (poolId: string) => {
+  const {csl, release} = wrappedCsl()
+  try {
+    const keyHash = await csl.Ed25519KeyHash.fromHex(poolId)
+    return keyHash.toBech32('pool')
+  } finally {
+    release()
   }
 }
 

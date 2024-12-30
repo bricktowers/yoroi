@@ -63,7 +63,7 @@ export const Dashboard = () => {
   const walletNavigateTo = useWalletNavigation()
 
   const handleOnParticipatePress = () => {
-    walletNavigateTo.navigateToGovernanceCentre({navigateToStakingOnSuccess: true})
+    walletNavigateTo.navigateToGovernanceCentre()
   }
 
   const onWithdraw = () => {
@@ -156,8 +156,6 @@ export const Dashboard = () => {
             onPress={navigateTo.stakingCenter}
             title={intl.formatMessage(messages.stakingCenterButton)}
             disabled={meta.isReadOnly}
-            shelleyTheme
-            block
             testID="stakingCenterButton"
           />
         </Actions>
@@ -166,11 +164,13 @@ export const Dashboard = () => {
   )
 }
 
-const useNavigateTo = () => {
+export const useNavigateTo = () => {
   const navigation = useNavigation<StackNavigationProp<DashboardRoutes>>()
 
   return {
     stakingCenter: () => navigation.navigate('staking-center', {screen: 'staking-center-main'}),
+    submittedTx: () => navigation.navigate('staking-submitted-tx'),
+    failedTx: () => navigation.navigate('staking-failed-tx'),
   }
 }
 

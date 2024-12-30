@@ -18,7 +18,7 @@ export const useStrings = () => {
     drepKey: intl.formatMessage(messages.drepKey),
     delegatingToADRep: intl.formatMessage(messages.delegatingToADRep),
     abstaining: intl.formatMessage(messages.abstaining),
-    delegateVotingToDRep: (drepID: string) => intl.formatMessage(messages.delegateVotingToDRep, {drepID}),
+    delegateVotingToDRep: intl.formatMessage(messages.delegateVotingToDRep),
     selectAbstain: intl.formatMessage(messages.selectAbstain),
     selectNoConfidence: intl.formatMessage(messages.selectNoConfidence),
     operations: intl.formatMessage(messages.operations),
@@ -67,6 +67,12 @@ export const useStrings = () => {
     readyToCollectRewards: intl.formatMessage(messages.readyToCollectRewards),
     notSupportedVersionButton: intl.formatMessage(messages.notSupportedVersionButton),
     scriptNotSupported: intl.formatMessage(messages.scriptNotSupported),
+    submittedTxButton: intl.formatMessage(messages.submittedTxButton),
+    submittedTxText: intl.formatMessage(messages.submittedTxText),
+    submittedTxTitle: intl.formatMessage(messages.submittedTxTitle),
+    failedTxButton: intl.formatMessage(messages.failedTxButton),
+    failedTxText: intl.formatMessage(messages.failedTxText),
+    failedTxTitle: intl.formatMessage(messages.failedTxTitle),
   }
 }
 
@@ -124,7 +130,7 @@ const messages = defineMessages({
   },
   delegateVotingToDRep: {
     id: 'components.governance.delegateVotingToDRep',
-    defaultMessage: '!!!Delegate voting to \n{drepID}',
+    defaultMessage: '!!!Delegate voting to',
   },
   selectAbstain: {
     id: 'components.governance.selectAbstain',
@@ -206,7 +212,7 @@ const messages = defineMessages({
   },
   transactionFailedDescription: {
     id: 'components.governance.transactionFailedDescription',
-    defaultMessage: '!!!Your transaction has not been processed properly due to technical issues',
+    defaultMessage: '!!!Your transaction has not been processed properly due to technical issues.',
   },
   tryAgain: {
     id: 'components.governance.tryAgain',
@@ -255,7 +261,7 @@ const messages = defineMessages({
   },
   registerStakingKey: {
     id: 'components.governance.registerStakingKey',
-    defaultMessage: '!!!Register staking key',
+    defaultMessage: '!!!Register staking key deposit',
   },
   enterDrepIDInfo: {
     id: 'components.governance.enterDrepIDInfo',
@@ -284,5 +290,29 @@ const messages = defineMessages({
   scriptNotSupported: {
     id: 'components.governance.scriptNotSupported',
     defaultMessage: '!!!Script DReps ids will be supported soon.',
+  },
+  submittedTxTitle: {
+    id: 'components.governance.submittedTxTitle',
+    defaultMessage: '!!!Transaction signed',
+  },
+  submittedTxText: {
+    id: 'components.governance.submittedTxText',
+    defaultMessage: `!!!It will show up in the transaction list once it's confirmed by the network.`,
+  },
+  submittedTxButton: {
+    id: 'components.governance.submittedTxButton',
+    defaultMessage: '!!!Close',
+  },
+  failedTxTitle: {
+    id: 'components.governance.failedTxTitle',
+    defaultMessage: '!!!Transaction failed',
+  },
+  failedTxText: {
+    id: 'components.governance.failedTxText',
+    defaultMessage: '!!!Your transaction has not been processed properly due to technical issues.',
+  },
+  failedTxButton: {
+    id: 'components.governance.failedTxButton',
+    defaultMessage: '!!!Try again',
   },
 })

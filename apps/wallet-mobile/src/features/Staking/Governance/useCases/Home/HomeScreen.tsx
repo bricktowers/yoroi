@@ -17,7 +17,6 @@ import {StyleSheet, Text, View} from 'react-native'
 import {useModal} from '../../../../../components/Modal/ModalContext'
 import {Spacer} from '../../../../../components/Spacer/Spacer'
 import {useMetrics} from '../../../../../kernel/metrics/metricsManager'
-import {useUnsafeParams} from '../../../../../kernel/navigation'
 import {useStakingInfo} from '../../../../../legacy/Dashboard/StakePoolInfos'
 import {
   useCreateGovernanceTx,
@@ -28,9 +27,9 @@ import {
 import {TransactionInfo} from '../../../../../yoroi-wallets/types/other'
 import {useSelectedWallet} from '../../../../WalletManager/common/hooks/useSelectedWallet'
 import {Action} from '../../common/Action/Action'
-import {mapStakingKeyStateToGovernanceAction} from '../../common/helpers'
+import {mapStakingKeyStateToGovernanceAction, useGovernanceActions} from '../../common/helpers'
 import {LearnMoreLink} from '../../common/LearnMoreLink/LearnMoreLink'
-import {Routes, useNavigateTo} from '../../common/navigation'
+import {useNavigateTo} from '../../common/navigation'
 import {useStrings} from '../../common/strings'
 import {GovernanceVote} from '../../types'
 import {EnterDrepIdModal} from '../EnterDrepIdModal/EnterDrepIdModal'
@@ -94,7 +93,7 @@ const ParticipatingInGovernanceVariant = ({
   isTxPending?: boolean
 }) => {
   const strings = useStrings()
-  const styles = useStyles()
+  const {styles} = useStyles()
   const navigateTo = useNavigateTo()
   const {data: bech32DrepId} = useBech32DRepID(action.kind === 'delegate' ? action.drepID : '', {
     enabled: action.kind === 'delegate',
@@ -180,7 +179,7 @@ const formattingOptions = (styles: any) => {
 
 const NeverParticipatedInGovernanceVariant = () => {
   const strings = useStrings()
-  const styles = useStyles()
+  const {styles} = useStyles()
   const navigateTo = useNavigateTo()
   const {
     wallet,
@@ -189,17 +188,15 @@ const NeverParticipatedInGovernanceVariant = () => {
   const {manager} = useGovernance()
   const {openModal} = useModal()
   const stakingInfo = useStakingInfo(wallet, {suspense: true})
-  const params = useUnsafeParams<Routes['staking-gov-home']>()
   const {track} = useMetrics()
   const [pendingVote, setPendingVote] = React.useState<GovernanceVote['kind'] | null>(null)
+  const governanceActions = useGovernanceActions()
 
   useFocusEffect(
     React.useCallback(() => {
       track.governanceDashboardPageViewed()
     }, [track]),
   )
-
-  const navigateToStakingOnSuccess = params?.navigateToStakingOnSuccess ?? false
 
   const hasStakingKeyRegistered = stakingInfo?.data?.status !== 'not-registered'
   useWalletEvent(wallet, 'utxos', stakingInfo.refetch)
@@ -239,6 +236,7 @@ const NeverParticipatedInGovernanceVariant = () => {
     openDRepIdModal(async (drepID) => {
       const vote = {kind: 'delegate', drepID} as const
       const stakingKey = await wallet.getStakingKey()
+
       setPendingVote(vote.kind)
 
       createDelegationCertificate(
@@ -250,7 +248,11 @@ const NeverParticipatedInGovernanceVariant = () => {
               : null
             const certs = stakeCert !== null ? [stakeCert, certificate] : [certificate]
             const unsignedTx = await createGovernanceTxMutation.mutateAsync({certificates: certs, addressMode})
-            navigateTo.confirmTx({unsignedTx, vote, registerStakingKey: stakeCert !== null, navigateToStakingOnSuccess})
+
+            governanceActions.handleDelegateAction({
+              unsignedTx,
+              drepID,
+            })
           },
         },
       )
@@ -271,7 +273,10 @@ const NeverParticipatedInGovernanceVariant = () => {
             : null
           const certs = stakeCert !== null ? [stakeCert, certificate] : [certificate]
           const unsignedTx = await createGovernanceTxMutation.mutateAsync({certificates: certs, addressMode})
-          navigateTo.confirmTx({unsignedTx, vote, registerStakingKey: stakeCert !== null, navigateToStakingOnSuccess})
+
+          governanceActions.handleAbstainAction({
+            unsignedTx,
+          })
         },
       },
     )
@@ -291,7 +296,10 @@ const NeverParticipatedInGovernanceVariant = () => {
             : null
           const certs = stakeCert !== null ? [stakeCert, certificate] : [certificate]
           const unsignedTx = await createGovernanceTxMutation.mutateAsync({certificates: certs, addressMode})
-          navigateTo.confirmTx({unsignedTx, vote, registerStakingKey: stakeCert !== null, navigateToStakingOnSuccess})
+
+          governanceActions.handleNoConfidenceAction({
+            unsignedTx,
+          })
         },
       },
     )
@@ -377,5 +385,5 @@ const useStyles = () => {
     },
   })
 
-  return styles
+  return {styles} as const
 }

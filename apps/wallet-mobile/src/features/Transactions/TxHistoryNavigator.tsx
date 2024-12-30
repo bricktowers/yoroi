@@ -30,24 +30,19 @@ import {ListMultipleAddressesScreen} from '../Receive/useCases/ListMultipleAddre
 import {RequestSpecificAmountScreen} from '../Receive/useCases/RequestSpecificAmountScreen'
 import {ScanCodeScreen} from '../Scan/useCases/ScanCodeScreen'
 import {ShowCameraPermissionDeniedScreen} from '../Scan/useCases/ShowCameraPermissionDeniedScreen/ShowCameraPermissionDeniedScreen'
-import {ConfirmTxScreen} from '../Send/useCases/ConfirmTx/ConfirmTxScreen'
-import {FailedTxScreen} from '../Send/useCases/ConfirmTx/FailedTx/FailedTxScreen'
-import {SubmittedTxScreen} from '../Send/useCases/ConfirmTx/SubmittedTx/SubmittedTxScreen'
 import {SelectTokenFromListScreen} from '../Send/useCases/ListAmountsToSend/AddToken/SelectTokenFromListScreen'
 import {EditAmountScreen} from '../Send/useCases/ListAmountsToSend/EditAmount/EditAmountScreen'
 import {ListAmountsToSendScreen} from '../Send/useCases/ListAmountsToSend/ListAmountsToSendScreen'
+import {FailedTxScreen as SendFailedTxScreen} from '../Send/useCases/ShowFailedTxScreen/FailedTxScreen'
+import {SubmittedTxScreen as SendSubmittedTxScreen} from '../Send/useCases/ShowSubmittedTxScreen/SubmittedTxScreen'
 import {StartMultiTokenTxScreen} from '../Send/useCases/StartMultiTokenTx/StartMultiTokenTxScreen'
-import {NetworkTag} from '../Settings/ChangeNetwork/NetworkTag'
+import {NetworkTag} from '../Settings/useCases/changeAppSettings/ChangeNetwork/NetworkTag'
 import {SwapTabNavigator} from '../Swap/SwapNavigator'
-import {
-  ConfirmTxScreen as ConfirmTxSwapScreen,
-  EditSlippageScreen,
-  SelectPoolFromListScreen,
-  ShowFailedTxScreen as FailedTxSwapScreen,
-  ShowSubmittedTxScreen as SubmittedTxSwapScreen,
-} from '../Swap/useCases'
+import {EditSlippageScreen, SelectPoolFromListScreen} from '../Swap/useCases'
+import {ReviewSwap} from '../Swap/useCases/ReviewSwap/ReviewSwap'
+import {FailedTxScreen as SwapFailedTxScreen} from '../Swap/useCases/ShowFailedTxScreen/FailedTxScreen'
 import {ShowPreprodNoticeScreen} from '../Swap/useCases/ShowPreprodNoticeScreen/ShowPreprodNoticeScreen'
-import {ShowSanchoNoticeScreen} from '../Swap/useCases/ShowSanchoNoticeScreen/ShowSanchoNoticeScreen'
+import {SubmittedTxScreen as SwapSubmittedTxScreen} from '../Swap/useCases/ShowSubmittedTxScreen/SubmittedTxScreen'
 import {SelectBuyTokenFromListScreen} from '../Swap/useCases/StartOrderSwapScreen/CreateOrder/EditBuyAmount/SelectBuyTokenFromListScreen/SelectBuyTokenFromListScreen'
 import {SelectSellTokenFromListScreen} from '../Swap/useCases/StartOrderSwapScreen/CreateOrder/EditSellAmount/SelectSellTokenFromListScreen/SelectSellTokenFromListScreen'
 import {useSelectedWallet} from '../WalletManager/common/hooks/useSelectedWallet'
@@ -234,19 +229,10 @@ export const TxHistoryNavigator = () => {
               />
 
               <Stack.Screen
-                name="swap-sancho-notice"
-                component={ShowSanchoNoticeScreen}
+                name="swap-review"
+                component={ReviewSwap}
                 options={{
-                  ...sendOptions(navigationOptions, color),
-                  title: strings.swapTitle,
-                }}
-              />
-
-              <Stack.Screen
-                name="swap-confirm-tx"
-                component={ConfirmTxSwapScreen}
-                options={{
-                  title: strings.confirmationTransaction,
+                  title: strings.reviewSwapTitle,
                 }}
               />
 
@@ -286,14 +272,18 @@ export const TxHistoryNavigator = () => {
 
               <Stack.Screen
                 name="swap-submitted-tx"
-                component={SubmittedTxSwapScreen}
-                options={{headerShown: false, gestureEnabled: false}}
+                component={SwapSubmittedTxScreen}
+                options={{
+                  headerShown: false,
+                }}
               />
 
               <Stack.Screen
                 name="swap-failed-tx"
-                component={FailedTxSwapScreen}
-                options={{headerShown: false, gestureEnabled: false}}
+                component={SwapFailedTxScreen}
+                options={{
+                  headerShown: false,
+                }}
               />
 
               <Stack.Screen
@@ -353,24 +343,21 @@ export const TxHistoryNavigator = () => {
               </Stack.Screen>
 
               <Stack.Screen //
-                name="send-confirm-tx"
-                component={ConfirmTxScreen}
+                name="send-submitted-tx"
                 options={{
-                  title: strings.confirmTitle,
+                  headerShown: false,
                   ...sendOptions(navigationOptions, color),
                 }}
+                component={SendSubmittedTxScreen}
               />
 
-              <Stack.Screen
-                name="send-submitted-tx"
-                component={SubmittedTxScreen}
-                options={{headerShown: false, gestureEnabled: false}}
-              />
-
-              <Stack.Screen
+              <Stack.Screen //
                 name="send-failed-tx"
-                component={FailedTxScreen}
-                options={{headerShown: false, gestureEnabled: false}}
+                options={{
+                  headerShown: false,
+                  ...sendOptions(navigationOptions, color),
+                }}
+                component={SendFailedTxScreen}
               />
 
               <Stack.Screen //
@@ -430,6 +417,10 @@ const messages = defineMessages({
   swapToTitle: {
     id: 'swap.swapScreen.swapTo',
     defaultMessage: '!!!Swap to',
+  },
+  reviewSwapTitle: {
+    id: 'swap.review.title',
+    defaultMessage: '!!!Swap review',
   },
   slippageTolerance: {
     id: 'swap.swapScreen.slippageTolerance',
@@ -510,6 +501,7 @@ const useStrings = () => {
   return {
     claimShowSuccess: intl.formatMessage(messages.claimShowSuccessTitle),
     confirmationTransaction: intl.formatMessage(messages.confirmationTransaction),
+    reviewSwapTitle: intl.formatMessage(messages.reviewSwapTitle),
     confirmTitle: intl.formatMessage(messages.confirmTitle),
     describeSelectedAddressTitle: intl.formatMessage(messages.describeSelectedAddressTitle),
     editAmountTitle: intl.formatMessage(messages.editAmountTitle),

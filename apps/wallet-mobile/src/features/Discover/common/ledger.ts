@@ -98,27 +98,47 @@ async function formatLedgerWithdrawals(
 ): Promise<Array<Withdrawal>> {
   const result: Array<Withdrawal> = []
 
-  const withdrawalKeys = await withdrawals.keys()
-  for (let i = 0; i < (await withdrawalKeys.len()); i++) {
-    const rewardAddress = await withdrawalKeys.get(i)
+  const keys = await withdrawals.keys()
+  const keysLength = await keys.len()
+  for (let i = 0; i < keysLength; i++) {
+    const rewardAddress = await keys.get(i)
     const withdrawalAmount = await withdrawals.get(rewardAddress)
     if (withdrawalAmount == null) {
       throw new Error(`formatLedgerWithdrawals should never happen`)
     }
-
-    const rewardAddressPayload = Buffer.from(await rewardAddress.toAddress().then((a) => a.toBytes())).toString('hex')
+    const rewardAddressPayload = await (await rewardAddress.toAddress()).toHex()
     const addressing = addressingMap(rewardAddressPayload)
-    if (addressing == null) {
-      throw new Error(`formatLedgerWithdrawals Ledger can only withdraw from own address ${rewardAddressPayload}`)
+    let stakeCredential: null | Withdrawal['stakeCredential'] = null
+    if (addressing != null) {
+      stakeCredential = {
+        type: CredentialParamsType.KEY_PATH,
+        keyPath: addressing.path,
+      }
+    } else {
+      const cred = await rewardAddress.paymentCred()
+      const maybeKeyHash = await cred.toKeyhash()
+      const maybeScriptHash = await cred.toScripthash()
+      if (maybeKeyHash) {
+        stakeCredential = {
+          type: CredentialParamsType.KEY_HASH,
+          keyHashHex: await maybeKeyHash.toHex(),
+        }
+      } else if (maybeScriptHash) {
+        stakeCredential = {
+          type: CredentialParamsType.SCRIPT_HASH,
+          scriptHashHex: await maybeScriptHash.toHex(),
+        }
+      }
+    }
+    if (stakeCredential === null) {
+      throw new Error('Failed to resolve credential type for reward address: ' + rewardAddressPayload)
     }
     result.push({
       amount: await withdrawalAmount.toStr(),
-      stakeCredential: {
-        type: CredentialParamsType.KEY_PATH,
-        keyPath: addressing.path,
-      },
+      stakeCredential,
     })
   }
+
   return result
 }
 async function formatLedgerCertificates(
@@ -200,6 +220,15 @@ export async function toLedgerSignRequest(
   additionalRequiredSigners: Array<string> = [],
 ): Promise<SignTransactionRequest> {
   const parsedCbor = await cbor.decode(rawTxBody)
+  const tagsState = await csl.hasTransactionSetTag(
+    await (await csl.FixedTransaction.newFromBodyBytes(await txBody.toBytes())).toBytes(),
+  )
+
+  if (tagsState === csl.TransactionSetsState.MixedSets) {
+    throw new Error('Transaction with mixed sets cannot be signed by Ledger')
+  }
+
+  const txHasSetTags = tagsState === csl.TransactionSetsState.AllSetsHaveTag
 
   async function formatInputs(inputs: TransactionInputs): Promise<Array<TxInput>> {
     const formatted = []
@@ -513,6 +542,9 @@ export async function toLedgerSignRequest(
       referenceInputs: formattedReferenceInputs,
     },
     additionalWitnessPaths,
+    options: {
+      tagCborSets: txHasSetTags,
+    },
   }
 }
 

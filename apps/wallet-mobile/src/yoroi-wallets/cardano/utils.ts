@@ -1,5 +1,8 @@
 /* eslint-disable no-empty */
+import {WasmModuleProxy} from '@emurgo/cross-csl-core'
 import {SendToken} from '@emurgo/yoroi-lib'
+import {normalizeToAddress} from '@emurgo/yoroi-lib/dist/internals/utils/addresses'
+import {invalid} from '@yoroi/common'
 import {Balance, Chain, Portfolio, Wallet} from '@yoroi/types'
 import {BigNumber} from 'bignumber.js'
 import {Buffer} from 'buffer'
@@ -12,8 +15,8 @@ import {CardanoMobile} from '../wallets'
 import {toAssetNameHex, toPolicyId} from './api/utils'
 import {withMinAmounts} from './getMinAmounts'
 import {MultiToken} from './MultiToken'
-import {CardanoTypes} from './types'
-import {wrappedCsl as getCSL} from './wrappedCsl'
+import {CardanoTypes, YoroiWallet} from './types'
+import {wrappedCsl as getCSL, wrappedCsl} from './wrappedCsl'
 
 export const deriveRewardAddressHex = async (
   accountPubKeyHex: string,
@@ -29,6 +32,25 @@ export const deriveRewardAddressHex = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = Buffer.from((await rewardAddrAsAddr.toBytes()) as any, 'hex').toString('hex')
   return result
+}
+
+export const deriveRewardAddressFromAddress = async (address: string, chainId: number): Promise<string> => {
+  const {csl, release} = wrappedCsl()
+
+  try {
+    const result = await csl.Address.fromBech32(address)
+      .then((address) => csl.BaseAddress.fromAddress(address))
+      .then((baseAddress) => baseAddress?.stakeCred() ?? invalid('invalid base address'))
+      .then((stakeCredential) => csl.RewardAddress.new(chainId, stakeCredential))
+      .then((rewardAddress) => rewardAddress.toAddress())
+      .then((rewardAddrAsAddress) => rewardAddrAsAddress.toBech32(undefined))
+      .catch((error) => error)
+
+    if (typeof result !== 'string') throw new Error('Its not possible to derive reward address')
+    return result
+  } finally {
+    release()
+  }
 }
 
 /**
@@ -228,4 +250,36 @@ export const getTransactionUnspentOutput = async ({
   } finally {
     release()
   }
+}
+
+export const getHexAddressingMap = async (csl: WasmModuleProxy, wallet: YoroiWallet) => {
+  const addressedUtxos = wallet.utxos.map(async (utxo: RawUtxo) => {
+    const addressing = wallet.getAddressing(utxo.receiver)
+    const hexAddress = await normalizeToAddress(csl, utxo.receiver).then((a) => a?.toHex())
+
+    return {addressing, hexAddress}
+  })
+
+  const addressing = await Promise.all(addressedUtxos)
+  return addressing.reduce<{[addressHex: string]: Array<number>}>((acc, curr) => {
+    if (!curr.hexAddress) return acc
+    acc[curr.hexAddress] = curr.addressing.path
+    return acc
+  }, {})
+}
+
+export const getAddressedUtxos = (wallet: YoroiWallet) => {
+  return wallet.allUtxos.map((utxo: RawUtxo): CardanoTypes.CardanoAddressedUtxo => {
+    const addressing = wallet.getAddressing(utxo.receiver)
+
+    return {
+      addressing,
+      txIndex: utxo.tx_index,
+      txHash: utxo.tx_hash,
+      amount: utxo.amount,
+      receiver: utxo.receiver,
+      utxoId: utxo.utxo_id,
+      assets: utxo.assets,
+    }
+  })
 }

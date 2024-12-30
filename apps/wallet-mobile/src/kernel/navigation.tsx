@@ -1,16 +1,15 @@
 import {MaterialTopTabNavigationOptions} from '@react-navigation/material-top-tabs'
-import {NavigationProp, NavigationState, NavigatorScreenParams, useNavigation, useRoute} from '@react-navigation/native'
+import {NavigationState, NavigatorScreenParams, useNavigation, useRoute} from '@react-navigation/native'
 import {StackNavigationOptions, StackNavigationProp, TransitionPresets} from '@react-navigation/stack'
 import {isKeyOf} from '@yoroi/common'
 import {Atoms, ThemedPalette, useTheme} from '@yoroi/theme'
 import {Chain, Portfolio, Scan} from '@yoroi/types'
 import React from 'react'
-import {Dimensions, InteractionManager, Platform, TouchableOpacity, TouchableOpacityProps, View} from 'react-native'
+import {Dimensions, Platform, TouchableOpacity, TouchableOpacityProps, View} from 'react-native'
 
 import {Icon} from '../components/Icon'
 import {Routes as StakingGovernanceRoutes} from '../features/Staking/Governance/common/navigation'
-import {YoroiUnsignedTx} from '../yoroi-wallets/types/yoroi'
-import {compareArrays} from '../yoroi-wallets/utils/utils'
+import {YoroiSignedTx} from '../yoroi-wallets/types/yoroi'
 
 // prettier-ignore
 export const useUnsafeParams = <Params, >() => {
@@ -117,7 +116,7 @@ export type WalletStackRoutes = {
   'wallet-selection': undefined
   'exchange-result': undefined
   'main-wallet-routes': NavigatorScreenParams<WalletTabRoutes>
-  'nft-details-routes': NavigatorScreenParams<NftRoutes>
+  'review-tx-routes': NavigatorScreenParams<ReviewTxRoutes>
   settings: NavigatorScreenParams<SettingsStackRoutes>
   'voting-registration': NavigatorScreenParams<VotingRegistrationRoutes>
   'toggle-analytics-settings': NavigatorScreenParams<ToggleAnalyticsSettingsRoutes>
@@ -153,11 +152,10 @@ export type TxHistoryRoutes = {
   'receive-specific-amount': undefined
   'receive-multiple': undefined
   'send-start-tx': undefined
-  'send-confirm-tx': undefined
-  'send-submitted-tx': {txId: string}
-  'send-failed-tx': undefined
   'send-list-amounts-to-send': undefined
   'send-edit-amount': undefined
+  'send-submitted-tx': undefined
+  'send-failed-tx': undefined
   'send-select-token-from-list': undefined
 } & SwapTokenRoutes &
   ScanRoutes &
@@ -179,25 +177,19 @@ type ClaimRoutes = {
 
 type SwapTokenRoutes = {
   'swap-start-swap': NavigatorScreenParams<SwapTabRoutes>
-  'swap-confirm-tx': undefined
+  'swap-review': undefined
   'swap-select-sell-token': undefined
   'swap-select-buy-token': undefined
   'swap-edit-slippage': undefined
   'swap-select-pool': undefined
-  'swap-submitted-tx': {txId: string}
-  'swap-failed-tx': undefined
   'swap-preprod-notice': undefined
-  'swap-sancho-notice': undefined
+  'swap-submitted-tx': undefined
+  'swap-failed-tx': undefined
 }
 export type SwapTokenRouteseNavigation = StackNavigationProp<SwapTokenRoutes>
 
 export type StakingCenterRoutes = {
   'staking-center-main': undefined
-  'delegation-confirmation': {
-    poolId: string
-    yoroiUnsignedTx: YoroiUnsignedTx
-  }
-  'delegation-failed-tx': undefined
 }
 
 export type SwapTabRoutes = {
@@ -251,9 +243,6 @@ export type SettingsStackRoutes = {
       onPress: () => void
     }
   }
-  'collateral-confirm-tx': undefined
-  'collateral-tx-submitted': undefined
-  'collateral-tx-failed': undefined
 }
 
 export type ToggleAnalyticsSettingsRoutes = {
@@ -265,7 +254,6 @@ export type SettingsRouteNavigation = StackNavigationProp<SettingsStackRoutes>
 export type DiscoverRoutes = {
   'discover-browser': NavigatorScreenParams<BrowserRoutes>
   'discover-select-dapp-from-list': undefined
-  'discover-review-tx': {cbor: string}
 }
 
 export type BrowserRoutes = {
@@ -276,11 +264,8 @@ export type BrowserRoutes = {
 export type DashboardRoutes = {
   'staking-dashboard-main': undefined
   'staking-center': NavigatorScreenParams<StakingCenterRoutes>
-  'delegation-confirmation': {
-    poolId: string
-    yoroiUnsignedTx: YoroiUnsignedTx
-  }
-  'delegation-failed-tx': undefined
+  'staking-submitted-tx': undefined
+  'staking-failed-tx': undefined
 }
 
 export type PortfolioRoutes = {
@@ -292,6 +277,29 @@ export type PortfolioRoutes = {
     id: string
   }
   history: NavigatorScreenParams<TxHistoryRoutes>
+}
+
+export type ReviewTxRoutes = {
+  'review-tx'?: {
+    cbor?: string
+    operations?: Array<React.ReactNode>
+    receiverCustomTitle?: React.ReactNode
+    details?: {title: string; component: React.ReactNode}
+    createdBy?: React.ReactNode
+    onConfirm?: () => void
+    onCancel?: () => void
+    onSuccess?: (signedTx: YoroiSignedTx) => void
+    onError?: () => void
+    onNotSupportedCIP1694?: () => void
+    onCIP36SupportChange?: (supportsCIP36: boolean) => void
+  }
+  'review-tx-submitted-tx': undefined
+  'review-tx-failed-tx': undefined
+}
+
+export type PortfolioTokenListTabRoutes = {
+  'wallet-token': undefined
+  'dapps-token': undefined
 }
 
 export type VotingRegistrationRoutes = {
@@ -350,6 +358,7 @@ export type AppRoutes = {
   'choose-biometric-login': undefined
   'dark-theme-announcement': undefined
   'setup-wallet': undefined
+  notifications: undefined
 }
 export type AppRouteNavigation = StackNavigationProp<AppRoutes>
 
@@ -446,6 +455,16 @@ export const useWalletNavigation = () => {
           params: {
             screen: 'send-start-tx',
           },
+        },
+      })
+    },
+
+    navigateToTxReview: (params?: ReviewTxRoutes['review-tx']) => {
+      navigation.navigate('manage-wallets', {
+        screen: 'review-tx-routes',
+        params: {
+          screen: 'review-tx',
+          params,
         },
       })
     },
@@ -574,14 +593,11 @@ export const useWalletNavigation = () => {
       })
     },
 
-    navigateToGovernanceCentre: ({navigateToStakingOnSuccess = false} = {}) => {
+    navigateToGovernanceCentre: () => {
       navigation.navigate('manage-wallets', {
         screen: 'governance',
         params: {
           screen: 'staking-gov-home',
-          params: {
-            navigateToStakingOnSuccess,
-          },
         },
       })
     },
@@ -634,66 +650,3 @@ const getFocusedRouteName = (state: Partial<NavigationState> | NavigationState['
 
   return [name]
 }
-
-function useKeepRoutesInHistory(routesToKeep: string[]) {
-  const navigation = useNavigation()
-  const [initialRouteId] = React.useState(() => getNavigationRouteId(navigation))
-
-  React.useEffect(() => {
-    const currentRouteId = getNavigationRouteId(navigation)
-
-    if (currentRouteId !== initialRouteId) {
-      return
-    }
-    const {routes} = navigation.getState()
-    const currentRouteNames = routes.map((r) => r.name)
-
-    if (compareArrays(currentRouteNames, routesToKeep)) {
-      return
-    }
-
-    const newRoutes = routes.filter((r) => routesToKeep.includes(r.name))
-
-    const task = InteractionManager.runAfterInteractions(() => {
-      const newState = {
-        index: newRoutes.length - 1,
-        routes: newRoutes.map((r) => ({...r, state: undefined})),
-        routeNames: newRoutes.map((r) => r.name),
-      }
-      navigation.reset(newState)
-    })
-
-    return () => task.cancel()
-  }, [navigation, initialRouteId, routesToKeep])
-}
-
-export function useOverridePreviousRoute<RouteName extends string>(previousRouteName: RouteName) {
-  const navigation = useNavigation()
-  const [initialRouteName] = React.useState(() => getNavigationRouteName(navigation))
-  const allRouteNames: string[] = navigation.getState().routes.map((route) => route.name)
-  const previousRouteIndex = allRouteNames.indexOf(previousRouteName)
-  const currentRouteIndex = allRouteNames.indexOf(initialRouteName)
-
-  let newRoutes = allRouteNames
-  if (previousRouteIndex < currentRouteIndex) {
-    newRoutes = allRouteNames.filter((routeName, index) => index <= previousRouteIndex || index >= currentRouteIndex)
-  }
-
-  if (previousRouteIndex > currentRouteIndex) {
-    newRoutes = allRouteNames.filter((routeName, index) => index < currentRouteIndex)
-    newRoutes.push(previousRouteName, initialRouteName)
-  }
-
-  useKeepRoutesInHistory(newRoutes)
-}
-
-function getNavigationRouteId(navigation: NavigationProp<ReactNavigation.RootParamList>) {
-  const state = navigation.getState()
-  return state.routes[state.index].key
-}
-
-function getNavigationRouteName(navigation: NavigationProp<ReactNavigation.RootParamList>) {
-  return selectRouteName(navigation.getState())
-}
-
-const selectRouteName = (state: NavigationState) => state.routes[state.index].name

@@ -1,5 +1,5 @@
 import {useIsFocused} from '@react-navigation/native'
-import {atomicBreakdown, parseDecimal} from '@yoroi/common'
+import {atomicBreakdown} from '@yoroi/common'
 import {isPrimaryToken} from '@yoroi/portfolio'
 import {useTheme} from '@yoroi/theme'
 import {useTransfer} from '@yoroi/transfer'
@@ -15,12 +15,12 @@ import {Spacer} from '../../../../../components/Spacer/Spacer'
 import {TextInput} from '../../../../../components/TextInput/TextInput'
 import {useLanguage} from '../../../../../kernel/i18n'
 import {logger} from '../../../../../kernel/logger/logger'
-import {editedFormatter, pastedFormatter} from '../../../../../yoroi-wallets/utils/amountUtils'
+import {Quantities} from '../../../../../yoroi-wallets/utils/utils'
 import {usePortfolioBalances} from '../../../../Portfolio/common/hooks/usePortfolioBalances'
 import {usePortfolioPrimaryBreakdown} from '../../../../Portfolio/common/hooks/usePortfolioPrimaryBreakdown'
 import {TokenAmountItem} from '../../../../Portfolio/common/TokenAmountItem/TokenAmountItem'
 import {useSelectedWallet} from '../../../../WalletManager/common/hooks/useSelectedWallet'
-import {useNavigateTo, useOverridePreviousSendTxRoute} from '../../../common/navigation'
+import {useNavigateTo} from '../../../common/navigation'
 import {useStrings} from '../../../common/strings'
 import {NoBalance} from './ShowError/NoBalance'
 import {UnableToSpend} from './ShowError/UnableToSpend'
@@ -46,27 +46,25 @@ export const EditAmountScreen = () => {
 
   const [quantity, setQuantity] = React.useState(initialQuantity)
   const [inputValue, setInputValue] = React.useState(
-    atomicBreakdown(initialQuantity, amount.info.decimals).bn.toFormat(),
+    initialQuantity === 0n ? '' : atomicBreakdown(initialQuantity, amount.info.decimals).bn.toFormat(),
   )
   const spendable = isPrimary ? available - primaryBreakdown.lockedAsStorageCost : available
 
-  useOverridePreviousSendTxRoute(initialQuantity === 0n ? 'send-select-token-from-list' : 'send-list-amounts-to-send')
-
   React.useEffect(() => {
     setQuantity(initialQuantity)
-    setInputValue(atomicBreakdown(initialQuantity, amount.info.decimals).bn.toFormat())
+    setInputValue(initialQuantity === 0n ? '' : atomicBreakdown(initialQuantity, amount.info.decimals).bn.toFormat())
   }, [amount.info.decimals, initialQuantity])
 
   const isFocused = useIsFocused()
   React.useEffect(() => {
     return () => {
-      if (quantity === 0n && !isFocused) {
+      if (amount.quantity === 0n && !isFocused) {
         InteractionManager.runAfterInteractions(() => {
           amountRemoved(selectedTokenId)
         })
       }
     }
-  }, [amountRemoved, isFocused, quantity, selectedTokenId])
+  }, [amount.quantity, amountRemoved, isFocused, selectedTokenId])
 
   const hasBalance = available >= quantity
   // primary can have locked amount
@@ -76,13 +74,9 @@ export const EditAmountScreen = () => {
   const handleOnChangeQuantity = React.useCallback(
     (text: string) => {
       try {
-        const {text: newInputValue, bi: newQuantity} = parseDecimal({
-          value: text,
-          decimalPlaces: amount.info.decimals,
-          format: numberLocale,
-        })
-        setInputValue(newInputValue)
-        setQuantity(newQuantity)
+        const [input, quantity] = Quantities.parseFromText(text, amount.info.decimals ?? 0, numberLocale)
+        setInputValue(input)
+        setQuantity(BigInt(quantity))
       } catch (error) {
         logger.error('EditAmountScreen: handleOnChangeQuantity error parsing input', {error})
       }
@@ -91,13 +85,9 @@ export const EditAmountScreen = () => {
   )
 
   const handleOnMaxBalance = React.useCallback(() => {
-    const {text: newInputValue, bi: newQuantity} = parseDecimal({
-      value: spendable.toString(),
-      decimalPlaces: amount.info.decimals,
-      format: numberLocale,
-    })
-    setInputValue(newInputValue)
-    setQuantity(newQuantity)
+    const [input, quantity] = Quantities.parseFromText(spendable.toString(), amount.info.decimals ?? 0, numberLocale)
+    setInputValue(input)
+    setQuantity(BigInt(quantity))
   }, [amount.info.decimals, numberLocale, spendable])
 
   const handleOnApply = React.useCallback(() => {
@@ -153,7 +143,6 @@ export const EditAmountScreen = () => {
           <ApplyButton
             onPress={handleOnApply}
             title={strings.apply.toLocaleUpperCase()}
-            shelleyTheme
             disabled={isUnableToSpend || !hasBalance || isZero}
           />
         </Actions>
@@ -190,17 +179,6 @@ type AmountInputProps = {
 const AmountInput = ({onChange, value, ticker}: AmountInputProps) => {
   const {styles, colors} = useStyles()
 
-  const onChangeText = (text: string) => {
-    const shorterStringLength = Math.min(text.length, value.length)
-    const wasPasted =
-      Math.abs(value.length - text.length) > 1 ||
-      value.substring(0, shorterStringLength) !== text.substring(0, shorterStringLength)
-
-    const formatter = wasPasted ? pastedFormatter : editedFormatter
-
-    onChange(formatter(text))
-  }
-
   return (
     <TextInput
       keyboardType="numeric"
@@ -208,7 +186,7 @@ const AmountInput = ({onChange, value, ticker}: AmountInputProps) => {
       autoComplete="off"
       value={value}
       placeholder="0"
-      onChangeText={onChangeText}
+      onChangeText={onChange}
       selectTextOnAutoFocus
       allowFontScaling
       right={<Ticker ticker={ticker} />}
@@ -217,6 +195,7 @@ const AmountInput = ({onChange, value, ticker}: AmountInputProps) => {
       underlineColorAndroid="transparent"
       activeUnderlineColor="transparent"
       selectionColor={colors.selected}
+      cursorColor={colors.cursor}
       noHelper
     />
   )
@@ -273,7 +252,7 @@ const useStyles = () => {
     },
   })
   const colors = {
-    black: color.gray_max,
+    cursor: color.el_gray_max,
     selected: color.input_selected,
   }
   return {styles, colors} as const

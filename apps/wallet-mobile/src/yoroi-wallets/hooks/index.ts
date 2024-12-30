@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {walletChecksum} from '@emurgo/cip4-js'
 import {Certificate} from '@emurgo/cross-csl-core'
+import {FullPoolInfo, PoolInfoApi} from '@emurgo/yoroi-lib'
 import AsyncStorage, {AsyncStorageStatic} from '@react-native-async-storage/async-storage'
 import {mountMMKVStorage, observableStorageMaker, parseBoolean, useMutationWithInvalidations} from '@yoroi/common'
 import {themeStorageMaker} from '@yoroi/theme'
@@ -439,7 +440,10 @@ export const useFrontendFees = (
     suspense: true,
     queryKey: [wallet.id, 'frontend-fees'],
     ...options,
-    queryFn: () => wallet.api.getFrontendFees(),
+    queryFn: () =>
+      wallet.api.getFrontendFees().catch(() => ({
+        // TODO: Without this it break when offline. Needs better fixing
+      })),
   })
 
   return {
@@ -697,4 +701,21 @@ export const useThemeStorageMaker = () => {
   const themeStorage = themeStorageMaker({storage: themeDiscoveryStorage})
 
   return themeStorage
+}
+
+export const usePoolInfo = ({poolId}: {poolId: string}): FullPoolInfo => {
+  const {networkManager} = useSelectedNetwork()
+  const poolInfoApi = React.useMemo(
+    () => new PoolInfoApi(networkManager.legacyApiBaseUrl),
+    [networkManager.legacyApiBaseUrl],
+  )
+  const poolInfo = useQuery({
+    queryKey: ['usePoolInfo', poolId],
+    queryFn: async () => {
+      return poolInfoApi.getSingleFullPoolInfo(poolId)
+    },
+    suspense: true,
+  })
+
+  return poolInfo?.data ?? {chain: null, explorer: null}
 }

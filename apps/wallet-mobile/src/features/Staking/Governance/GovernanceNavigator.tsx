@@ -4,17 +4,16 @@ import React from 'react'
 
 import {SafeArea} from '../../../components/SafeArea'
 import {defaultStackNavigationOptions} from '../../../kernel/navigation'
-import {NetworkTag} from '../../Settings/ChangeNetwork/NetworkTag'
+import {NetworkTag} from '../../Settings/useCases/changeAppSettings/ChangeNetwork/NetworkTag'
 import {useGovernanceManagerMaker} from './common/helpers'
 import {NavigationStack} from './common/navigation'
 import {useStrings} from './common/strings'
 import {ChangeVoteScreen} from './useCases/ChangeVote/ChangeVoteScreen'
-import {ConfirmTxScreen} from './useCases/ConfirmTx/ConfirmTxScreen'
-import {FailedTxScreen} from './useCases/FailedTx/FailedTxScreen'
 import {HomeScreen} from './useCases/Home/HomeScreen'
 import {NoFundsScreen} from './useCases/NoFunds/NoFundsScreen'
 import {NotSupportedCardanoAppVersion} from './useCases/NotSupportedCardanoAppVersion/NotSupportedCardanoAppVersion'
-import {SuccessTxScreen} from './useCases/SuccessTx/SuccessTxScreen'
+import {FailedTxScreen} from './useCases/ShowFailedTxScreen/FailedTxScreen'
+import {SubmittedTxScreen} from './useCases/ShowSubmittedTxScreen/SubmittedTxScreen'
 
 const Stack = NavigationStack
 
@@ -45,16 +44,6 @@ export const GovernanceNavigator = () => {
           />
 
           <Stack.Screen
-            name="staking-gov-confirm-tx"
-            component={ConfirmTxScreen}
-            options={{title: strings.confirmTxTitle}}
-          />
-
-          <Stack.Screen name="staking-gov-tx-success" component={SuccessTxScreen} options={txStatusOptions} />
-
-          <Stack.Screen name="staking-gov-tx-failed" component={FailedTxScreen} options={txStatusOptions} />
-
-          <Stack.Screen
             name="staking-gov-not-supported-version"
             component={NotSupportedCardanoAppVersion}
             options={txStatusOptions}
@@ -65,6 +54,10 @@ export const GovernanceNavigator = () => {
             component={NoFundsScreen}
             options={{title: strings.governanceCentreTitle}}
           />
+
+          <Stack.Screen name="staking-gov-submitted-tx" component={SubmittedTxScreen} options={{headerShown: false}} />
+
+          <Stack.Screen name="staking-gov-failed-tx" component={FailedTxScreen} options={{headerShown: false}} />
         </Stack.Navigator>
       </SafeArea>
     </GovernanceProvider>
