@@ -6,11 +6,13 @@ import {FlatList, StyleSheet, View} from 'react-native'
 import {SimpleTab} from '../../../../components/SimpleTab/SimpleTab'
 import {Spacer} from '../../../../components/Spacer/Spacer'
 import {useMetrics} from '../../../../kernel/metrics/metricsManager'
+import {ShowDisclaimer} from '../../../Legal/Disclaimer/ShowDisclaimer'
 import {useSearch, useSearchOnNavBar} from '../../../Search/SearchContext'
 import {NetworkTag} from '../../../Settings/useCases/changeAppSettings/ChangeNetwork/NetworkTag'
 import {ChainDAppsWarning} from '../../common/ChainDAppsWarning'
 import {getGoogleSearchItem} from '../../common/helpers'
 import {useDAppsConnected} from '../../common/useDAppsConnected'
+import {useShowWelcomeDApp} from '../../common/useShowWelcomeDApp'
 import {useStrings} from '../../common/useStrings'
 import {CountDAppsAvailable} from './CountDAppsAvailable/CountDAppsAvailable'
 import {CountDAppsConnected} from './CountDAppsConnected/CountDAppsConnected'
@@ -31,6 +33,7 @@ export const SelectDappFromListScreen = () => {
   const [currentTab, setCurrentTab] = React.useState<TDAppTabs>('connected')
   const [categoriesSelected, setCategoriesSelected] = React.useState<string[]>([])
   const {track} = useMetrics()
+  const [isShowedWelcomeDApp] = useShowWelcomeDApp()
 
   React.useEffect(() => {
     if (currentTab === 'recommended') {
@@ -46,7 +49,7 @@ export const SelectDappFromListScreen = () => {
       headerTitle: ({children}) => <NetworkTag style={styles.networkTag}>{children}</NetworkTag>,
     },
   })
-  const {data: connectedOrigins = []} = useDAppsConnected({refetchOnMount: true, refetchInterval: 500})
+  const {data: connectedOrigins = []} = useDAppsConnected({refetchOnMount: true})
 
   const isDappConnected = (dappOrigins: string[]) => {
     return dappOrigins.some((dappOrigin) => connectedOrigins.includes(dappOrigin))
@@ -74,7 +77,9 @@ export const SelectDappFromListScreen = () => {
 
   return (
     <>
-      <WelcomeDAppModal />
+      <WelcomeDAppModal disabled={isShowedWelcomeDApp} />
+
+      <ShowDisclaimer type="dapps" disabled={!isShowedWelcomeDApp} />
 
       <View style={[styles.root]}>
         <ChainDAppsWarning />
@@ -142,7 +147,7 @@ const HeaderControl = ({
   const {visible} = useSearch()
   const styles = useStyles()
   const strings = useStrings()
-  const {data: connectedOrigins = []} = useDAppsConnected({refetchOnMount: true, refetchInterval: 500})
+  const {data: connectedOrigins = []} = useDAppsConnected({refetchOnMount: true})
   const hasConnectedDapps = connectedOrigins.length > 0
   const {data: list} = useDappList({suspense: true})
   const filters = Object.keys(list?.filters ?? {})
@@ -192,7 +197,7 @@ const useFilteredDappList = (tab: TDAppTabs, categoriesSelected: string[]) => {
   const {search, visible} = useSearch()
   const {track} = useMetrics()
   const {data: list} = useDappList({suspense: true})
-  const {data: connectedOrigins = []} = useDAppsConnected({refetchOnMount: true, refetchInterval: 500})
+  const {data: connectedOrigins = []} = useDAppsConnected({refetchOnMount: true})
   const hasConnectedDapps = connectedOrigins.length > 0
   const isSearching = visible
 

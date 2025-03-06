@@ -34,6 +34,7 @@ import {
 import {useDeepLinkWatcher} from './features/Links/common/useDeepLinkWatcher'
 import {useInitNotifications} from './features/Notifications/useCases/common/hooks'
 import {NotificationsDevScreen} from './features/Notifications/useCases/NotificationsDevScreen'
+import {NotificationUIHandler} from './features/Notifications/useCases/NotificationUIHandler'
 import {SearchProvider} from './features/Search/SearchContext'
 import {SetupWalletNavigator} from './features/SetupWallet/SetupWalletNavigator'
 import {useHasWallets} from './features/WalletManager/common/hooks/useHasWallets'
@@ -55,7 +56,7 @@ const changeNavigationBarColor = (colorScheme: 'default-dark' | 'default-light',
 }
 
 export const AppNavigator = () => {
-  useInitNotifications({enabled: features.notifications})
+  useInitNotifications({localEnabled: true, pushEnabled: features.pushNotifications})
   useDeepLinkWatcher()
   const strings = useStrings()
   const [routeName, setRouteName] = React.useState<string>()
@@ -201,12 +202,19 @@ export const AppNavigator = () => {
 
               <Stack.Group
                 screenOptions={{
+                  gestureEnabled: false,
                   presentation: 'transparentModal',
                   ...(Platform.OS === 'android' && {...TransitionPresets.DefaultTransition}), // overriding general navigation settings
                   cardStyle: {backgroundColor: 'transparent'}, // this is needed for the modal to be transparent
                 }}
               >
-                <Stack.Screen name="modal" component={ModalScreen} />
+                <Stack.Screen
+                  name="modal"
+                  component={ModalScreen}
+                  options={{
+                    gestureEnabled: false,
+                  }}
+                />
               </Stack.Group>
             </>
           )}
@@ -226,6 +234,8 @@ export const AppNavigator = () => {
           )}
         </Stack.Navigator>
       </ModalProvider>
+
+      <NotificationUIHandler />
     </NavigationContainer>
   )
 }

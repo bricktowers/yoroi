@@ -1,57 +1,25 @@
 import {useAsyncStorage} from '@yoroi/common'
-import {mountAsyncStorage} from '@yoroi/common/src'
 import {App, Notifications as NotificationTypes} from '@yoroi/types'
-import * as BackgroundFetch from 'expo-background-fetch'
-import * as TaskManager from 'expo-task-manager'
 import * as React from 'react'
 import {Subject} from 'rxjs'
 
 import {YoroiWallet} from '../../../../yoroi-wallets/cardano/types'
 import {TRANSACTION_DIRECTION} from '../../../../yoroi-wallets/types/other'
+import {SyncWalletInfo} from '../../../WalletManager/common/types'
 import {useWalletManager} from '../../../WalletManager/context/WalletManagerProvider'
 import {walletManager} from '../../../WalletManager/wallet-manager'
-import {notificationManager} from './notification-manager'
 import {generateNotificationId} from './notifications'
 import {buildProcessedNotificationsStorage} from './storage'
 
-const backgroundTaskId = 'yoroi-transaction-received-notifications-background-fetch'
 const storageKey = 'transaction-received-notification-history'
 
-// Check is needed for hot reloading, as task can not be defined twice
-if (!TaskManager.isTaskDefined(backgroundTaskId)) {
-  const appStorage = mountAsyncStorage({path: '/'})
-  TaskManager.defineTask(backgroundTaskId, async () => {
-    await syncAllWallets()
-    const notifications = await buildNotifications(appStorage)
-    notifications.forEach((notification) => notificationManager.events.push(notification))
-    const hasNewData = notifications.length > 0
-    return hasNewData ? BackgroundFetch.BackgroundFetchResult.NewData : BackgroundFetch.BackgroundFetchResult.NoData
-  })
+type BuildNotificationsParams = {
+  appStorage: App.Storage
+  sinceDate: Date
+  walletIds: string[]
 }
 
-const registerBackgroundFetchAsync = () => {
-  return BackgroundFetch.registerTaskAsync(backgroundTaskId, {
-    minimumInterval: 60 * 10,
-    stopOnTerminate: false,
-    startOnBoot: true,
-  })
-}
-
-const unregisterBackgroundFetchAsync = () => {
-  return BackgroundFetch.unregisterTaskAsync(backgroundTaskId)
-}
-
-const syncAllWallets = async () => {
-  const ids = [...walletManager.walletMetas.keys()]
-  for (const id of ids) {
-    const wallet = walletManager.getWalletById(id)
-    if (!wallet) continue
-    await wallet.sync({})
-  }
-}
-
-const buildNotifications = async (appStorage: App.Storage) => {
-  const walletIds = [...walletManager.walletMetas.keys()]
+const buildNotifications = async ({appStorage, sinceDate, walletIds}: BuildNotificationsParams) => {
   const notifications: NotificationTypes.TransactionReceivedEvent[] = []
 
   for (const walletId of walletIds) {
@@ -77,13 +45,20 @@ const buildNotifications = async (appStorage: App.Storage) => {
     await storage.addValues(newTxIds)
 
     newTxIds.forEach((id) => {
+      const txDate = wallet.transactions[id].submittedAt ?? new Date().toISOString()
+      const isReceived = wallet.transactions[id].direction === TRANSACTION_DIRECTION.RECEIVED
+      const isIntraWallet = wallet.transactions[id].direction === TRANSACTION_DIRECTION.SELF
+      const isConfirmedAfterDeadline = new Date(txDate).getTime() > sinceDate.getTime()
+      const shouldBeDisplayed = (isReceived || isIntraWallet) && isConfirmedAfterDeadline
+      if (!shouldBeDisplayed) return
       const metadata: NotificationTypes.TransactionReceivedEvent['metadata'] = {
         txId: id,
         isSentByUser: wallet.transactions[id]?.direction === TRANSACTION_DIRECTION.SENT,
         nextTxsCounter: newTxIds.length + processed.length,
         previousTxsCounter: processed.length,
+        walletId,
       }
-      notifications.push(createTransactionReceivedNotification(metadata))
+      notifications.push(createTransactionReceivedNotification(metadata, new Date(txDate)))
     })
   }
 
@@ -97,10 +72,11 @@ const getTxIds = (wallet: YoroiWallet) => {
 
 export const createTransactionReceivedNotification = (
   metadata: NotificationTypes.TransactionReceivedEvent['metadata'],
-) => {
+  date: Date,
+): NotificationTypes.TransactionReceivedEvent => {
   return {
     id: generateNotificationId(),
-    date: new Date().toISOString(),
+    date: date.toISOString(),
     isRead: false,
     trigger: NotificationTypes.Trigger.TransactionReceived,
     metadata,
@@ -112,29 +88,29 @@ export const transactionReceivedSubject = new Subject<NotificationTypes.Transact
 export const useTransactionReceivedNotifications = ({enabled}: {enabled: boolean}) => {
   const {walletManager} = useWalletManager()
   const asyncStorage = useAsyncStorage()
+  const walletId = walletManager.selectedWalledId
 
   React.useEffect(() => {
-    if (!enabled) return
-    registerBackgroundFetchAsync()
-    return () => {
-      unregisterBackgroundFetchAsync()
-    }
-  }, [enabled])
-
-  React.useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !walletId) return
+    const subscriptionBeginDate = new Date()
+    let latestStatuses: Map<string, SyncWalletInfo> = new Map()
     const subscription = walletManager.syncWalletInfos$.subscribe(async (status) => {
-      const walletInfos = Array.from(status.values())
-      const walletsDoneSyncing = walletInfos.filter((info) => info.status === 'done')
-      const areAllDone = walletsDoneSyncing.length === walletInfos.length
-      if (!areAllDone) return
+      const selectedWalletOldStatus = latestStatuses.get(walletId)
+      const selectedWalletCurrentStatus = status.get(walletId)
+      latestStatuses = status
 
-      const notifications = await buildNotifications(asyncStorage)
-      notifications.forEach((notification) => transactionReceivedSubject.next(notification))
+      if (selectedWalletOldStatus?.status !== 'done' && selectedWalletCurrentStatus?.status === 'done') {
+        const notifications = await buildNotifications({
+          appStorage: asyncStorage,
+          sinceDate: subscriptionBeginDate,
+          walletIds: [walletId],
+        })
+        notifications.forEach((notification) => transactionReceivedSubject.next(notification))
+      }
     })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [walletManager, asyncStorage, enabled])
+  }, [walletManager, asyncStorage, enabled, walletId, walletManager.selectedNetwork])
 }

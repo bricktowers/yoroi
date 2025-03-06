@@ -1,3 +1,4 @@
+import {networkConfigs} from '@yoroi/blockchains'
 import {useTheme} from '@yoroi/theme'
 import {Chain} from '@yoroi/types'
 import * as React from 'react'
@@ -11,7 +12,6 @@ import {useMetrics} from '../../../../../kernel/metrics/metricsManager'
 import {useWalletNavigation} from '../../../../../kernel/navigation'
 import {availableNetworks} from '../../../../WalletManager/common/constants'
 import {useWalletManager} from '../../../../WalletManager/context/WalletManagerProvider'
-import {networkConfigs} from '../../../../WalletManager/network-manager/network-manager'
 import {useStrings} from './strings'
 
 export const NetworkTag = ({
@@ -44,18 +44,20 @@ export const NetworkTag = ({
       const nextNetwork = availableNetworks[(availableNetworks.indexOf(selectedNetwork) + 1) % availableNetworks.length]
 
       if (nextNetwork === Chain.Network.Mainnet) {
-        openModal(
-          strings.networkTagModalTitle,
-          <MainnetWarningDialog
-            onCancel={closeModal}
-            onOk={() => {
-              track.networkSelected({to_network: nextNetwork, from_network: selectedNetwork})
-              walletManager.setSelectedNetwork(nextNetwork)
-              closeModal()
-            }}
-          />,
-          280,
-        )
+        openModal({
+          title: strings.networkTagModalTitle,
+          content: (
+            <MainnetWarningDialog
+              onCancel={closeModal}
+              onOk={() => {
+                track.networkSelected({to_network: nextNetwork, from_network: selectedNetwork})
+                walletManager.setSelectedNetwork(nextNetwork)
+                closeModal()
+              }}
+            />
+          ),
+          height: 280,
+        })
 
         return
       }

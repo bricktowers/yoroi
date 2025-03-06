@@ -2,15 +2,17 @@ import {useNavigation} from '@react-navigation/core'
 import {NavigationState, useFocusEffect} from '@react-navigation/native'
 import {FlashList} from '@shopify/flash-list'
 import {isString} from '@yoroi/common'
-import {useSwap, useSwapOrdersByStatusOpen} from '@yoroi/swap'
+import {amountFormatter, infoExtractName} from '@yoroi/portfolio'
+import {getPoolUrlByProvider, useSwap, useSwapOrdersByStatusOpen} from '@yoroi/swap'
 import {useTheme} from '@yoroi/theme'
-import {Buffer} from 'buffer'
-import _ from 'lodash'
+import {Portfolio} from '@yoroi/types'
+import _, {capitalize} from 'lodash'
 import React, {useRef} from 'react'
 import {useIntl} from 'react-intl'
-import {ActivityIndicator, Alert, Linking, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {ActivityIndicator, Alert, Linking, StyleSheet, TouchableOpacity, View, ViewProps} from 'react-native'
 
 import {Button, ButtonType} from '../../../../../components/Button/Button'
+import {Divider} from '../../../../../components/Divider/Divider'
 import {
   ExpandableInfoCard,
   ExpandableInfoCardSkeleton,
@@ -26,24 +28,23 @@ import {Text} from '../../../../../components/Text'
 import {useLanguage} from '../../../../../kernel/i18n'
 import {useMetrics} from '../../../../../kernel/metrics/metricsManager'
 import {useWalletNavigation} from '../../../../../kernel/navigation'
+import {isEmptyString} from '../../../../../kernel/utils'
 import {SubmitTxInsufficientCollateralError} from '../../../../../yoroi-wallets/cardano/api/errors'
-import {convertBech32ToHex, getTransactionSigners} from '../../../../../yoroi-wallets/cardano/common/signatureUtils'
+import {convertBech32ToHex} from '../../../../../yoroi-wallets/cardano/common/signatureUtils'
 import {YoroiWallet} from '../../../../../yoroi-wallets/cardano/types'
-import {createRawTxSigningKey, generateCIP30UtxoCbor} from '../../../../../yoroi-wallets/cardano/utils'
+import {generateCIP30UtxoCbor} from '../../../../../yoroi-wallets/cardano/utils'
 import {useTransactionInfos} from '../../../../../yoroi-wallets/hooks'
 import {usePortfolioTokenInfos} from '../../../../Portfolio/common/hooks/usePortfolioTokenInfos'
 import {TokenInfoIcon} from '../../../../Portfolio/common/TokenAmountItem/TokenInfoIcon'
 import {useSearch} from '../../../../Search/SearchContext'
 import {getCollateralAmountInLovelace} from '../../../../Settings/useCases/changeWalletSettings/ManageCollateral/helpers'
 import {useSelectedWallet} from '../../../../WalletManager/common/hooks/useSelectedWallet'
-import {ConfirmRawTx} from '../../../common/ConfirmRawTx/ConfirmRawTx'
 import {Counter} from '../../../common/Counter/Counter'
 import {EmptyOpenOrdersIllustration} from '../../../common/Illustrations/EmptyOpenOrdersIllustration'
 import {LiquidityPool} from '../../../common/LiquidityPool/LiquidityPool'
 import {useNavigateTo} from '../../../common/navigation'
 import {PoolIcon} from '../../../common/PoolIcon/PoolIcon'
 import {useStrings} from '../../../common/strings'
-import {SwapInfoLink} from '../../../common/SwapInfoLink/SwapInfoLink'
 import {getCancellationOrderFee} from './helpers'
 import {mapOpenOrders, MappedOpenOrder} from './mapOrders'
 
@@ -52,10 +53,11 @@ export const OpenOrders = () => {
   const strings = useStrings()
   const {styles} = useStyles()
   const intl = useIntl()
-  const {wallet, meta} = useSelectedWallet()
+  const {wallet} = useSelectedWallet()
   const {order: swapApiOrder} = useSwap()
-  const {navigateToTxHistory} = useWalletNavigation()
+  const {navigateToTxReview} = useWalletNavigation()
   const [isLoading, setIsLoading] = React.useState(false)
+  const navigateTo = useNavigateTo()
 
   const orders = useSwapOrdersByStatusOpen()
   const {numberLocale} = useLanguage()
@@ -126,34 +128,17 @@ export const OpenOrders = () => {
     })
   }
 
-  const onRawTxConfirm = async (rootKey: string, order: MappedOpenOrder) => {
+  const onSuccess = (order: MappedOpenOrder) => {
     try {
-      const tx = await createCancellationTxAndSign(order.id, rootKey)
-      if (!tx) return
-      await wallet.submitTransaction(tx.txBase64)
       trackCancellationSubmitted(order)
+      navigateTo.submittedTx()
       closeModal()
-      navigateToTxHistory()
     } catch (error) {
       if (error instanceof SubmitTxInsufficientCollateralError) {
         handleCollateralError()
         return
       }
-      throw error
-    }
-  }
-
-  const onRawTxHwConfirm = (order: MappedOpenOrder) => {
-    try {
-      trackCancellationSubmitted(order)
-      closeModal()
-      navigateToTxHistory()
-    } catch (error) {
-      if (error instanceof SubmitTxInsufficientCollateralError) {
-        handleCollateralError()
-        return
-      }
-      throw error
+      navigateTo.failedTx()
     }
   }
 
@@ -164,7 +149,25 @@ export const OpenOrders = () => {
     return !!collateral.utxo && collateral.amount.quantity >= BigInt(getCollateralAmountInLovelace())
   }
 
-  const onOrderCancelConfirm = (order: MappedOpenOrder) => {
+  const generateSwapCancellationCbor = async (bech32Address: string, utxo: string) => {
+    const collateralUtxo = await getCollateralUtxo()
+    const addressHex = await convertBech32ToHex(bech32Address)
+    const cbor = await swapApiOrder.cancel({
+      utxos: {collateral: collateralUtxo, order: utxo},
+      address: addressHex,
+    })
+
+    return cbor
+  }
+
+  const onOrderCancelConfirm = async (
+    order: MappedOpenOrder,
+    assetAmount: string,
+    assetPrice: string,
+    totalReturned: string,
+    fee: string,
+    liquidityPool: React.ReactNode,
+  ) => {
     if (!isString(order.utxo) || !isString(order.owner)) return
 
     if (!hasCollateral()) {
@@ -172,18 +175,25 @@ export const OpenOrders = () => {
       return
     }
 
-    openModal(
-      strings.signTransaction,
-      <ConfirmRawTx
-        cancelOrder={swapApiOrder.cancel}
-        utxo={order.utxo}
-        bech32Address={order.owner}
-        onCancel={closeModal}
-        onConfirm={(rootKey) => onRawTxConfirm(rootKey, order)}
-        onHWConfirm={() => onRawTxHwConfirm(order)}
-      />,
-      400,
-    )
+    const cbor = await generateSwapCancellationCbor(order.owner, order.utxo)
+
+    navigateToTxReview({
+      cbor,
+      onSuccess: () => onSuccess(order),
+      details: {
+        component: (
+          <Details
+            order={order}
+            assetAmount={assetAmount}
+            assetPrice={assetPrice}
+            totalReturned={totalReturned}
+            fee={fee}
+            liquidityPool={liquidityPool}
+          />
+        ),
+        title: strings.swapCancellationDetailsTitle,
+      },
+    })
   }
 
   const handleCollateralError = () => {
@@ -203,36 +213,6 @@ export const OpenOrders = () => {
     }
 
     return generateCIP30UtxoCbor(utxo)
-  }
-
-  const createCancellationTxAndSign = async (
-    orderId: string,
-    rootKey: string,
-  ): Promise<{txBase64: string} | undefined> => {
-    const order = normalizedOrders.find((o) => o.id === orderId)
-    if (!order || order.owner === undefined || order.utxo === undefined) return
-    const {utxo, owner: bech32Address} = order
-
-    try {
-      const collateralUtxo = await getCollateralUtxo()
-      const addressHex = await convertBech32ToHex(bech32Address)
-      const cbor = await swapApiOrder.cancel({
-        utxos: {collateral: collateralUtxo, order: utxo},
-        address: addressHex,
-      })
-      const signers = await getTransactionSigners(cbor, wallet, meta)
-      const keys = await Promise.all(signers.map(async (signer) => createRawTxSigningKey(rootKey, signer)))
-      const response = await wallet.signRawTx(cbor, keys)
-      if (!response) return
-      const hexBase64 = Buffer.from(response).toString('base64')
-      return {txBase64: hexBase64}
-    } catch (error) {
-      if (error instanceof SubmitTxInsufficientCollateralError) {
-        handleCollateralError()
-        return
-      }
-      throw error
-    }
   }
 
   const {
@@ -266,28 +246,44 @@ export const OpenOrders = () => {
       assetToLabel,
       tokenPrice,
       tokenAmount,
+      provider,
     } = order
-    const totalReturned = `${fromTokenAmount} ${fromTokenInfo?.ticker ?? fromTokenInfo?.name}`
     const collateralUtxo = await getCollateralUtxo()
+    const assetAmount = `${tokenAmount} ${assetToLabel}`
+    const assetPrice = `${tokenPrice} ${assetFromLabel}/${assetToLabel}`
+    const totalReturned = `${fromTokenAmount} ${fromTokenInfo?.ticker ?? fromTokenInfo?.name}`
+
+    const poolIcon = !isEmptyString(provider) ? <PoolIcon providerId={provider} size={18} /> : null
+    const poolProviderFormatted = !isEmptyString(provider) ? capitalize(provider) : null
+    const poolUrl = !isEmptyString(provider) ? getPoolUrlByProvider(provider) : null
+
+    const liquidityPool =
+      poolIcon && poolProviderFormatted != null && poolUrl != null ? (
+        <LiquidityPool liquidityPoolIcon={poolIcon} liquidityPoolName={poolProviderFormatted} poolUrl={poolUrl} />
+      ) : null
 
     try {
-      const fee = await getFee(utxo, collateralUtxo, bech32Address)
-      openModal(
-        strings.listOrdersSheetTitle,
-        <ModalContent
-          assetFromIcon={<TokenInfoIcon info={fromTokenInfo} size="sm" />}
-          assetToIcon={<TokenInfoIcon info={toTokenInfo} size="sm" />}
-          onConfirm={() => onOrderCancelConfirm(order)}
-          onBack={closeModal}
-          assetFromLabel={assetFromLabel}
-          assetToLabel={assetToLabel}
-          assetAmount={`${tokenAmount} ${assetToLabel}`}
-          assetPrice={`${tokenPrice} ${assetFromLabel}/${assetToLabel}`}
-          totalReturned={totalReturned}
-          fee={fee}
-        />,
-        460,
-      )
+      const fee = `${await getFee(utxo, collateralUtxo, bech32Address)} ${wallet.portfolioPrimaryTokenInfo.ticker}`
+
+      openModal({
+        title: strings.listOrdersSheetTitle,
+        content: (
+          <ModalContent
+            assetFromIcon={<TokenInfoIcon info={fromTokenInfo} size="sm" />}
+            assetToIcon={<TokenInfoIcon info={toTokenInfo} size="sm" />}
+            onConfirm={() => onOrderCancelConfirm(order, assetAmount, assetPrice, totalReturned, fee, liquidityPool)}
+            onBack={closeModal}
+            assetFromLabel={assetFromLabel}
+            assetToLabel={assetToLabel}
+            assetAmount={`${tokenAmount} ${assetToLabel}`}
+            assetPrice={`${tokenPrice} ${assetFromLabel}/${assetToLabel}`}
+            totalReturned={totalReturned}
+            fee={fee}
+            liquidityPool={liquidityPool}
+          />
+        ),
+        height: 460,
+      })
     } catch (error) {
       setIsLoading(false)
       if (error instanceof SubmitTxInsufficientCollateralError) {
@@ -542,6 +538,7 @@ const ModalContent = ({
   assetAmount,
   totalReturned,
   fee,
+  liquidityPool,
 }: {
   onConfirm: () => void
   onBack: () => void
@@ -553,8 +550,8 @@ const ModalContent = ({
   assetAmount: string
   totalReturned: string
   fee: string
+  liquidityPool: React.ReactNode
 }) => {
-  const strings = useStrings()
   const {styles} = useStyles()
 
   const handleConfirm = () => {
@@ -572,29 +569,62 @@ const ModalContent = ({
 
       <Spacer height={10} />
 
-      <ModalContentRow label={strings.listOrdersSheetAssetPrice} value={assetPrice} />
-
-      <Spacer height={10} />
-
-      <ModalContentRow label={strings.listOrdersSheetAssetAmount} value={assetAmount} />
-
-      <Spacer height={10} />
-
-      <ModalContentRow label={strings.listOrdersSheetTotalReturned} value={totalReturned} />
-
-      <Spacer height={35} />
-
-      <ModalContentRow label={strings.listOrdersSheetCancellationFee} value={fee} />
-
-      <Spacer height={10} />
-
-      <SwapInfoLink />
+      <ModalData
+        assetPrice={assetPrice}
+        assetAmount={assetAmount}
+        totalReturned={totalReturned}
+        fee={fee}
+        liquidityPool={liquidityPool}
+      />
 
       <Spacer fill />
 
       <ModalContentButtons onConfirm={handleConfirm} onBack={onBack} />
 
       <Spacer height={30} />
+    </View>
+  )
+}
+
+const ModalData = ({
+  assetPrice,
+  assetAmount,
+  totalReturned,
+  fee,
+  liquidityPool,
+}: {
+  assetPrice: string
+  assetAmount: string
+  totalReturned: string
+  fee: string
+  liquidityPool: React.ReactNode
+}) => {
+  const strings = useStrings()
+  const {styles} = useStyles()
+
+  return (
+    <View>
+      <View style={styles.contentRow}>
+        <Text style={styles.contentLabel}>{strings.dex.toLocaleUpperCase()}</Text>
+
+        {liquidityPool}
+      </View>
+
+      <Space height="sm" />
+
+      <ModalContentRow label={strings.listOrdersSheetAssetPrice} value={assetPrice} />
+
+      <Space height="sm" />
+
+      <ModalContentRow label={strings.listOrdersSheetAssetAmount} value={assetAmount} />
+
+      <Space height="sm" />
+
+      <ModalContentRow label={strings.listOrdersSheetTotalReturned} value={totalReturned} />
+
+      <Space height="sm" />
+
+      <ModalContentRow label={strings.listOrdersSheetCancellationFee} value={fee} />
     </View>
   )
 }
@@ -748,6 +778,117 @@ const EmptySearchResult = () => {
   )
 }
 
+const Details = ({
+  order,
+  assetAmount,
+  assetPrice,
+  totalReturned,
+  fee,
+  liquidityPool,
+}: {
+  order: MappedOpenOrder
+  assetAmount: string
+  assetPrice: string
+  totalReturned: string
+  fee: string
+  liquidityPool: React.ReactNode
+}) => {
+  const {styles} = useStyles()
+  const strings = useStrings()
+
+  const isFromPrimary = order.fromTokenInfo?.nature === Portfolio.Token.Nature.Primary
+  const fromDetail = isFromPrimary ? order.fromTokenInfo?.description : order.fromTokenInfo?.fingerprint
+  const fromName = order.fromTokenInfo ? infoExtractName(order.fromTokenInfo) : ''
+  const fromAmount = order.fromTokenInfo ? {quantity: order.from.quantity, info: order.fromTokenInfo} : null
+
+  const isToPrimary = order.toTokenInfo?.nature === Portfolio.Token.Nature.Primary
+  const toDetail = isToPrimary ? order.toTokenInfo?.description : order.toTokenInfo?.fingerprint
+  const toName = order.toTokenInfo ? infoExtractName(order.toTokenInfo) : ''
+  const toAmount = order.toTokenInfo ? {quantity: order.to.quantity, info: order.toTokenInfo} : null
+
+  return (
+    <View>
+      <Text style={styles.amountItemLabel}>{strings.swapFrom}</Text>
+
+      <View style={styles.token}>
+        <Left>
+          <TokenInfoIcon info={order.fromTokenInfo} size="md" />
+        </Left>
+
+        <Middle>
+          <View style={styles.row}>
+            <Text numberOfLines={1} ellipsizeMode="middle" style={styles.name} testID="tokenInfoText">
+              {fromName}
+            </Text>
+          </View>
+
+          <Text numberOfLines={1} ellipsizeMode="middle" style={styles.detail} testID="tokenFingerprintText">
+            {fromDetail}
+          </Text>
+        </Middle>
+
+        <Right style={styles.end}>
+          {fromAmount && (
+            <Text style={styles.quantity}>{`${amountFormatter({dropTraillingZeros: true})(fromAmount)} ${
+              order.fromTokenInfo?.ticker ?? ''
+            }`}</Text>
+          )}
+        </Right>
+      </View>
+
+      <Space height="lg" />
+
+      <Text style={styles.amountItemLabel}>{strings.swapTo}</Text>
+
+      <View style={styles.token}>
+        <Left>
+          <TokenInfoIcon info={order.toTokenInfo} size="md" />
+        </Left>
+
+        <Middle>
+          <View style={styles.row}>
+            <Text numberOfLines={1} ellipsizeMode="middle" style={styles.name} testID="tokenInfoText">
+              {toName}
+            </Text>
+          </View>
+
+          <Text numberOfLines={1} ellipsizeMode="middle" style={styles.detail} testID="tokenFingerprintText">
+            {toDetail}
+          </Text>
+        </Middle>
+
+        <Right style={styles.end}>
+          {toAmount && (
+            <Text style={styles.quantity}>{`${amountFormatter({dropTraillingZeros: true})(toAmount)} ${
+              order.toTokenInfo?.ticker ?? ''
+            }`}</Text>
+          )}
+        </Right>
+      </View>
+
+      <Space height="lg" />
+
+      <Divider />
+
+      <Space height="lg" />
+
+      <ModalData
+        assetAmount={assetAmount}
+        assetPrice={assetPrice}
+        totalReturned={totalReturned}
+        fee={fee}
+        liquidityPool={liquidityPool}
+      />
+    </View>
+  )
+}
+
+const Left = ({style, ...props}: ViewProps) => <View style={style} {...props} />
+const Middle = ({style, ...props}: ViewProps) => (
+  <View style={[style, {flex: 1, justifyContent: 'center', paddingHorizontal: 8}]} {...props} />
+)
+const Right = ({style, ...props}: ViewProps) => <View style={style} {...props} />
+
 const useStyles = () => {
   const {color, atoms} = useTheme()
   const styles = StyleSheet.create({
@@ -842,7 +983,41 @@ const useStyles = () => {
       ...atoms.align_center,
       ...atoms.justify_center,
     },
+    row: {
+      ...atoms.flex,
+      ...atoms.flex_row,
+      ...atoms.align_center,
+    },
+    end: {
+      ...atoms.align_end,
+    },
+    quantity: {
+      color: color.gray_900,
+      ...atoms.body_1_lg_regular,
+    },
+    name: {
+      color: color.gray_900,
+      ...atoms.body_1_lg_medium,
+    },
+    detail: {
+      color: color.gray_600,
+      maxWidth: 140,
+      ...atoms.body_3_sm_regular,
+    },
+    token: {
+      ...atoms.flex_row,
+      ...atoms.align_center,
+    },
+    amountItemLabel: {
+      fontSize: 12,
+      color: color.text_gray_medium,
+      ...atoms.pb_sm,
+    },
   })
 
-  return {styles} as const
+  const colors = {
+    icon: color.secondary_600,
+  }
+
+  return {styles, colors} as const
 }

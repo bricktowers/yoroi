@@ -24,7 +24,11 @@ export const TokenItem = ({
   const {height: windowHeight} = useWindowDimensions()
 
   const handleShowTokenDetails = () => {
-    openModal(strings.tokenDetailsTitle, <TokenDetails tokenInfo={tokenInfo} />, windowHeight * 0.8)
+    openModal({
+      title: strings.tokenDetailsTitle,
+      content: <TokenDetails tokenInfo={tokenInfo} />,
+      height: windowHeight * 0.8,
+    })
   }
 
   if (!isSent)

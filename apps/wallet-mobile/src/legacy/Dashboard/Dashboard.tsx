@@ -29,6 +29,7 @@ import {WithdrawWarningModal} from '../../features/Staking/Governance/useCases/W
 import {useSelectedNetwork} from '../../features/WalletManager/common/hooks/useSelectedNetwork'
 import {useSelectedWallet} from '../../features/WalletManager/common/hooks/useSelectedWallet'
 import globalMessages from '../../kernel/i18n/global-messages'
+import {useMetrics} from '../../kernel/metrics/metricsManager'
 import {DashboardRoutes, useWalletNavigation} from '../../kernel/navigation'
 import {isEmptyString} from '../../kernel/utils'
 import {useBalances, useIsOnline, useSync} from '../../yoroi-wallets/hooks'
@@ -39,14 +40,16 @@ import {EpochProgress} from './EpochProgress'
 import {NotDelegatedInfo} from './NotDelegatedInfo'
 import {StakePoolInfos, useStakingInfo} from './StakePoolInfos'
 import {UserSummary} from './UserSummary'
-import {WithdrawStakingRewards} from './WithdrawStakingRewards/WithdrawStakingRewards'
+import {useWithdrawStakingRewardsStrings, WithdrawStakingRewards} from './WithdrawStakingRewards/WithdrawStakingRewards'
 
 export const Dashboard = () => {
+  const strings = useWithdrawStakingRewardsStrings()
   const {styles} = useStyles()
   const intl = useIntl()
   const navigateTo = useNavigateTo()
   const governanceStrings = useStrings()
   const {isPoolRetiring} = usePoolTransition()
+  const {track} = useMetrics()
 
   const {wallet, meta} = useSelectedWallet()
   const {isLoading: isSyncing, sync} = useSync(wallet)
@@ -67,15 +70,21 @@ export const Dashboard = () => {
   }
 
   const onWithdraw = () => {
+    track.claimAdaTransactionInitiated()
+
     if (isGovernanceFeatureEnabled && !isParticipatingInGovernance) {
-      openModal(
-        governanceStrings.withdrawWarningTitle,
-        <WithdrawWarningModal onParticipatePress={handleOnParticipatePress} />,
-      )
+      openModal({
+        title: governanceStrings.withdrawWarningTitle,
+        content: <WithdrawWarningModal onParticipatePress={handleOnParticipatePress} />,
+      })
       return
     }
 
-    openModal('', <WithdrawStakingRewards wallet={wallet} />, Math.min(windowHeight * 0.9, 704))
+    openModal({
+      title: strings.warningModalTitle,
+      content: <WithdrawStakingRewards wallet={wallet} />,
+      height: Math.min(windowHeight * 0.9, 730),
+    })
   }
 
   return (

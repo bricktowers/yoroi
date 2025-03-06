@@ -15,6 +15,7 @@ import {SafeAreaView} from 'react-native-safe-area-context'
 import {Button} from '../../../components/Button/Button'
 import {ScrollView} from '../../../components/ScrollView/ScrollView'
 import {Text} from '../../../components/Text'
+import {useWalletManager} from '../../WalletManager/context/WalletManagerProvider'
 import {notificationManager} from './common/notification-manager'
 import {createTransactionReceivedNotification} from './common/transaction-received-notification'
 
@@ -28,16 +29,19 @@ export const NotificationsDevScreen = () => {
 
 const Screen = () => {
   const manager = useNotificationManager()
+  const walletManager = useWalletManager()
+  const selectedWalletId = walletManager.selected.wallet?.id ?? ''
 
   const handleOnTriggerTransactionReceived = () => {
-    manager.events.push(
-      createTransactionReceivedNotification({
-        previousTxsCounter: 0,
-        nextTxsCounter: 1,
-        txId: '123',
-        isSentByUser: false,
-      }),
-    )
+    const date = new Date()
+    const metadata = {
+      previousTxsCounter: 0,
+      nextTxsCounter: 1,
+      txId: '123',
+      isSentByUser: false,
+      walletId: selectedWalletId,
+    }
+    manager.events.push(createTransactionReceivedNotification(metadata, date))
   }
 
   return (
@@ -46,7 +50,7 @@ const Screen = () => {
         <View style={{padding: 16, gap: 8}}>
           <Text style={{fontSize: 24}}>Notifications Playground</Text>
 
-          <Button title="Trigger Transacrion Received Notification" onPress={handleOnTriggerTransactionReceived} />
+          <Button title="Trigger Transaction Received Notification" onPress={handleOnTriggerTransactionReceived} />
 
           <Text style={{fontSize: 24}}>Settings</Text>
 

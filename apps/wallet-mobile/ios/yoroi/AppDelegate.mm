@@ -2,6 +2,7 @@
 #import "AppDelegate.h"
 #import "RNBootSplash.h"
 #import "RNNotifications.h"
+#import <Firebase.h>
 
 #import <React/RCTBundleURLProvider.h>
 
@@ -17,6 +18,21 @@
   // react-native-bootsplash
   UIView *rootView = self.window.rootViewController.view;
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+
+  NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
+  NSString *googleServiceFilePath;
+
+  if ([bundleID isEqualToString:@"com.emurgo.yoroi-nightly"]) {
+      googleServiceFilePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info-Nightly" ofType:@"plist"];
+  } else {
+      googleServiceFilePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info-Production" ofType:@"plist"];
+  }
+
+  if (googleServiceFilePath) {
+      FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:googleServiceFilePath];
+      [FIRApp configureWithOptions:options];
+  }
+
   [RNNotifications startMonitorNotifications];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];

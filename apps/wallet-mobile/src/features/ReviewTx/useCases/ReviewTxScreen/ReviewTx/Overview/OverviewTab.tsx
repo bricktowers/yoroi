@@ -5,7 +5,7 @@ import {useTheme} from '@yoroi/theme'
 import {Balance, Portfolio} from '@yoroi/types'
 import {Image} from 'expo-image'
 import * as React from 'react'
-import {Linking, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View} from 'react-native'
+import {Linking, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View} from 'react-native'
 import {useQuery} from 'react-query'
 
 import {Button} from '../../../../../../components/Button/Button'
@@ -101,11 +101,11 @@ const WalletInfoSection = ({tx, createdBy}: {tx: FormattedTx; createdBy?: React.
   const {height: windowHeight} = useWindowDimensions()
 
   const handleShowWalletBalance = () => {
-    openModal(
-      strings.walletBalanceTitle,
-      <WalletBalance image={seedImage} plate={plate} name={meta.name} />,
-      windowHeight * 0.8,
-    )
+    openModal({
+      title: strings.walletBalanceTitle,
+      content: <WalletBalance image={seedImage} plate={plate} name={meta.name} />,
+      height: windowHeight * 0.8,
+    })
   }
 
   return (
@@ -116,7 +116,7 @@ const WalletInfoSection = ({tx, createdBy}: {tx: FormattedTx; createdBy?: React.
         <View style={styles.plate}>
           <Icon.WalletAvatar image={seedImage} style={styles.walletChecksum} size={24} />
 
-          <Space width="xs" />
+          <Space width="sm" />
 
           <TouchableOpacity activeOpacity={0.5} onPress={handleShowWalletBalance}>
             <Text style={styles.walletInfoText}>{`${plate} | ${meta.name}`}</Text>
@@ -177,7 +177,13 @@ const MyWalletSection = ({
           {address}
         </Text>
 
-        {ownedOutputs[0]?.addressKind === CredKind.Script && <Icon.DigitalAsset size={24} color={colors.icon} />}
+        {ownedOutputs[0]?.addressKind === CredKind.Script && (
+          <>
+            <Space width="xs" />
+
+            <Icon.DigitalAsset size={24} color={colors.icon} />
+          </>
+        )}
       </CopiableText>
 
       <Space height="sm" />
@@ -273,12 +279,7 @@ const OneExternalPartySection = ({
       <Space height="sm" />
 
       <View style={styles.externalPartyAddress}>
-        <Text style={styles.externalPartyAddressText}>
-          {output?.addressKind === CredKind.Script && receiverCustomTitle == null
-            ? strings.receiveToScriptLabel
-            : strings.receiveToLabel}
-          :
-        </Text>
+        <Text style={styles.externalPartyAddressText}>{strings.receiveToLabel}:</Text>
 
         {receiverCustomTitle ?? (
           <CopiableText textToCopy={address}>
@@ -290,7 +291,13 @@ const OneExternalPartySection = ({
               {address}
             </Text>
 
-            {output?.addressKind === CredKind.Script && <Icon.DigitalAsset size={24} color={colors.icon} />}
+            {output?.addressKind === CredKind.Script && (
+              <>
+                <Space width="xs" />
+
+                <Icon.DigitalAsset size={24} color={colors.icon} />
+              </>
+            )}
           </CopiableText>
         )}
       </View>
@@ -320,7 +327,13 @@ const MultiExternalPartiesSection = ({outputs}: {outputs: FormattedOutputs}) => 
             {address}
           </Text>
 
-          {output?.addressKind === CredKind.Script && <Icon.DigitalAsset size={24} color={colors.icon} />}
+          {output?.addressKind === CredKind.Script && (
+            <>
+              <Space width="xs" />
+
+              <Icon.DigitalAsset size={24} color={colors.icon} />
+            </>
+          )}
         </CopiableText>
 
         <Space height="sm" />
@@ -404,11 +417,11 @@ const OperationsSection = ({
           if (index === 0) return operation
 
           return (
-            <>
+            <React.Fragment key={index}>
               <Space height="sm" />
 
               {operation}
-            </>
+            </React.Fragment>
           )
         })}
 
@@ -456,13 +469,11 @@ const Details = ({details}: {details?: {title: string; component: React.ReactNod
   if (details == null) return null
 
   const handleOnPress = () => {
-    openModal(
-      details.title ?? '',
-      <ScrollView bounces={false} style={styles.details}>
-        {details.component}
-      </ScrollView>,
-      400,
-    )
+    openModal({
+      title: details.title ?? '',
+      content: <View style={styles.details}>{details.component}</View>,
+      height: 400,
+    })
   }
 
   return (
@@ -489,7 +500,7 @@ export const CreatedByInfoItem = ({logo, url}: {logo?: string; url: string}) => 
       <View style={styles.plate}>
         {logo != null && <Image source={{uri: logo}} style={styles.logo} />}
 
-        <Space width="xs" />
+        <Space width="sm" />
 
         <TouchableOpacity onPress={() => Linking.openURL(url)}>
           <Text style={styles.link}>{url.replace(/^https?:\/\//, '').replace(/\/+$/, '')}</Text>
@@ -549,8 +560,8 @@ const useShowOperationsNotice = (operations: Operations) => {
       clearTimeout(timeout)
 
       timeout = setTimeout(() => {
-        openModal(strings.operationsNoticeTitle, <OperationsNotice />, 570)
-      }, 500)
+        openModal({title: strings.operationsNoticeTitle, content: <OperationsNotice />, height: 570}), 500
+      })
     }
 
     if (operations.components.length > 0 && query.data) openOperationsNotice()
@@ -678,7 +689,7 @@ const useStyles = () => {
   })
 
   const colors = {
-    send: color.primary_500,
+    send: color.el_primary_medium,
     received: color.green_static,
     icon: color.el_gray_medium,
   }

@@ -1,6 +1,6 @@
 {
   "name": "@yoroi/staking",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "The Staking package of Yoroi SDK",
   "keywords": [
     "yoroi",
@@ -110,6 +110,7 @@
     ],
     "coverageReporters": [
       "text-summary",
+      "lcov",
       "html"
     ],
     "coverageThreshold": {
@@ -149,7 +150,7 @@
     "@types/react": "^18.2.55",
     "@types/react-test-renderer": "^18.0.7",
     "@yoroi/common": "1.5.4",
-    "@yoroi/types": "1.5.9",
+    "@yoroi/types": "1.5.10",
     "axios": "^1.5.0",
     "axios-mock-adapter": "^1.21.5",
     "commitlint": "^17.0.2",

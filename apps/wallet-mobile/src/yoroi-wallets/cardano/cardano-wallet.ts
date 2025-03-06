@@ -4,6 +4,7 @@ import * as CSL from '@emurgo/cross-csl-core'
 import {createSignedLedgerTxFromCbor, signRawTransaction} from '@emurgo/yoroi-lib'
 import {Datum} from '@emurgo/yoroi-lib/dist/internals/models'
 import {AppApi} from '@yoroi/api'
+import {cardanoConfig, derivationConfig, protocolParamsPlaceholder} from '@yoroi/blockchains'
 import {isNonNullable} from '@yoroi/common'
 import {Api, App, Balance, HW, Network, Portfolio, Wallet} from '@yoroi/types'
 import {BigNumber} from 'bignumber.js'
@@ -17,9 +18,6 @@ import {toLedgerSignRequest} from '../../features/Discover/common/ledger'
 import {buildPortfolioBalanceManager} from '../../features/Portfolio/common/helpers/build-balance-manager'
 import {toBalanceManagerSyncArgs} from '../../features/Portfolio/common/transformers/toBalanceManagerSyncArgs'
 import {makeMemosManager, MemosManager} from '../../features/Transactions/common/memos/memosManager'
-import {cardanoConfig} from '../../features/WalletManager/common/adapters/cardano/cardano-config'
-import {derivationConfig} from '../../features/WalletManager/common/derivation-config'
-import {protocolParamsPlaceholder} from '../../features/WalletManager/network-manager/network-manager'
 import {LocalizableError} from '../../kernel/i18n/LocalizableError'
 import {throwLoggedError} from '../../kernel/logger/helpers/throw-logged-error'
 import {logger} from '../../kernel/logger/logger'
@@ -338,7 +336,9 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
       if (implementationConfig.features.staking) {
         const derivation = implementationConfig.features.staking.derivation
 
-        const accountPubKey = await CardanoMobile.Bip32PublicKey.fromBytes(Buffer.from(this.publicKeyHex, 'hex'))
+        const accountPubKey = await CardanoMobile.Bip32PublicKey.fromBytes(
+          new Uint8Array(Buffer.from(this.publicKeyHex, 'hex')),
+        )
         const stakingKey = await accountPubKey
           .derive(derivation.role)
           .then((key) => key.derive(derivation.index))
@@ -435,7 +435,7 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
         try {
           const absSlotNumber = await this.getAbsoluteSlotNumber()
           const votingPublicKey = await Promise.resolve(Buffer.from(catalystKeyHex, 'hex'))
-            .then((bytes) => CardanoMobile.PrivateKey.fromExtendedBytes(bytes))
+            .then((bytes) => CardanoMobile.PrivateKey.fromExtendedBytes(new Uint8Array(bytes)))
             .then((key) => key.toPublic())
           const stakingPublicKey = await this.getStakingKey()
           const changeAddr = this.getAddressedChangeAddress(addressMode)
@@ -690,6 +690,16 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
     // end of portfolio
 
     async clear() {
+      // TODO: the correct way would be following these steps:
+      // 1st) pausing all fetches (all background syncing) utxo/used addresses/token infos
+      // 2nd) clearing all data
+      // 3rd) marking all caches as stale (queries etc)
+      // 4th) resuming all syncs
+      // NOTE: there is room for data inconsistency here
+
+      // NOTE: this will invalidate all tokens for that network which means other wallets will be affected too
+      this.networkManager.tokenManager.clear({sourceId: `resync-wallet-${this.id}`})
+
       // TODO: missing accounts clear (it wasnt reseting it before, so 🤷‍♂️)
       this.balanceManager.clear()
       await this.transactionManager.clear()
@@ -813,7 +823,9 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
     }
 
     async signTx(unsignedTx: YoroiUnsignedTx, decryptedMasterKey: string) {
-      const masterKey = await CardanoMobile.Bip32PrivateKey.fromBytes(Buffer.from(decryptedMasterKey, 'hex'))
+      const masterKey = await CardanoMobile.Bip32PrivateKey.fromBytes(
+        new Uint8Array(Buffer.from(decryptedMasterKey, 'hex')),
+      )
       const accountPrivateKey = await masterKey
         .derive(implementationConfig.derivations.base.harden.purpose)
         .then((key) => key.derive(implementationConfig.derivations.base.harden.coinType))
@@ -881,18 +893,15 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
       return doesCardanoAppVersionSupportCIP1694(await getCardanoAppMajorVersion(hwDeviceInfo, useUSB))
     }
 
-    async signSwapCancellationWithLedger(cbor: string, useUSB: boolean, hwDeviceInfo: HW.DeviceInfo): Promise<void> {
-      const tx = await CardanoMobile.Transaction.fromHex(cbor)
-      const txBody = await tx.body()
+    async signRawTxWithLedger(cbor: string, useUSB: boolean, hwDeviceInfo: HW.DeviceInfo): Promise<void> {
       const payload = await toLedgerSignRequest(
         CardanoMobile,
-        txBody,
+        cbor,
         this.networkManager.chainId,
         this.networkManager.protocolMagic,
         await getHexAddressingMap(CardanoMobile, this),
         await getHexAddressingMap(CardanoMobile, this),
         getAddressedUtxos(this),
-        await txBody.toBytes(),
         [],
       )
 

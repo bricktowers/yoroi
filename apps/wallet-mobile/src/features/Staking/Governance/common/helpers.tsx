@@ -37,7 +37,7 @@ export const mapStakingKeyStateToGovernanceAction = (state: StakingKeyState): Go
     ? {kind: 'abstain'}
     : vote.action === 'no-confidence'
     ? {kind: 'no-confidence'}
-    : {kind: 'delegate', drepID: vote.drepID}
+    : {kind: 'delegate', hash: vote.hash, type: vote.type}
 }
 
 export const useIsGovernanceFeatureEnabled = (wallet: YoroiWallet) => {
@@ -76,12 +76,21 @@ export const useGovernanceActions = () => {
   const {updateLatestGovernanceAction} = useUpdateLatestGovernanceAction(wallet.id)
   const {navigateToTxReview} = useWalletNavigation()
 
-  const handleDelegateAction = ({drepID, unsignedTx}: {drepID: string; unsignedTx: YoroiUnsignedTx}) => {
+  const handleDelegateAction = ({
+    hash,
+    unsignedTx,
+    type,
+  }: {
+    hash: string
+    type: 'key' | 'script'
+    unsignedTx: YoroiUnsignedTx
+  }) => {
     unsignedTxChanged(unsignedTx)
 
     navigateToTxReview({
-      onSuccess: (signedTx) => {
-        updateLatestGovernanceAction({kind: 'delegate-to-drep', drepID, txID: signedTx.signedTx.id})
+      onSuccess: (args) => {
+        if (args?.signedTx?.signedTx?.id == null) throw new Error('useGovernanceActions:: invalid state')
+        updateLatestGovernanceAction({kind: 'delegate-to-drep', hash, type, txID: args.signedTx.signedTx.id})
         navigateTo.submittedTx()
       },
       onError: navigateTo.failedTx,
@@ -93,8 +102,9 @@ export const useGovernanceActions = () => {
     unsignedTxChanged(unsignedTx)
 
     navigateToTxReview({
-      onSuccess: (signedTx) => {
-        updateLatestGovernanceAction({kind: 'vote', vote: 'abstain', txID: signedTx.signedTx.id})
+      onSuccess: (args) => {
+        if (args?.signedTx?.signedTx?.id == null) throw new Error('useGovernanceActions:: invalid state')
+        updateLatestGovernanceAction({kind: 'vote', vote: 'abstain', txID: args?.signedTx.signedTx.id})
         navigateTo.submittedTx()
       },
       onError: navigateTo.failedTx,
@@ -106,8 +116,9 @@ export const useGovernanceActions = () => {
     unsignedTxChanged(unsignedTx)
 
     navigateToTxReview({
-      onSuccess: (signedTx) => {
-        updateLatestGovernanceAction({kind: 'vote', vote: 'no-confidence', txID: signedTx.signedTx.id})
+      onSuccess: (args) => {
+        if (args?.signedTx?.signedTx?.id == null) throw new Error('useGovernanceActions:: invalid state')
+        updateLatestGovernanceAction({kind: 'vote', vote: 'no-confidence', txID: args?.signedTx.signedTx.id})
         navigateTo.submittedTx()
       },
       onError: navigateTo.failedTx,

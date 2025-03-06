@@ -1,4 +1,5 @@
 import {useNavigation} from '@react-navigation/native'
+import {useSetupWallet} from '@yoroi/setup-wallet'
 import {useTheme} from '@yoroi/theme'
 import {Wallet} from '@yoroi/types'
 import React from 'react'
@@ -11,6 +12,7 @@ import {Icon} from '../../../../components/Icon'
 import {Spacer} from '../../../../components/Spacer/Spacer'
 import {DIALOG_BUTTONS, showConfirmationDialog} from '../../../../kernel/dialogs'
 import {confirmationMessages} from '../../../../kernel/i18n/global-messages'
+import {useMetrics} from '../../../../kernel/metrics/metricsManager'
 import {SettingsRouteNavigation, useWalletNavigation} from '../../../../kernel/navigation'
 import {useResync} from '../../../../yoroi-wallets/hooks'
 import {useAuth} from '../../../Auth/AuthProvider'
@@ -26,6 +28,10 @@ import {
   SettingsItem,
   SettingsSection,
 } from '../../SettingsItems'
+import {
+  useChangeNotificationDisplaySettings,
+  useNotificationDisplaySettings,
+} from './Notifications/NotificationsDisplaySettings'
 
 export const WalletSettingsScreen = () => {
   const intl = useIntl()
@@ -130,6 +136,14 @@ export const WalletSettingsScreen = () => {
 
         <Spacer height={24} />
 
+        <SettingsSection title={strings.inAppNotifications}>
+          <SettingsItem icon={<Icon.Bell {...iconProps} />} label={strings.allowNotifications}>
+            <NotificationDisplaySwitcher />
+          </SettingsItem>
+        </SettingsSection>
+
+        <Spacer height={24} />
+
         <SettingsSection title={strings.about}>
           <SettingsBuildItem label={strings.walletType} value={intl.formatMessage(getWalletType(implementation))} />
         </SettingsSection>
@@ -151,15 +165,19 @@ const ResyncButton = () => {
   const strings = useStrings()
   const {wallet} = useSelectedWallet()
   const {colors} = useStyles()
-  const {navigateToTxHistory} = useWalletNavigation()
   const intl = useIntl()
+  const {walletIdChanged} = useSetupWallet()
+  const settingsNavigation = useNavigation<SettingsRouteNavigation>()
   const {resync, isLoading} = useResync(wallet, {
-    onMutate: () => navigateToTxHistory(),
+    onMutate: () => {
+      settingsNavigation.navigate('settings-preparing-wallet')
+    },
   })
 
   const onResync = async () => {
     const selection = await showConfirmationDialog(confirmationMessages.resync, intl)
     if (selection === DIALOG_BUTTONS.YES) {
+      walletIdChanged(wallet.id)
       resync()
     }
   }
@@ -196,6 +214,23 @@ const AddressModeSwitcher = (props: {isSingle: boolean}) => {
   }
 
   return <SettingsSwitch value={!isSingleLocal} onValueChange={handleOnSwitchAddressMode} />
+}
+
+const NotificationDisplaySwitcher = () => {
+  const displayNotifications = useNotificationDisplaySettings()
+  const {mutate} = useChangeNotificationDisplaySettings()
+  const [localValue, setLocalValue] = React.useState(displayNotifications)
+  const {track} = useMetrics()
+
+  const handleOnToggle = () => {
+    const newValue = !localValue
+    setLocalValue(newValue)
+    mutate(newValue)
+    const status = newValue ? 'enabled' : 'disabled'
+    track.settingsInAppNotificationsStatusUpdated({status})
+  }
+
+  return <SettingsSwitch value={localValue} onValueChange={handleOnToggle} />
 }
 
 const useLogout = () => {
@@ -296,6 +331,14 @@ const messages = defineMessages({
     id: 'components.settings.walletsettingscreen.resyncWallet',
     defaultMessage: '!!!Resync',
   },
+  inAppNotifications: {
+    id: 'components.settings.walletsettingscreen.inAppNotifications',
+    defaultMessage: '!!!In-app notifications',
+  },
+  allowNotifications: {
+    id: 'components.settings.walletsettingscreen.allowNotifications',
+    defaultMessage: '!!!Allow notifications',
+  },
 })
 
 const useStrings = () => {
@@ -323,6 +366,8 @@ const useStrings = () => {
     multipleAddresses: intl.formatMessage(messages.multipleAddresses),
     singleAddress: intl.formatMessage(messages.singleAddress),
     multipleAddressesInfo: intl.formatMessage(messages.multipleAddressesInfo),
+    inAppNotifications: intl.formatMessage(messages.inAppNotifications),
+    allowNotifications: intl.formatMessage(messages.allowNotifications),
   }
 }
 

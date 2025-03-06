@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native'
+import {useFocusEffect, useNavigation} from '@react-navigation/native'
 import {useSetupWallet} from '@yoroi/setup-wallet'
 import {useTheme} from '@yoroi/theme'
 import {HW} from '@yoroi/types'
@@ -12,13 +12,17 @@ import {StepperProgress} from '../../../../components/StepperProgress/StepperPro
 import {showErrorDialog} from '../../../../kernel/dialogs'
 import {errorMessages} from '../../../../kernel/i18n/global-messages'
 import {LocalizableError} from '../../../../kernel/i18n/LocalizableError'
+import {useMetrics} from '../../../../kernel/metrics/metricsManager'
 import {SetupWalletRouteNavigation} from '../../../../kernel/navigation'
 import {LedgerConnect} from '../../../../legacy/HW'
 import {getHWDeviceInfo} from '../../../../yoroi-wallets/cardano/hw/hw'
 import {Device} from '../../../../yoroi-wallets/types/hw'
 import {useWalletManager} from '../../../WalletManager/context/WalletManagerProvider'
 import {useStrings} from '../../common/useStrings'
-import {WalletDuplicatedModal} from '../../common/WalletDuplicatedModal/WalletDuplicatedModal'
+import {
+  WalletDuplicatedModal,
+  WalletDuplicatedModalActions,
+} from '../../common/WalletDuplicatedModal/WalletDuplicatedModal'
 
 type Props = {
   defaultDevices?: Array<Device> // for storybook
@@ -30,10 +34,18 @@ export const ConnectNanoXScreen = ({defaultDevices}: Props) => {
   const {styles} = useStyles()
   const {walletManager} = useWalletManager()
   const {openModal} = useModal()
+  const {track} = useMetrics()
 
   const navigation = useNavigation<SetupWalletRouteNavigation>()
 
   const {hwDeviceInfoChanged, walletImplementation, useUSB} = useSetupWallet()
+
+  useFocusEffect(
+    React.useCallback(() => {
+      track.connectWalletConnectPageViewed()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
+  )
 
   const onSuccess = (hwDeviceInfo: HW.DeviceInfo) => {
     hwDeviceInfoChanged(hwDeviceInfo)
@@ -43,15 +55,17 @@ export const ConnectNanoXScreen = ({defaultDevices}: Props) => {
     if (duplicatedAccountWalletMeta) {
       const {plate, seed} = walletManager.checksum(hwDeviceInfo.bip44AccountPublic)
 
-      openModal(
-        strings.restoreDuplicatedWalletModalTitle,
-        <WalletDuplicatedModal
-          plate={plate}
-          seed={seed}
-          duplicatedAccountWalletMetaId={duplicatedAccountWalletMeta.id}
-          duplicatedAccountWalletMetaName={duplicatedAccountWalletMeta.name}
-        />,
-      )
+      openModal({
+        title: strings.restoreDuplicatedWalletModalTitle,
+        content: (
+          <WalletDuplicatedModal
+            plate={plate}
+            seed={seed}
+            duplicatedAccountWalletMetaName={duplicatedAccountWalletMeta.name}
+          />
+        ),
+        footer: <WalletDuplicatedModalActions duplicatedAccountWalletMetaId={duplicatedAccountWalletMeta.id} />,
+      })
       return
     }
 

@@ -1,11 +1,13 @@
+import {useFocusEffect} from '@react-navigation/native'
 import {useCardAnimation} from '@react-navigation/stack'
 import {useTheme} from '@yoroi/theme'
 import React from 'react'
-import {Animated, GestureResponderEvent, Pressable, StyleSheet, Text, View} from 'react-native'
+import {Animated, BackHandler, GestureResponderEvent, Pressable, StyleSheet, Text, View} from 'react-native'
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {KeyboardAvoidingView} from '../KeyboardAvoidingView/KeyboardAvoidingView'
 import {LoadingOverlay} from '../LoadingOverlay/LoadingOverlay'
+import {ScrollView, useScrollView} from '../ScrollView/ScrollView'
 import {Spacer} from '../Spacer/Spacer'
 import {FullModalScreen} from './FullModalScreen'
 import {useModal} from './ModalContext'
@@ -13,13 +15,27 @@ import {useModal} from './ModalContext'
 export const ModalScreen = () => {
   const styles = useStyles()
   const {current} = useCardAnimation()
-  const {height, closeModal, content, isOpen, isLoading, full} = useModal()
+  const {height, closeModal, content, footer, isOpen, isLoading, full, canDiscard} = useModal()
   const [swipeLocationY, setSwipeLocationY] = React.useState(height)
   // NOTE: this is to fill the bottom of the screen with the same color as the modal
   const {bottom} = useSafeAreaInsets()
+  const {isScrollBarShown, setIsScrollBarShown, scrollViewRef} = useScrollView()
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (canDiscard) {
+          closeModal()
+        }
+        return true // disable normal behaviour
+      }
+      BackHandler.addEventListener('hardwareBackPress', onBackPress)
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress)
+    }, [canDiscard, closeModal]),
+  )
 
   const onResponderMove = ({nativeEvent}: GestureResponderEvent) => {
-    if (swipeLocationY < nativeEvent.locationY && isOpen) {
+    if (swipeLocationY < nativeEvent.locationY && isOpen && canDiscard) {
       setSwipeLocationY(height)
       closeModal()
       return
@@ -36,7 +52,7 @@ export const ModalScreen = () => {
 
   return (
     <SafeAreaView style={styles.backdrop}>
-      <Pressable style={styles.cancellableArea} onPress={closeModal} />
+      <Pressable style={styles.cancellableArea} {...(canDiscard && {onPress: closeModal})} />
 
       <KeyboardAvoidingView style={styles.root} keyboardVerticalOffset={0}>
         <Animated.View
@@ -61,7 +77,18 @@ export const ModalScreen = () => {
 
             <Header onResponderMove={onResponderMove} onStartShouldSetResponder={() => true} />
 
-            {content}
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={styles.scroll}
+              ref={scrollViewRef}
+              onScrollBarChange={setIsScrollBarShown}
+            >
+              {content}
+            </ScrollView>
+
+            {footer !== undefined && (
+              <View style={[styles.actions, isScrollBarShown && styles.actionsScroll]}>{footer}</View>
+            )}
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
@@ -133,6 +160,7 @@ const useStyles = () => {
       ...atoms.self_stretch,
     },
     title: {
+      ...atoms.text_center,
       ...atoms.heading_3_medium,
       ...atoms.p_lg,
       color: color.text_gray_max,
@@ -146,6 +174,16 @@ const useStyles = () => {
       height: 4,
       width: 32,
       borderRadius: 10,
+    },
+    actions: {
+      ...atoms.p_lg,
+    },
+    actionsScroll: {
+      ...atoms.border_t,
+      borderTopColor: color.gray_200,
+    },
+    scroll: {
+      ...atoms.flex_grow,
     },
   })
   return styles

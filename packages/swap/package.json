@@ -1,6 +1,6 @@
 {
   "name": "@yoroi/swap",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "The Swap package of Yoroi SDK",
   "keywords": [
     "yoroi",
@@ -115,6 +115,7 @@
     ],
     "coverageReporters": [
       "text-summary",
+      "lcov",
       "html"
     ],
     "coverageThreshold": {
@@ -151,7 +152,7 @@
     "@yoroi/api": "1.5.3",
     "@yoroi/common": "1.5.4",
     "@yoroi/portfolio": "1.0.3",
-    "@yoroi/types": "1.5.9",
+    "@yoroi/types": "1.5.10",
     "bignumber.js": "^9.0.1",
     "commitlint": "^17.0.2",
     "del-cli": "^5.0.0",

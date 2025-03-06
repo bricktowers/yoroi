@@ -45,7 +45,7 @@ export const DashboardTokensList = () => {
   }
 
   const renderTokensList = () => {
-    if (isZeroADABalance) {
+    if (tokensList.length === 0 || isZeroADABalance) {
       return <View style={styles.container}>{isPreprod ? <PreprodFaucetBanner /> : <BuyADABanner />}</View>
     }
 
@@ -70,7 +70,7 @@ export const DashboardTokensList = () => {
         ListHeaderComponent={<Spacer width={16} />}
         ItemSeparatorComponent={() => <Spacer width={8} />}
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.info.id}
+        keyExtractor={(item) => item.info?.id}
         renderItem={({item}) => (
           <View style={[styles.tokenItemContainer, {width: cardItemWidth}]}>
             <DashboardTokenItem tokenInfo={item} />

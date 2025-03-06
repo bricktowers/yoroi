@@ -4,6 +4,8 @@ import type {
   GetExtendedPublicKeyResponse,
   GetSerialResponse,
   GetVersionResponse,
+  MessageData,
+  SignMessageResponse,
   SignTransactionRequest,
   SignTransactionResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano'
@@ -12,11 +14,10 @@ import AppAda, {DeviceStatusCodes} from '@cardano-foundation/ledgerjs-hw-app-car
 // @ts-ignore
 import TransportHID from '@emurgo/react-native-hid'
 import TransportBLE from '@ledgerhq/react-native-hw-transport-ble'
+import {cardanoConfig, derivationConfig} from '@yoroi/blockchains'
 import {HW, Wallet} from '@yoroi/types'
 import {BleError} from 'react-native-ble-plx'
 
-import {cardanoConfig} from '../../../features/WalletManager/common/adapters/cardano/cardano-config'
-import {derivationConfig} from '../../../features/WalletManager/common/derivation-config'
 import {ledgerMessages} from '../../../kernel/i18n/global-messages'
 import {LocalizableError} from '../../../kernel/i18n/LocalizableError'
 import {logger} from '../../../kernel/logger/logger'
@@ -277,6 +278,21 @@ export const signTxWithLedger = async (
   try {
     const appAda = await connectionHandler(hwDeviceInfo.hwFeatures.deviceId, hwDeviceInfo.hwFeatures.deviceObj, useUSB)
     const ledgerSignature: SignTransactionResponse = await appAda.signTransaction(signRequest)
+    await appAda.transport.close()
+    return ledgerSignature
+  } catch (e) {
+    throw mapLedgerError(e)
+  }
+}
+
+export const signMessageWithLedger = async (
+  signRequest: MessageData,
+  hwDeviceInfo: HW.DeviceInfo,
+  useUSB: boolean,
+): Promise<SignMessageResponse> => {
+  try {
+    const appAda = await connectionHandler(hwDeviceInfo.hwFeatures.deviceId, hwDeviceInfo.hwFeatures.deviceObj, useUSB)
+    const ledgerSignature = await appAda.signMessage(signRequest)
     await appAda.transport.close()
     return ledgerSignature
   } catch (e) {

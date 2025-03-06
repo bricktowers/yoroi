@@ -16,7 +16,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {useMutation} from 'react-query'
 
-import {Button} from '../../../../../components/Button/Button'
+import {Button, ButtonType} from '../../../../../components/Button/Button'
 import {CopyButton} from '../../../../../components/CopyButton'
 import {ErrorPanel} from '../../../../../components/ErrorPanel/ErrorPanel'
 import {Icon} from '../../../../../components/Icon'
@@ -54,7 +54,7 @@ export const ManageCollateralScreen = () => {
   const {openModal, closeModal} = useModal()
   const strings = useStrings()
   const balances = useBalances(wallet)
-  const {navigateToTxReview} = useWalletNavigation()
+  const {navigateToTxReview, resetToTxHistory} = useWalletNavigation()
   const {unsignedTxChanged} = useReviewTx()
   const lockedAmount = asQuantity(wallet.primaryBreakdown.lockedAsStorageCost.toString())
 
@@ -76,9 +76,11 @@ export const ManageCollateralScreen = () => {
     setCollateralId(collateralId)
   }
 
-  const onSuccess = (signedTx: YoroiSignedTx) => {
+  const handleOnSuccess = (signedTx?: YoroiSignedTx) => {
+    if (signedTx?.signedTx?.id == null) throw new Error('ManageCollateralScreen:: invalid state')
     const collateralId = `${signedTx.signedTx.id}:0`
     setCollateralId(collateralId)
+    resetToTxHistory()
   }
 
   const createCollateralTransaction = () => {
@@ -87,7 +89,7 @@ export const ManageCollateralScreen = () => {
     createUnsignedTx([createCollateralEntry(wallet)], {
       onSuccess: (yoroiUnsignedTx) => {
         unsignedTxChanged(yoroiUnsignedTx)
-        navigateToTxReview({onSuccess, operations: [<Operation key="0" />]})
+        navigateToTxReview({onSuccess: (args) => handleOnSuccess(args?.signedTx), operations: [<Operation key="0" />]})
       },
     })
   }
@@ -122,11 +124,12 @@ export const ManageCollateralScreen = () => {
   }
 
   const handleCollateralInfoModal = () => {
-    openModal(
-      strings.initialCollateralInfoModalTitle,
-      <InitialCollateralInfoModal onConfirm={handleGenerateCollateral} />,
-      Math.min(screenHeight * 0.9, 650),
-    )
+    openModal({
+      title: strings.initialCollateralInfoModalTitle,
+      content: <InitialCollateralInfoModal />,
+      footer: <ModalsButtons onConfirm={handleGenerateCollateral} onCancel={closeModal} />,
+      height: Math.min(screenHeight * 0.9, 650),
+    })
   }
 
   const shouldShowPrimaryButton = !hasCollateral || didSpend
@@ -184,6 +187,18 @@ export const ManageCollateralScreen = () => {
   )
 }
 
+const ModalsButtons = ({onConfirm, onCancel}: {onConfirm: () => void; onCancel: () => void}) => {
+  const strings = useStrings()
+
+  return (
+    <View>
+      <Button type={ButtonType.SecondaryText} title={strings.cancel} onPress={onCancel} />
+
+      <Button title={strings.initialCollateralInfoModalButton} onPress={onConfirm} />
+    </View>
+  )
+}
+
 type ActionableAmountProps = {
   collateralId: RawUtxo['utxo_id']
   amount: Portfolio.Token.Amount
@@ -232,7 +247,7 @@ const Operation = () => {
   const {openModal} = useModal()
 
   const handleOnPressInfo = () => {
-    openModal(strings.collateralInfoModalTitle, <CollateralInfoModal />, 500)
+    openModal({title: strings.collateralInfoModalTitle, content: <CollateralInfoModal />, height: 500})
   }
 
   return (

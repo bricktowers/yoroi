@@ -3,7 +3,7 @@ import {useSwap} from '@yoroi/swap'
 import {useTheme} from '@yoroi/theme'
 import {useTransfer} from '@yoroi/transfer'
 import {Chain} from '@yoroi/types'
-import React from 'react'
+import * as React from 'react'
 import {GestureResponderEvent, StyleSheet, View} from 'react-native'
 
 import {Button, ButtonType} from '../../../../components/Button/Button'
@@ -16,12 +16,13 @@ import {useReceive} from '../../../Receive/common/ReceiveProvider'
 import {useMultipleAddressesInfo} from '../../../Receive/common/useMultipleAddressesInfo'
 import {useReceiveAddressesStatus} from '../../../Receive/common/useReceiveAddressesStatus'
 import {useSwapForm} from '../../../Swap/common/SwapFormProvider'
+import {useSwapConfig} from '../../../Swap/common/useSwapConfig'
 import {useAddressMode} from '../../../WalletManager/common/hooks/useAddressMode'
 import {useSelectedWallet} from '../../../WalletManager/common/hooks/useSelectedWallet'
 import {useWalletManager} from '../../../WalletManager/context/WalletManagerProvider'
 import {useStrings} from '../../common/strings'
 
-export const ActionsBanner = ({disabled = false}: {disabled: boolean}) => {
+export const ActionsBanner = () => {
   const {styles} = useStyles()
   const strings = useStrings()
   const navigateTo = useNavigateTo()
@@ -33,8 +34,9 @@ export const ActionsBanner = ({disabled = false}: {disabled: boolean}) => {
   const {hideMultipleAddressesInfo, isShowingMultipleAddressInfo} = useMultipleAddressesInfo()
 
   const {reset: resetSendState} = useTransfer()
-  const {orderData} = useSwap()
-  const {resetSwapForm} = useSwapForm()
+  const {orderData, buyTokenInfoChanged} = useSwap()
+  const {buyTokenInfo} = useSwapConfig()
+  const {resetSwapForm, buyTouched} = useSwapForm()
 
   const {track} = useMetrics()
 
@@ -59,6 +61,11 @@ export const ActionsBanner = ({disabled = false}: {disabled: boolean}) => {
     }
 
     resetSwapForm()
+
+    if (buyTokenInfo) {
+      buyTokenInfoChanged(buyTokenInfo)
+      buyTouched()
+    }
 
     track.swapInitiated({
       from_asset: [
@@ -109,49 +116,30 @@ export const ActionsBanner = ({disabled = false}: {disabled: boolean}) => {
           icon={Icon.Received}
           onPress={handleOnPressReceive}
           testID="receiveButton"
-          disabled={disabled}
           onLongPress={handleOnLongPressReceive}
         />
 
-        <Text style={[styles.actionLabel, disabled && styles.disabledLabel]}>{strings.receiveLabel}</Text>
+        <Text style={styles.actionLabel}>{strings.receiveLabel}</Text>
       </View>
 
       {!meta.isReadOnly && (
         <>
           <View style={styles.centralized}>
-            <Button
-              type={ButtonType.Circle}
-              icon={Icon.Send}
-              onPress={handleOnSend}
-              testID="sendButton"
-              disabled={disabled}
-            />
+            <Button type={ButtonType.Circle} icon={Icon.Send} onPress={handleOnSend} testID="sendButton" />
 
-            <Text style={[styles.actionLabel, disabled && styles.disabledLabel]}>{strings.sendLabel}</Text>
+            <Text style={styles.actionLabel}>{strings.sendLabel}</Text>
           </View>
 
           <View style={styles.centralized}>
-            <Button
-              type={ButtonType.Circle}
-              icon={Icon.Swap}
-              onPress={handleOnSwap}
-              testID="swapButton"
-              disabled={disabled}
-            />
+            <Button type={ButtonType.Circle} icon={Icon.Swap} onPress={handleOnSwap} testID="swapButton" />
 
-            <Text style={[styles.actionLabel, disabled && styles.disabledLabel]}>{strings.swapLabel}</Text>
+            <Text style={styles.actionLabel}>{strings.swapLabel}</Text>
           </View>
 
           <View style={styles.centralized}>
-            <Button
-              type={ButtonType.Circle}
-              icon={Icon.Exchange}
-              onPress={handleOnExchange}
-              testID="buyButton"
-              disabled={disabled}
-            />
+            <Button type={ButtonType.Circle} icon={Icon.Exchange} onPress={handleOnExchange} testID="buyButton" />
 
-            <Text style={[styles.actionLabel, disabled && styles.disabledLabel]}>{strings.exchange}</Text>
+            <Text style={styles.actionLabel}>{strings.exchange}</Text>
           </View>
         </>
       )}
@@ -176,9 +164,6 @@ const useStyles = () => {
       ...atoms.pt_sm,
       ...atoms.body_3_sm_medium,
       color: color.text_gray_medium,
-    },
-    disabledLabel: {
-      color: color.text_gray_low,
     },
   })
 

@@ -4,14 +4,14 @@
     "defaultMessage": "!!!Current Version",
     "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
     "start": {
-      "line": 101,
+      "line": 123,
       "column": 18,
-      "index": 2616
+      "index": 3312
     },
     "end": {
-      "line": 104,
+      "line": 126,
       "column": 3,
-      "index": 2696
+      "index": 3392
     }
   },
   {
@@ -19,14 +19,14 @@
     "defaultMessage": "!!!Commit",
     "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
     "start": {
-      "line": 105,
+      "line": 127,
       "column": 10,
-      "index": 2708
+      "index": 3404
     },
     "end": {
-      "line": 108,
+      "line": 130,
       "column": 3,
-      "index": 2771
+      "index": 3467
     }
   },
   {
@@ -34,14 +34,14 @@
     "defaultMessage": "!!!Network",
     "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
     "start": {
-      "line": 109,
+      "line": 131,
       "column": 11,
-      "index": 2784
+      "index": 3480
     },
     "end": {
-      "line": 112,
+      "line": 134,
       "column": 3,
-      "index": 2849
+      "index": 3545
     }
   },
   {
@@ -49,14 +49,14 @@
     "defaultMessage": "!!!Wallet type",
     "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
     "start": {
-      "line": 113,
+      "line": 135,
       "column": 14,
-      "index": 2865
+      "index": 3561
     },
     "end": {
-      "line": 116,
+      "line": 138,
       "column": 3,
-      "index": 2976
+      "index": 3672
     }
   },
   {
@@ -64,14 +64,14 @@
     "defaultMessage": "!!!Byron-era wallet",
     "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
     "start": {
-      "line": 117,
+      "line": 139,
       "column": 15,
-      "index": 2993
+      "index": 3689
     },
     "end": {
-      "line": 120,
+      "line": 142,
       "column": 3,
-      "index": 3104
+      "index": 3800
     }
   },
   {
@@ -79,14 +79,14 @@
     "defaultMessage": "!!!Shelley-era wallet",
     "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
     "start": {
-      "line": 121,
+      "line": 143,
       "column": 17,
-      "index": 3123
+      "index": 3819
     },
     "end": {
-      "line": 124,
+      "line": 146,
       "column": 3,
-      "index": 3238
+      "index": 3934
     }
   },
   {
@@ -94,14 +94,29 @@
     "defaultMessage": "!!!Unknown Wallet Type",
     "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
     "start": {
-      "line": 125,
+      "line": 147,
       "column": 21,
-      "index": 3261
+      "index": 3957
     },
     "end": {
-      "line": 128,
+      "line": 150,
       "column": 3,
-      "index": 3381
+      "index": 4077
+    }
+  },
+  {
+    "id": "components.settings.walletsettingscreen.fcmToken",
+    "defaultMessage": "!!!FCM Token",
+    "file": "src/features/Settings/useCases/changeAppSettings/About/About.tsx",
+    "start": {
+      "line": 151,
+      "column": 12,
+      "index": 4091
+    },
+    "end": {
+      "line": 154,
+      "column": 3,
+      "index": 4192
     }
   }
 ]

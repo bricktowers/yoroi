@@ -8,18 +8,19 @@ import {Button} from '../../../components/Button/Button'
 import {Checkbox} from '../../../components/Checkbox/Checkbox'
 import {useModal} from '../../../components/Modal/ModalContext'
 import {PleaseWaitView} from '../../../components/PleaseWaitModal'
-import {ScrollView, useScrollView} from '../../../components/ScrollView/ScrollView'
 import {Space} from '../../../components/Space/Space'
 import {Warning} from '../../../components/Warning/Warning'
 import {StakeRewardsWithdrawalOperation} from '../../../features/ReviewTx/common/operations'
 import {useReviewTx} from '../../../features/ReviewTx/common/ReviewTxProvider'
 import {useSelectedWallet} from '../../../features/WalletManager/common/hooks/useSelectedWallet'
 import globalMessages, {confirmationMessages, ledgerMessages, txLabels} from '../../../kernel/i18n/global-messages'
+import {useMetrics} from '../../../kernel/metrics/metricsManager'
 import {useWalletNavigation} from '../../../kernel/navigation'
 import {YoroiWallet} from '../../../yoroi-wallets/cardano/types'
 import {useWithdrawalTx} from '../../../yoroi-wallets/hooks'
 import {YoroiUnsignedTx} from '../../../yoroi-wallets/types/yoroi'
 import {Quantities} from '../../../yoroi-wallets/utils/utils'
+import {useNavigateTo} from '../Dashboard'
 import {useStakingInfo} from '../StakePoolInfos'
 type Props = {
   wallet: YoroiWallet
@@ -30,12 +31,23 @@ export const WithdrawStakingRewards = ({wallet}: Props) => {
   const {closeModal} = useModal()
   const {navigateToTxReview} = useWalletNavigation()
   const {unsignedTxChanged} = useReviewTx()
+  const {track} = useMetrics()
+  const navigateTo = useNavigateTo()
+
+  const onSuccess = () => {
+    track.claimAdaTransactionSubmitted()
+    navigateTo.submittedTx()
+  }
+
+  const onError = () => {
+    navigateTo.failedTx()
+  }
 
   const handleOnConfirm = (withdrawalTx: YoroiUnsignedTx) => {
     closeModal()
 
     unsignedTxChanged(withdrawalTx)
-    navigateToTxReview({operations: [<StakeRewardsWithdrawalOperation key="0" />]})
+    navigateToTxReview({onSuccess, onError, operations: [<StakeRewardsWithdrawalOperation key="0" />]})
   }
 
   return (
@@ -46,14 +58,13 @@ export const WithdrawStakingRewards = ({wallet}: Props) => {
 }
 
 const WithdrawalTxForm = ({wallet, onDone}: {wallet: YoroiWallet; onDone: (withdrawalTx: YoroiUnsignedTx) => void}) => {
-  const {styles, colors} = useStyles()
+  const {styles} = useStyles()
   const bold = useBold()
   const {meta} = useSelectedWallet()
   const {stakingInfo} = useStakingInfo(wallet, {suspense: true})
   const strings = useWithdrawStakingRewardsStrings()
   const [isChecked, setIsChecked] = React.useState(false)
   const [deregister, setDeregister] = React.useState<boolean>()
-  const {isScrollBarShown, setIsScrollBarShown, scrollViewRef} = useScrollView()
 
   const {isLoading} = useWithdrawalTx(
     {wallet, deregister, addressMode: meta.addressMode},
@@ -67,9 +78,7 @@ const WithdrawalTxForm = ({wallet, onDone}: {wallet: YoroiWallet; onDone: (withd
 
   return (
     <View style={styles.root} testID="dangerousActionView">
-      <Header title={strings.warningModalTitle}></Header>
-
-      <ScrollView ref={scrollViewRef} style={styles.scroll} bounces={false} onScrollBarChange={setIsScrollBarShown}>
+      <View>
         <Warning content={[strings.warning1, strings.warning2, strings.warning3].join('\r\n')} />
 
         <Space height="lg" />
@@ -107,9 +116,9 @@ const WithdrawalTxForm = ({wallet, onDone}: {wallet: YoroiWallet; onDone: (withd
         </View>
 
         <Space height="lg" />
-      </ScrollView>
+      </View>
 
-      <View style={[styles.actions, isScrollBarShown && {borderTopWidth: 1, borderTopColor: colors.lightGray}]}>
+      <View style={styles.actions}>
         <Button
           onPress={() => setDeregister(false)}
           title={strings.keepButton}
@@ -123,12 +132,7 @@ const WithdrawalTxForm = ({wallet, onDone}: {wallet: YoroiWallet; onDone: (withd
   )
 }
 
-const Header = ({title}: {title: string}) => {
-  const {styles} = useStyles()
-  return <View style={styles.header}>{title !== '' && <Text style={styles.title}>{title}</Text>}</View>
-}
-
-const useWithdrawStakingRewardsStrings = () => {
+export const useWithdrawStakingRewardsStrings = () => {
   const intl = useIntl()
 
   return {
@@ -213,9 +217,6 @@ const useStyles = () => {
   const styles = StyleSheet.create({
     root: {
       flex: 1,
-    },
-    scroll: {
-      flex: 1,
       ...atoms.px_lg,
     },
     paragraph: {
@@ -236,15 +237,6 @@ const useStyles = () => {
     bolder: {
       color: color.gray_max,
       ...atoms.body_2_md_medium,
-    },
-    title: {
-      ...atoms.heading_3_medium,
-      ...atoms.p_lg,
-      color: color.text_gray_max,
-    },
-    header: {
-      ...atoms.align_center,
-      ...atoms.self_stretch,
     },
   })
 
