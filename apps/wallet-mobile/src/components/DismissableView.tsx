@@ -5,10 +5,10 @@ type Props = {
   isVisible: boolean
   children: React.ReactNode
   duration?: number
-  style?: ViewStyle
+  style?: Exclude<ViewStyle, 'opacity'>
 }
 
-export const DismissibleBanner = ({isVisible, children, style, duration = 300}: Props) => {
+export const DismissibleView = ({isVisible, children, style, duration = 300}: Props) => {
   const fadeAnim = React.useRef(new Animated.Value(0)).current
   const [shouldRender, setShouldRender] = React.useState(isVisible)
 
