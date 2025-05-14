@@ -117,9 +117,9 @@ export const transformersMaker = ({
         numbers_have_decimals: true,
         sell_token: tokenIn,
         buy_token: tokenOut,
-        sell_amount: amountIn,
+        sell_amount: String(amountIn),
 
-        buy_amount: amountIn * wantedPrice,
+        buy_amount: String(amountIn * wantedPrice),
         dex: protocol ? fromSwapProtocol(protocol) : undefined,
       }),
     },
@@ -137,9 +137,9 @@ export const transformersMaker = ({
         numbers_have_decimals: true,
         sell_token: tokenIn,
         buy_token: tokenOut,
-        buy_amount: amountOut,
-        sell_amount: amountIn,
-        partner,
+        ...(amountOut !== undefined && {buy_amount: String(amountOut)}),
+        ...(amountIn !== undefined && {sell_amount: String(amountIn)}),
+        ...(partner !== undefined && {partner}),
         // muesli expects slippage as a percentage
         slippage: slippage / 100,
         dex: resolveDexes({
@@ -184,24 +184,25 @@ export const transformersMaker = ({
     create: {
       request: ({
         slippage = 0,
-
         protocol,
         blockedProtocols,
         tokenIn,
         tokenOut,
         amountIn,
+        inputs,
       }: Swap.CreateRequest): CreateOrderRequest => ({
         numbers_have_decimals: true,
         sell_token: tokenIn,
         buy_token: tokenOut,
-        sell_amount: amountIn,
+        sell_amount: String(amountIn),
         user_address: address,
-        partner,
+        ...(partner !== undefined && {partner}),
         slippage: slippage / 100,
         dex: resolveDexes({
           protocol: protocol ? fromSwapProtocol(protocol) : undefined,
           blockedProtocols: blockedProtocols?.map(fromSwapProtocol),
         }),
+        utxos: inputs,
       }),
       response: ({
         quote: {
@@ -247,15 +248,17 @@ export const transformersMaker = ({
         tokenIn,
         tokenOut,
         amountIn,
+        inputs,
       }: Swap.CreateRequest): LimitOrderRequest => ({
         dex: fromSwapProtocol(protocol),
-        buy_amount: amountIn * wantedPrice,
+        buy_amount: String(amountIn * wantedPrice),
 
         numbers_have_decimals: true,
         sell_token: tokenIn,
         buy_token: tokenOut,
-        sell_amount: amountIn,
+        sell_amount: String(amountIn),
         user_address: address,
+        utxos: inputs,
       }),
       response: ({
         quote: {
