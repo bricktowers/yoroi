@@ -80,6 +80,8 @@ export const useStrings = () => {
     delegateToAYoroiDRepDescription: intl.formatMessage(messages.delegateToAYoroiDRepDescription),
     delegateVotingToDRepDeprecatedFormatNotice: intl.formatMessage(messages.delegateVotingToDRepDeprecatedFormatNotice),
     yoroiRecord: intl.formatMessage(messages.yoroiRecord),
+    newToGovernanceTitle: intl.formatMessage(messages.newToGovernanceTitle),
+    newToGovernanceText: intl.formatMessage(messages.newToGovernanceText),
   }
 }
 
@@ -352,5 +354,14 @@ const messages = defineMessages({
   yoroiRecord: {
     id: 'components.governance.yoroiRecord',
     defaultMessage: '!!!See Yoroi’s voting record',
+  },
+  newToGovernanceTitle: {
+    id: 'components.governance.newToGovernance.title',
+    defaultMessage: '!!!New to governance? Start here',
+  },
+  newToGovernanceText: {
+    id: 'components.governance.newToGovernance.text',
+    defaultMessage:
+      '!!!Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano Governance',
   },
 })
