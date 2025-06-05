@@ -20,7 +20,6 @@ import {Banner} from '../../components/Banner/Banner'
 import {Button} from '../../components/Button/Button'
 import {useModal} from '../../components/Modal/ModalContext'
 import {Space} from '../../components/Space/Space'
-import {ConsiderDRepToUsStakingCenterBanner} from '../../features/Banners/useCases/ConsiderDRepToUsStakingCenterBanner'
 import {useIsParticipatingInGovernance} from '../../features/Staking/Governance/common/helpers'
 import {useStrings} from '../../features/Staking/Governance/common/strings'
 import {WithdrawWarningModal} from '../../features/Staking/Governance/useCases/WithdrawWarningModal/WithdrawWarningModal'
@@ -102,8 +101,6 @@ export const Dashboard = () => {
             />
           }
         >
-          <ConsiderDRepToUsStakingCenterBanner />
-
           {stakingInfo?.status !== 'staked' && (
             <>
               <NotDelegatedInfo />

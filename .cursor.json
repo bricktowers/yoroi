@@ -93,8 +93,7 @@
         "portfolio",
         "notifications",
         "claim",
-        "blockchains",
-        "banners"
+        "blockchains"
       ],
       "requireScope": true,
       "requireTicketNumber": false,
@@ -145,4 +144,4 @@
       "**/coverage/**"
     ]
   }
-} 
+}
