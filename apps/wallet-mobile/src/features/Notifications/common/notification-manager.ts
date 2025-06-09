@@ -15,20 +15,22 @@ export const pushNotificationsManager = notificationManagerMaker({
 })
 
 export const useNotificationManagerMaker = () => {
+  const cleanupRef = React.useRef<Notifications.Manager | null>(null)
   const walletManger = useWalletManager()
   const walletId = walletManger.selected.wallet?.id ?? ''
-  return React.useMemo(
-    () =>
-      notificationManagerMaker({
-        eventsStorage,
-        configStorage: configStorage.join(`${walletId}/`),
-        subscriptions: {
-          [Notifications.Trigger.TransactionReceived]: transactionReceivedSubject,
-          [Notifications.Trigger.PrimaryTokenPriceChanged]: primaryTokenPriceChangedSubject,
-          [Notifications.Trigger.RewardsUpdated]: rewardsUpdatedSubject,
-          [Notifications.Trigger.Banner]: bannerTriggersSubject,
-        },
-      }),
-    [walletId],
-  )
+  return React.useMemo(() => {
+    cleanupRef.current?.destroy()
+    const manager = notificationManagerMaker({
+      eventsStorage: eventsStorage.join(`${walletId}/`),
+      configStorage: configStorage.join(`${walletId}/`),
+      subscriptions: {
+        [Notifications.Trigger.TransactionReceived]: transactionReceivedSubject,
+        [Notifications.Trigger.PrimaryTokenPriceChanged]: primaryTokenPriceChangedSubject,
+        [Notifications.Trigger.RewardsUpdated]: rewardsUpdatedSubject,
+        [Notifications.Trigger.Banner]: bannerTriggersSubject,
+      },
+    })
+    cleanupRef.current = manager
+    return manager
+  }, [walletId])
 }
