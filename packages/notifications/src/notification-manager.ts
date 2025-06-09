@@ -1,5 +1,6 @@
-import {BehaviorSubject, Subject, Subscription} from 'rxjs'
+import {BehaviorSubject, Subject, Subscription, of} from 'rxjs'
 import {App, Notifications} from '@yoroi/types'
+import {concatMap, delay} from 'rxjs/operators'
 
 type EventsStorageData = ReadonlyArray<Notifications.Event>
 type ConfigStorageData = Partial<Notifications.Config>
@@ -21,9 +22,14 @@ export const notificationManagerMaker = ({
       const observable = subscriptions?.[trigger] as
         | Subject<Notifications.Event>
         | undefined
-      const subscription = observable?.subscribe((event: Notifications.Event) =>
-        events.push(event),
-      )
+      const subscription = observable
+        ?.pipe(
+          concatMap((event) =>
+            // Delay between each event to avoid race conditions
+            of(event).pipe(delay(20)),
+          ),
+        )
+        .subscribe((event: Notifications.Event) => events.push(event))
       if (subscription) {
         localSubscriptions.push(subscription)
       }
