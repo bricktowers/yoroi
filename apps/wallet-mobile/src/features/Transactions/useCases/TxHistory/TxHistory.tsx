@@ -11,7 +11,6 @@ import {Spacer} from '../../../../components/Spacer/Spacer'
 import {useMetrics} from '../../../../kernel/metrics/metricsManager'
 import {usePoolTransitionModal} from '../../../../legacy/Staking/PoolTransition/usePoolTransitionModal'
 import {useSync} from '../../../../yoroi-wallets/hooks'
-import {ConsiderDRepToUsTxHistoryBanner} from '../../../Banners/useCases/ConsiderDRepToUsTxHistoryBanner'
 import {useBuyBannerNotification} from '../../../Exchange/common/ShowBuyBanner/ShowBuyBanner'
 import {useGetImportantAlertsModal} from '../../../Notifications/common/GetImportantAlertsModal'
 import {useSelectedWallet} from '../../../WalletManager/common/hooks/useSelectedWallet'
@@ -95,8 +94,6 @@ export const TxHistory = () => {
             style={styles.warningNoteStyles}
           />
         )}
-
-        <ConsiderDRepToUsTxHistoryBanner />
 
         <TxList onScroll={onScroll} refreshing={isLoading} onRefresh={handleOnRefresh} />
       </View>

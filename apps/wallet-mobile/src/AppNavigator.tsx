@@ -20,7 +20,6 @@ import {EnableLoginWithPin} from './features/Auth/EnableLoginWithPin'
 import {OsLoginScreen} from './features/Auth/OsLoginScreen/OsLoginScreen'
 import {PinLoginScreen} from './features/Auth/PinLoginScreen/PinLoginScreen'
 import {DeveloperScreen} from './features/Dev/DeveloperScreen'
-import {Playground} from './features/Dev/Playground'
 import {AgreementChangedNavigator, InitializationNavigator} from './features/Initialization'
 import {
   ChooseBiometricLoginScreen,
@@ -226,8 +225,6 @@ export const AppNavigator = () => {
               <Stack.Screen name="developer" component={DeveloperScreen} options={{headerShown: false}} />
 
               <Stack.Screen name="storybook" component={StorybookScreen} />
-
-              <Stack.Screen name="playground" component={Playground} />
 
               <Stack.Screen name="notifications" component={NotificationsDevScreen} />
             </Stack.Group>

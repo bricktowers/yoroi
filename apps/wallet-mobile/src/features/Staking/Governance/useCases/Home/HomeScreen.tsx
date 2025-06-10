@@ -26,7 +26,6 @@ import {
   useWalletEvent,
 } from '../../../../../yoroi-wallets/hooks'
 import {TransactionInfo} from '../../../../../yoroi-wallets/types/other'
-import {ConsiderDRepToUsGovernanceBanner} from '../../../../Banners/useCases/ConsiderDRepToUsGovernanceBanner'
 import {useSelectedWallet} from '../../../../WalletManager/common/hooks/useSelectedWallet'
 import {Action} from '../../common/Action/Action'
 import {formatDrepHashToCIP129Format} from '../../common/drep'
@@ -182,11 +181,7 @@ const ParticipatingInGovernanceVariant = ({
 
       <Spacer fill />
 
-      <View>
-        {!isTxPending && <ConsiderDRepToUsGovernanceBanner />}
-
-        <LearnMoreLink />
-      </View>
+      <LearnMoreLink />
 
       <Spacer height={24} />
     </View>

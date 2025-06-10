@@ -4,10 +4,9 @@ import * as CSL from '@emurgo/cross-csl-core'
 import {createSignedLedgerTxFromCbor, signRawTransaction} from '@emurgo/yoroi-lib'
 import {Datum} from '@emurgo/yoroi-lib/dist/internals/models'
 import {AppApi} from '@yoroi/api'
-import {bannersManagerMaker} from '@yoroi/banners'
 import {cardanoConfig, derivationConfig, protocolParamsPlaceholder} from '@yoroi/blockchains'
-import {isNonNullable, observableStorageMaker} from '@yoroi/common'
-import {Api, App, Balance, Banners, HW, Network, Portfolio, Wallet} from '@yoroi/types'
+import {isNonNullable} from '@yoroi/common'
+import {Api, App, Balance, HW, Network, Portfolio, Wallet} from '@yoroi/types'
 import {BigNumber} from 'bignumber.js'
 import {Buffer} from 'buffer'
 import {freeze} from 'immer'
@@ -89,9 +88,6 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
 
     private readonly transactionManager: TransactionManager
     private readonly memosManager: MemosManager
-
-    readonly bannersManager: Readonly<Banners.Manager<Banners.StorageKey>>
-
     readonly balanceManager: Readonly<Portfolio.Manager.Balance>
     readonly balance$: Observable<Portfolio.Event.BalanceManager>
     readonly portfolioPrimaryTokenInfo: Readonly<Portfolio.Token.Info>
@@ -161,12 +157,6 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
       // the calculation of locked deposit, since the cost can change
       const protocolParams = await networkManager.api.protocolParams()
 
-      const walletStorage = networkManager.rootStorage.join(`${id}/`)
-      const bannersStorage = observableStorageMaker<false, Banners.StorageKey>(walletStorage.join('banners/'))
-      const bannersManager = bannersManagerMaker<Banners.StorageKey>({
-        storage: bannersStorage,
-      })
-
       const wallet = new CardanoWallet({
         id,
         accountPubKeyHex,
@@ -179,7 +169,6 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
         portfolioPrimaryTokenInfo: primaryTokenInfo,
         accountVisual,
         protocolParams,
-        bannersManager,
       })
       if (!isYoroiWallet(wallet)) throwLoggedError('ShelleyWallet: build invalid wallet')
 
@@ -200,7 +189,6 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
       memosManager,
       balanceManager,
       accountManager,
-      bannersManager,
 
       portfolioPrimaryTokenInfo,
       protocolParams,
@@ -215,7 +203,6 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
       memosManager: MemosManager
       balanceManager: Readonly<Portfolio.Manager.Balance>
       accountManager: AccountManager
-      bannersManager: Readonly<Banners.Manager<Banners.StorageKey>>
 
       portfolioPrimaryTokenInfo: Readonly<Portfolio.Token.Info>
       protocolParams: Api.Cardano.ProtocolParams
@@ -234,7 +221,6 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
       this.balance$ = balanceManager.observable$
       this.accountManager = accountManager
       this.portfolioPrimaryTokenInfo = portfolioPrimaryTokenInfo
-      this.bannersManager = bannersManager
 
       this.protocolParams = protocolParams
 
