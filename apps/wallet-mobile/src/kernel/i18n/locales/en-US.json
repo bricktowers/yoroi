@@ -208,6 +208,8 @@
   "components.governance.delegatingToYoroiDRep": "Delegating to Yoroi DRep",
   "components.governance.delegateToAYoroiDRepDescription": "Support the Commercial and Technical adoption of the Cardano roadmap. Please note Yoroi is part of the EMURGO Group.",
   "components.governance.yoroiRecord": "See Yoroi’s voting record",
+  "components.governance.newToGovernance.title": "New to governance? Start here",
+  "components.governance.newToGovernance.text": "Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano Governance",
   "components.initialization.acepttermsofservicescreen.aggreeClause": "I agree with the Terms of Service",
   "components.initialization.acepttermsofservicescreen.continueButton": "Accept",
   "components.initialization.acepttermsofservicescreen.savingConsentModalTitle": "Initializing",

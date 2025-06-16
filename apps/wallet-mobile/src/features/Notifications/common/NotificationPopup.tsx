@@ -8,8 +8,8 @@ import {Icon} from '../../../components/Icon'
 import {IconProps} from '../../../components/Icon/type'
 import {useMetrics} from '../../../kernel/metrics/metricsManager'
 import {useWalletNavigation} from '../../../kernel/navigation'
+import {BannerIds} from './banners'
 import {NotificationItem} from './NotificationPopupItem'
-import {BannerIds} from './show-banners'
 import {SwipeOutWrapper} from './SwipeOutWrapper'
 import {TransactionReceivedNotificationPopup} from './TransactionReceivedNotificationPopup'
 import {useStrings} from './useStrings'
@@ -72,6 +72,9 @@ export const NotificationPopup = ({event, onPress, onCancel, onExpired}: Props) 
       track.inAppNotificationOpened()
       if (event.id === BannerIds.BuyCrypto || event.id === BannerIds.TestAda) {
         navigation.navigateToExchange()
+      }
+      if (event.id === BannerIds.GovernanceParticipation) {
+        navigation.navigateToGovernanceCentre()
       }
     }
   }

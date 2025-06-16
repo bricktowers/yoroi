@@ -11,8 +11,9 @@ import {Spacer} from '../../../../components/Spacer/Spacer'
 import {useMetrics} from '../../../../kernel/metrics/metricsManager'
 import {usePoolTransitionModal} from '../../../../legacy/Staking/PoolTransition/usePoolTransitionModal'
 import {useSync} from '../../../../yoroi-wallets/hooks'
-import {useBuyBannerNotification} from '../../../Exchange/common/ShowBuyBanner/ShowBuyBanner'
+import {useBuyCryptoBanner} from '../../../Exchange/common/useBuyCryptoBanner'
 import {useGetImportantAlertsModal} from '../../../Notifications/common/GetImportantAlertsModal'
+import {useGovernanceBanner} from '../../../Staking/Governance/useCases/useGovernanceBanner'
 import {useSelectedWallet} from '../../../WalletManager/common/hooks/useSelectedWallet'
 import {useStrings} from '../../common/strings'
 import {TxList} from '../TxList/TxList'
@@ -24,11 +25,12 @@ import {useOnScroll} from './useOnScroll'
 import {WarningBanner} from './WarningBanner'
 
 export const TxHistory = () => {
+  useGovernanceBanner()
+  useBuyCryptoBanner()
+
   const strings = useStrings()
   const {styles, colors} = useStyles()
   const {isDark} = useTheme()
-
-  useBuyBannerNotification()
 
   const {track} = useMetrics()
   useGetImportantAlertsModal({enabled: true})

@@ -5,7 +5,7 @@ import {Linking, PermissionsAndroid, Platform} from 'react-native'
 import {Notifications} from 'react-native-notifications'
 
 import {WalletNavigation} from '../../../kernel/navigation'
-import {BannerIds} from './show-banners'
+import {BannerIds} from './banners'
 import {uiStorage} from './storage'
 
 const permissionModalStorageKey = 'triggeredNotificationsPermissionModal'
@@ -57,7 +57,11 @@ export const triggerNotificationAction = async (options: {
   if (event.trigger === YoroiNotifications.Trigger.Banner) {
     switch (event.id) {
       case BannerIds.BuyCrypto:
+      case BannerIds.TestAda:
         walletNavigation.navigateToExchange()
+        break
+      case BannerIds.GovernanceParticipation:
+        walletNavigation.navigateToGovernanceCentre()
         break
       default:
     }
