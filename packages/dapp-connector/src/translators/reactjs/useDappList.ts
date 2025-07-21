@@ -1,17 +1,32 @@
-import {useQuery, UseQueryOptions} from 'react-query'
+import {time} from '@yoroi/common'
+import {useQuery, UseQueryOptions, UseQueryResult} from '@tanstack/react-query'
+
 import {DappListResponse} from '../../adapters/api'
 import {useDappConnector} from './DappConnectorProvider'
 
+type DappListQueryKey = readonly [string, 'dappList', string]
+
 export const useDappList = (
-  options?: UseQueryOptions<DappListResponse, Error, DappListResponse, [string, 'dappList', string]>,
-) => {
+  options?: UseQueryOptions<
+    DappListResponse,
+    Error,
+    DappListResponse,
+    DappListQueryKey
+  >,
+): UseQueryResult<DappListResponse, Error> => {
   const {manager} = useDappConnector()
-  return useQuery([manager.walletId, 'dappList', manager.network], {
+
+  const queryKey: DappListQueryKey = [
+    manager.walletId,
+    'dappList',
+    manager.network,
+  ]
+
+  return useQuery<DappListResponse, Error, DappListResponse, DappListQueryKey>({
+    queryKey,
     queryFn: () => manager.getDAppList(),
     refetchOnMount: false,
-    refetchInterval: ONE_DAY,
-    ...options,
+    refetchInterval: time.oneDay,
+    ...(options ?? {}),
   })
 }
-
-const ONE_DAY = 1000 * 60 * 60 * 24

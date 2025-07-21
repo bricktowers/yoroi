@@ -17,7 +17,11 @@ import {
   SwapLimitOptionsResponse,
   SwapSplit,
 } from './swap/api'
-import {AppStorage, AppStorageFolderName} from './app/storage'
+import {
+  AppStorage,
+  AppStorageFolderName,
+  AppStorageKeyManager,
+} from './app/storage'
 import {AppMultiStorage, AppMultiStorageOptions} from './app/multi-storage'
 import {NumberLocale} from './intl/numbers'
 import {
@@ -285,6 +289,11 @@ import {SwapDex} from './swap/dex'
 import {SwapOrder} from './swap/order'
 import {SwapAggregator} from './swap/aggregator'
 import {SwapProtocol} from './swap/protocol'
+import {
+  PortfolioCurrencyConfig,
+  PortfolioCurrencyConfigBySymbol,
+  PortfolioCurrencySymbol,
+} from './portfolio/currency'
 
 export namespace App {
   export namespace Errors {
@@ -297,6 +306,11 @@ export namespace App {
     IsAsync extends boolean = true,
     K extends string = string,
   > extends AppStorage<IsAsync, K> {}
+  export type StorageKeyManager<
+    T = unknown,
+    R = T,
+    Key extends string = string,
+  > = AppStorageKeyManager<T, R, Key>
   export type StorageFolderName = AppStorageFolderName
   export interface MultiStorage<
     T,
@@ -541,6 +555,12 @@ export namespace Explorers {
 export namespace Portfolio {
   export type PrimaryBreakdown = PortfolioPrimaryBreakdown
   export type FungibilityFilter = PortfolioFungibilityFilter
+
+  export namespace Currency {
+    export type Symbol = PortfolioCurrencySymbol
+    export type Config = PortfolioCurrencyConfig
+    export type ConfigBySymbol = PortfolioCurrencyConfigBySymbol
+  }
 
   export namespace Event {
     export type SourceId = PortfolioEventSourceId

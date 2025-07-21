@@ -1,4 +1,4 @@
-import {Platform} from 'react-native'
+import {Platform, StyleProp, ViewStyle} from 'react-native'
 
 import {fontSize, lineHeight, tokens} from '../tokens/tokens'
 
@@ -334,6 +334,14 @@ export const atoms = {
   h_full: {
     height: '100%',
   },
+  full_screen: Platform.select({
+    web: {
+      minHeight: '100vh',
+    },
+    default: {
+      height: '100%',
+    },
+  }) as StyleProp<ViewStyle>,
 
   // border
   rounded_xs: {
@@ -443,6 +451,32 @@ export const atoms = {
   self_baseline: {
     alignSelf: 'baseline',
   },
+
+  // opacity
+  opacity_0: {
+    opacity: 0,
+  },
+  opacity_25: {
+    opacity: 0.25,
+  },
+  opacity_50: {
+    opacity: 0.5,
+  },
+  opacity_75: {
+    opacity: 0.75,
+  },
+
+  // background
+  bg_transparent: {
+    backgroundColor: 'transparent',
+  },
+
+  debug: {
+    backgroundColor: 'pink',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: 'purple',
+  },
 } as const
 
-export type Atoms = typeof atoms
+export type ThemeAtoms = typeof atoms

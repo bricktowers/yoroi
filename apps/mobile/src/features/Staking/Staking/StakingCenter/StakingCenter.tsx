@@ -1,0 +1,164 @@
+import {useFocusEffect} from '@react-navigation/native'
+import {useQueryClient} from '@tanstack/react-query'
+import {atoms as a, useTheme} from '@yoroi/theme'
+import React from 'react'
+import {defineMessages, useIntl} from 'react-intl'
+import {View} from 'react-native'
+import {SafeAreaView} from 'react-native-safe-area-context'
+import {WebView, WebViewMessageEvent} from 'react-native-webview'
+
+import {showErrorDialog} from '../../../../kernel/dialogs'
+import globalMessages from '../../../../kernel/i18n/global-messages'
+import {useLanguage} from '../../../../kernel/i18n/LanguageProvider'
+import {logger} from '../../../../kernel/logger/logger'
+import {useMetrics} from '../../../../kernel/metrics/metricsManager'
+import {Space} from '../../../../ui/Space/Space'
+import {useStakingTx} from '../../../Dashboard/StakePoolInfos'
+import {useReviewTx} from '../../../ReviewTx/common/ReviewTxProvider'
+import {useWalletManager} from '../../../WalletManager/context/WalletManagerProvider'
+import {useSelectedWallet} from '../../../WalletManager/hooks/useSelectedWallet'
+import {PoolDetailScreen} from '../PoolDetails'
+
+export const StakingCenter = () => {
+  const intl = useIntl()
+  const {isDark, atoms: ta} = useTheme()
+  const queryClient = useQueryClient()
+
+  const {languageCode} = useLanguage()
+  const {wallet, meta} = useSelectedWallet()
+  const {walletManager} = useWalletManager()
+  const {track} = useMetrics()
+  const {plate} = walletManager.checksum(wallet.publicKeyHex)
+  const {navigateToTxReview} = useWalletNavigation()
+  const {unsignedTxChanged} = useReviewTx()
+  const navigateTo = useNavigateTo()
+
+  const [selectedPoolId, setSelectedPoolId] = React.useState<string | null>(
+    null,
+  )
+  const [isContentLoaded, setIsContentLoaded] = React.useState(false)
+  const [url, setUrl] = React.useState<null | string>(null)
+
+  useFocusEffect(
+    React.useCallback(() => {
+      track.stakingCenterPageViewed()
+    }, [track]),
+  )
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setUrl(prepareStakingURL(languageCode, plate))
+      return () => {
+        setUrl(null) // force rerender, so the list's CTAs are reset
+        setSelectedPoolId(null) // any pool can be reselected once go back from signing
+      }
+    }, [languageCode, plate]),
+  )
+
+  const onSuccess = () => {
+    queryClient.resetQueries([wallet.id, 'stakingInfo'])
+    track.stakingCenterDelegationSubmitted()
+    navigateTo.submittedTx()
+  }
+
+  const onError = () => {
+    setSelectedPoolId(null)
+    queryClient.resetQueries([wallet.id, 'stakingInfo'])
+    navigateTo.failedTx()
+  }
+
+  const {isLoading} = useStakingTx(
+    {wallet, poolId: selectedPoolId ?? undefined, meta},
+    {
+      enabled: selectedPoolId != null,
+      suspense: false,
+      onSuccess: (yoroiUnsignedTx) => {
+        if (selectedPoolId == null) return
+
+        track.stakingCenterDelegationInitiated()
+        unsignedTxChanged(yoroiUnsignedTx)
+        navigateToTxReview({onSuccess, onError})
+      },
+      onError,
+    },
+  )
+
+  const handleOnMessage = async (event: WebViewMessageEvent) => {
+    const selectedPoolHashes = JSON.parse(decodeURI(event.nativeEvent.data))
+    if (!Array.isArray(selectedPoolHashes) || selectedPoolHashes.length < 1) {
+      await showErrorDialog(noPoolDataDialog, intl)
+    }
+    logger.debug('selected pools from explorer:', selectedPoolHashes)
+    setSelectedPoolId(selectedPoolHashes[0])
+  }
+
+  const shouldDisplayPoolIDInput = !wallet.isMainnet
+  const shouldDisplayPoolList = wallet.isMainnet && url != null
+
+  return (
+    <SafeAreaView
+      edges={['right', 'bottom', 'left']}
+      style={[a.flex_1, a.px_lg, ta.bg_color_max]}
+    >
+      {shouldDisplayPoolIDInput && (
+        <PoolDetailScreen onPressDelegate={setSelectedPoolId} />
+      )}
+
+      {shouldDisplayPoolList && (
+        <View style={a.flex_1}>
+          <Space.Height.sm />
+
+          <WebView
+            style={{opacity: isContentLoaded ? 1 : 0}}
+            originWhitelist={['*']}
+            androidLayerType="software"
+            source={{uri: url}}
+            onMessage={(event) => handleOnMessage(event)}
+            onLoadEnd={() => setTimeout(() => setIsContentLoaded(true), 250)}
+            {...(isDark && {
+              injectedJavaScript: `
+              document.documentElement.style.overscrollBehavior = 'none'
+              document.body.style.backgroundColor = "#222"
+              document.body.style.filter = "invert(0.9) hue-rotate(180deg)"
+              document.body.style.caretColor = "#FFFFFF"
+              setTimeout(() =>
+                [...document.images].forEach(i => i.style = 'filter:invert(1) hue-rotate(180deg)')
+              , 1000)
+            `,
+            })}
+          />
+        </View>
+      )}
+
+      <PleaseWaitModal
+        title=""
+        spinnerText={intl.formatMessage(globalMessages.pleaseWait)}
+        visible={isLoading}
+      />
+    </SafeAreaView>
+  )
+}
+
+const noPoolDataDialog = defineMessages({
+  title: {
+    id: 'components.stakingcenter.noPoolDataDialog.title',
+    defaultMessage: '!!!Invalid Pool Data',
+  },
+  message: {
+    id: 'components.stakingcenter.noPoolDataDialog.message',
+    defaultMessage:
+      '!!!The data from the stake pool(s) you selected is invalid. Please try again',
+  },
+})
+
+const prepareStakingURL = (locale: string, plate: string): string => {
+  // source=mobile is constant and already included
+  let finalURL = 'https://adapools.yoroiwallet.com/?source=mobile'
+
+  const lang = locale.slice(0, 2)
+  finalURL += `&lang=${lang}`
+
+  finalURL += `&bias=${plate}`
+
+  return finalURL
+}

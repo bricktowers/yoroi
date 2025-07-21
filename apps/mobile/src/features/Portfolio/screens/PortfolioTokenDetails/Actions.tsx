@@ -1,0 +1,100 @@
+import {isPrimaryToken} from '@yoroi/portfolio'
+import {useTheme} from '@yoroi/theme'
+import {Chain, Portfolio} from '@yoroi/types'
+import * as React from 'react'
+import {StyleSheet, View} from 'react-native'
+
+import {Button, ButtonType} from '../../../../components/Button/Button'
+import {Icon} from '../../../../components/Icon'
+import {useMetrics} from '../../../../kernel/metrics/metricsManager'
+import {useSwap} from '../../../Swap/common/SwapProvider'
+import {useSelectedNetwork} from '../../../WalletManager/hooks/useSelectedNetwork'
+import {useSelectedWallet} from '../../../WalletManager/hooks/useSelectedWallet'
+import {useNavigateTo} from '../../common/hooks/useNavigateTo'
+import {useStrings} from '../../common/hooks/useStrings'
+
+type Props = {
+  tokenInfo: Portfolio.Token.Info
+}
+export const Actions = ({tokenInfo}: Props) => {
+  const {styles} = useStyles()
+  const strings = useStrings()
+  const navigateTo = useNavigateTo()
+  const swapForm = useSwap()
+  const {track} = useMetrics()
+
+  const {network} = useSelectedNetwork()
+
+  const {
+    wallet: {portfolioPrimaryTokenInfo},
+  } = useSelectedWallet()
+
+  const handleOnSwap = () => {
+    if (network === Chain.Network.Preprod) return navigateTo.swapPreprodNotice()
+
+    swapForm.action({type: 'ResetForm'})
+
+    if (!isPrimaryToken(tokenInfo)) {
+      swapForm.action({type: 'TokenOutInputTouched'})
+      swapForm.action({type: 'TokenOutIdChanged', value: tokenInfo.id})
+    }
+
+    track.swapInitiated({
+      from_asset: [
+        {
+          asset_name: portfolioPrimaryTokenInfo.name,
+          asset_ticker: portfolioPrimaryTokenInfo.ticker,
+          policy_id: '',
+        },
+      ],
+      to_asset: [
+        {
+          asset_name: tokenInfo.name,
+          asset_ticker: tokenInfo.ticker,
+          policy_id: tokenInfo.id,
+        },
+      ],
+      order_type: 'market',
+      slippage_tolerance: 1,
+    })
+
+    navigateTo.resetTabAndSwap()
+  }
+
+  return (
+    <View style={styles.root}>
+      <View style={styles.container}>
+        <Button
+          type={ButtonType.Secondary}
+          title={strings.send}
+          icon={Icon.Send}
+          onPress={navigateTo.resetTabAndSend}
+        />
+
+        <Button title={strings.swap} icon={Icon.Swap} onPress={handleOnSwap} />
+      </View>
+    </View>
+  )
+}
+
+const useStyles = () => {
+  const {atoms, color} = useTheme()
+  const styles = StyleSheet.create({
+    root: {
+      borderTopColor: color.gray_200,
+      ...atoms.border_t,
+    },
+    container: {
+      ...atoms.flex_row,
+      ...atoms.gap_lg,
+      ...atoms.p_lg,
+    },
+  })
+
+  const colors = {
+    white: color.white_static,
+    primary: color.el_primary_medium,
+  } as const
+
+  return {styles, colors} as const
+}

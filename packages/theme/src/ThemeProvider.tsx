@@ -1,92 +1,141 @@
-import React from 'react'
-import {ColorSchemeName, useColorScheme as _useColorScheme} from 'react-native'
+import {App} from '@yoroi/types'
+import {invalid} from '@yoroi/common'
 
-import {ThemedPalette, SupportedThemes, Theme, ThemeStorage} from './types'
+import * as React from 'react'
+import {useColorScheme} from 'react-native'
+import {freeze} from 'immer'
+
+import {
+  ThemedPalette,
+  ThemeRecord,
+  ThemeName,
+  ThemeBasePalette,
+  ThemeConfig,
+} from './types'
 import {defaultLightTheme} from './themes/default-light'
 import {defaultDarkTheme} from './themes/default-dark'
 import {detectTheme} from './helpers/detect-theme'
-import {Atoms} from './atoms/atoms'
 
-type ThemeType = {
-  themeName: SupportedThemes
+type ThemeContext = {
+  config: ThemeConfig
+  paletteName: ThemeName
+  basePalette: ThemeBasePalette
+  basePaletteInverted: ThemeBasePalette
+  palette: ThemedPalette
+  selectTheme: (name: ThemeConfig) => void
+  isLight: boolean
+  isDark: boolean
+  // NOTE: atoms that are dependent on the theme palette
+  atoms: {
+    bg_color_max: {backgroundColor: string}
+    bg_color_min: {backgroundColor: string}
+    el_primary_max: {color: string}
+    el_primary_medium: {color: string}
+    el_primary_min: {color: string}
+    el_gray_max: {color: string}
+    el_gray_medium: {color: string}
+    el_gray_min: {color: string}
+    el_secondary: {color: string}
+    input_selected: {color: string}
+    text_primary_max: {color: string}
+    text_primary_medium: {color: string}
+    text_primary_min: {color: string}
+    text_gray_max: {color: string}
+    text_gray_medium: {color: string}
+    text_gray_low: {color: string}
+    text_gray_min: {color: string}
+    text_error: {color: string}
+    text_warning: {color: string}
+    text_success: {color: string}
+    text_info: {color: string}
+    web_bg_sidebar_active: {backgroundColor: string}
+    web_bg_sidebar_inactive: {backgroundColor: string}
+    mobile_bg_blur: {backgroundColor: string}
+  }
 }
 
-const themesData: ThemeType[] = [
-  {
-    themeName: 'system',
-  },
-  {
-    themeName: 'default-light',
-  },
-  {
-    themeName: 'default-dark',
-  },
-]
+const themes: Readonly<Record<Exclude<ThemeName, 'system'>, ThemeRecord>> =
+  freeze({
+    ['default-light']: defaultLightTheme,
+    ['default-dark']: defaultDarkTheme,
+  })
 
-const ThemeContext = React.createContext<undefined | ThemeContext>(undefined)
+export const ThemeContext = React.createContext<undefined | ThemeContext>(
+  undefined,
+)
 export const ThemeProvider = ({
   children,
   storage,
-}: {
-  children: React.ReactNode
-  storage: ThemeStorage
-}) => {
-  const colorScheme = useColorScheme()
-  const [selectedName, setSelectedName] = React.useState<SupportedThemes>(
-    storage.read() ?? 'system',
+}: React.PropsWithChildren<{
+  storage: App.StorageKeyManager<ThemeConfig>
+}>) => {
+  const hostTheme = useColorScheme() ?? 'dark'
+  const [selectedThemeConfig, setSelectedThemeConfig] =
+    React.useState<ThemeConfig>(() => storage.read())
+  const [paletteName, setPaletteName] = React.useState<ThemeName>(
+    detectTheme(hostTheme, selectedThemeConfig),
   )
-  const [themeName, setThemeName] = React.useState<
-    Exclude<SupportedThemes, 'system'>
-  >(detectTheme(colorScheme, selectedName))
 
-  const value = React.useMemo(
+  const value = React.useMemo<ThemeContext>(
     () => ({
-      name: selectedName,
-      color: themes[themeName].color,
-
-      selectThemeName: (newTheme: SupportedThemes) => {
-        setSelectedName(newTheme)
-        setThemeName(detectTheme(colorScheme, newTheme))
-        storage.save(newTheme)
+      config: selectedThemeConfig,
+      paletteName,
+      basePalette: themes[paletteName].base,
+      palette: themes[paletteName].theme,
+      atoms: {
+        bg_color_max: {backgroundColor: themes[paletteName].theme.bg_color_max},
+        bg_color_min: {backgroundColor: themes[paletteName].theme.bg_color_min},
+        el_primary_max: {color: themes[paletteName].theme.el_primary_max},
+        el_primary_medium: {color: themes[paletteName].theme.el_primary_medium},
+        el_primary_min: {color: themes[paletteName].theme.el_primary_min},
+        el_gray_max: {color: themes[paletteName].theme.el_gray_max},
+        el_gray_medium: {color: themes[paletteName].theme.el_gray_medium},
+        el_gray_min: {color: themes[paletteName].theme.el_gray_min},
+        el_secondary: {color: themes[paletteName].theme.el_secondary},
+        input_selected: {color: themes[paletteName].theme.input_selected},
+        text_primary_max: {color: themes[paletteName].theme.text_primary_max},
+        text_primary_medium: {
+          color: themes[paletteName].theme.text_primary_medium,
+        },
+        text_primary_min: {color: themes[paletteName].theme.text_primary_min},
+        text_gray_max: {color: themes[paletteName].theme.text_gray_max},
+        text_gray_medium: {color: themes[paletteName].theme.text_gray_medium},
+        text_gray_low: {color: themes[paletteName].theme.text_gray_low},
+        text_gray_min: {color: themes[paletteName].theme.text_gray_min},
+        text_error: {color: themes[paletteName].theme.text_error},
+        text_warning: {color: themes[paletteName].theme.text_warning},
+        text_success: {color: themes[paletteName].theme.text_success},
+        text_info: {color: themes[paletteName].theme.text_info},
+        web_bg_sidebar_active: {
+          backgroundColor: themes[paletteName].theme.web_bg_sidebar_active,
+        },
+        web_bg_sidebar_inactive: {
+          backgroundColor: themes[paletteName].theme.web_bg_sidebar_inactive,
+        },
+        mobile_bg_blur: {
+          backgroundColor: themes[paletteName].theme.mobile_bg_blur,
+        },
       },
 
-      isLight: themes[themeName].base === 'light',
-      isDark: themes[themeName].base === 'dark',
-      atoms: themes[themeName].atoms,
-      data: themesData,
-      colorScheme: themeName,
+      selectTheme: (newThemeName: ThemeConfig) => {
+        setSelectedThemeConfig(newThemeName)
+        setPaletteName(detectTheme(hostTheme, newThemeName))
+        storage.save(newThemeName)
+      },
+      isLight: themes[paletteName].base === 'light',
+      isDark: themes[paletteName].base === 'dark',
+      basePaletteInverted:
+        themes[paletteName].base === 'dark' ? 'light' : 'dark',
     }),
-    [colorScheme, storage, themeName, selectedName],
+    [hostTheme, storage, paletteName, selectedThemeConfig],
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
 export const useTheme = () =>
-  React.useContext(ThemeContext) ?? missingProvider()
+  React.useContext(ThemeContext) ?? invalid('ThemeProvider is missing')
 
-export const useThemeColor = () => useTheme().color
-
-type ThemeContext = {
-  name: SupportedThemes
-  color: ThemedPalette
-  selectThemeName: (name: SupportedThemes) => void
-  isLight: boolean
-  isDark: boolean
-  atoms: Atoms
-  data: ThemeType[]
-  colorScheme: Exclude<SupportedThemes, 'system'>
-}
-
-const themes: Record<Exclude<SupportedThemes, 'system'>, Theme> = {
-  ['default-light']: defaultLightTheme,
-  ['default-dark']: defaultDarkTheme,
-}
-
-const missingProvider = () => {
-  throw new Error('ThemeProvider is missing')
-}
-
-const useColorScheme = (): NonNullable<ColorSchemeName> => {
-  return _useColorScheme() as NonNullable<ColorSchemeName>
-}
+export const usePalette = () => useTheme().palette
+export const useThemedAtoms = () => useTheme().atoms
+export const useBasePalette = () => useTheme().basePalette

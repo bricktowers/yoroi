@@ -1,12 +1,8 @@
-import {
-  FetchData,
-  fetchData,
-  isLeft,
-  isNonNullable,
-  isRight,
-} from '@yoroi/common'
-import {Api, Chain, Left, Portfolio, Swap} from '@yoroi/types'
+import {fetchData, isLeft, isNonNullable, isRight} from '@yoroi/common'
+import {Api, Chain, Left, Swap} from '@yoroi/types'
+
 import {freeze} from 'immer'
+
 import {
   CancelResponse,
   EstimateResponse,
@@ -16,17 +12,9 @@ import {
   ReverseEstimateResponse,
   BuildResponse,
   TokensResponse,
+  DexhunterApiConfig,
 } from './types'
 import {DexhunterProtocols, transformersMaker} from './transformers'
-
-export type DexhunterApiConfig = {
-  address: string
-  primaryTokenInfo: Portfolio.Token.Info
-  isPrimaryToken: (token: string | null | undefined) => boolean
-  partner?: string
-  network: Chain.SupportedNetworks
-  request?: FetchData
-}
 
 export const dexhunterApiMaker = (
   config: DexhunterApiConfig,
@@ -196,8 +184,8 @@ export const dexhunterApiMaker = (
           body.wantedPrice !== undefined
             ? 'limitEstimate'
             : body.amountOut !== undefined
-            ? 'reverseEstimate'
-            : 'estimate'
+              ? 'reverseEstimate'
+              : 'estimate'
 
         const response = await request<
           EstimateResponse | ReverseEstimateResponse | LimitEstimateResponse
