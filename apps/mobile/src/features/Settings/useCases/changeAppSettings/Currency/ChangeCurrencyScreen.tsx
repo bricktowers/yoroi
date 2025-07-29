@@ -1,34 +1,18 @@
-import {useTheme} from '@yoroi/theme'
+import {atoms as a, useTheme} from '@yoroi/theme'
 import React from 'react'
-import {StyleSheet} from 'react-native'
 import {SafeAreaView} from 'react-native-safe-area-context'
 
-import {Boundary} from '../../../../../components/Boundary/Boundary'
-import {CurrencyPickerList} from './CurrencyPickerList'
+import {Boundary} from '../../../../../ui/Boundary/Boundary'
 
 export const ChangeCurrencyScreen = () => {
-  const styles = useStyles()
+  const {atoms: ta, palette: p} = useTheme()
 
   return (
     <SafeAreaView
       edges={['bottom', 'right', 'left']}
-      style={styles.safeAreaView}
+      style={[a.flex_1, ta.bg_color_max]}
     >
-      <Boundary>
-        <CurrencyPickerList />
-      </Boundary>
+      <Boundary>{/*<CurrencyPickerList />*/}</Boundary>
     </SafeAreaView>
   )
-}
-
-const useStyles = () => {
-  const {color} = useTheme()
-  const styles = StyleSheet.create({
-    safeAreaView: {
-      flex: 1,
-      backgroundColor: color.bg_color_max,
-    },
-  })
-
-  return styles
 }

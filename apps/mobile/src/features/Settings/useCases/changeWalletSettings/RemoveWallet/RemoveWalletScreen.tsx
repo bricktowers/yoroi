@@ -1,32 +1,26 @@
-import {useTheme} from '@yoroi/theme'
+import {atoms as a, useTheme} from '@yoroi/theme'
 import React from 'react'
 import {defineMessages, useIntl} from 'react-intl'
-import {
-  InteractionManager,
-  ScrollView,
-  StyleSheet,
-  View,
-  ViewProps,
-} from 'react-native'
+import {InteractionManager, ScrollView, View, ViewProps} from 'react-native'
 import {SafeAreaView} from 'react-native-safe-area-context'
 
-import {Button} from '../../../../../components/Button/Button'
-import {Checkbox} from '../../../../../components/Checkbox/Checkbox'
-import {KeyboardAvoidingView} from '../../../../../components/KeyboardAvoidingView/KeyboardAvoidingView'
-import {Spacer} from '../../../../../components/Spacer/Spacer'
-import {Text} from '../../../../../components/Text'
+import {useWalletNavigation} from '../../../../../kernel/navigation/navigation'
+import {Button} from '../../../../../ui/Button/Button'
+import {Checkbox} from '../../../../../ui/Checkbox/Checkbox'
+import {KeyboardAvoidingView} from '../../../../../ui/KeyboardAvoidingView/KeyboardAvoidingView'
+import {Space, SpaceHeight} from '../../../../../ui/Space/Space'
+import {Text} from '../../../../../ui/Text/Text'
 import {
   Checkmark,
   TextInput,
   TextInputProps,
-} from '../../../../../components/TextInput/TextInput'
-import {useWalletNavigation} from '../../../../../kernel/navigation'
-import {useSelectedWallet} from '../../../../WalletManager/common/hooks/useSelectedWallet'
+} from '../../../../../ui/TextInput/TextInput'
 import {useWalletManager} from '../../../../WalletManager/context/WalletManagerProvider'
+import {useSelectedWallet} from '../../../../WalletManager/hooks/useSelectedWallet'
 
 export const RemoveWalletScreen = () => {
   const strings = useStrings()
-  const styles = useStyles()
+  const {atoms: ta, palette: p} = useTheme()
   const {resetToWalletSetupInit, resetToWalletSelection} = useWalletNavigation()
   const {walletManager} = useWalletManager()
   const {meta} = useSelectedWallet()
@@ -50,39 +44,36 @@ export const RemoveWalletScreen = () => {
     (!meta.isHW && !hasMnemonicWrittenDown) || meta.name !== typedWalletName
 
   return (
-    <KeyboardAvoidingView style={styles.root}>
-      <SafeAreaView
-        edges={['left', 'right', 'bottom']}
-        style={styles.safeAreaView}
-      >
+    <KeyboardAvoidingView style={[ta.bg_color_max, a.flex_1, a.px_lg, a.pt_lg]}>
+      <SafeAreaView edges={['left', 'right', 'bottom']} style={a.flex_1}>
         <ScrollView bounces={false}>
           <Description>
             {!meta.isHW && (
-              <Text style={styles.description}>
+              <Text style={a.body_1_lg_regular}>
                 {strings.descriptionParagraph1}
               </Text>
             )}
 
-            <Spacer height={24} />
+            <Space.Height.xl />
 
-            <Text style={styles.description}>
+            <Text style={a.body_1_lg_regular}>
               {strings.descriptionParagraph2}
             </Text>
           </Description>
 
-          <Spacer height={32} />
+          <Space.Height.lg />
 
           <WalletInfo>
-            <Text style={styles.walletNameLabel}>{strings.walletName}</Text>
+            <Text style={a.body_1_lg_medium}>{strings.walletName}</Text>
 
-            <Spacer height={10} />
+            <SpaceHeight size={10} />
 
-            <Text style={styles.walletName}>{meta.name}</Text>
+            <Text style={a.body_1_lg_regular}>{meta.name}</Text>
 
-            <Spacer height={24} />
+            <Space.Height.xl />
 
             <WalletNameInput
-              placeholder={strings.walletName}
+              placeholder={a.body_1_lg_regular}
               value={typedWalletName}
               onChangeText={setTypedWalletName}
               right={typedWalletName === meta.name ? <Checkmark /> : undefined}
@@ -95,7 +86,7 @@ export const RemoveWalletScreen = () => {
           </WalletInfo>
         </ScrollView>
 
-        <Spacer fill />
+        <Space.Height.lg fill />
 
         {!meta.isHW && (
           <Checkbox
@@ -109,7 +100,9 @@ export const RemoveWalletScreen = () => {
           <Button
             onPress={handleOnRemoveWallet}
             title={strings.remove}
-            style={styles.removeButton}
+            style={{
+              backgroundColor: p.sys_magenta_500,
+            }}
             disabled={disabled}
           />
         </Actions>
@@ -122,8 +115,8 @@ const Description = (props: ViewProps) => {
   return <View {...props} />
 }
 const WalletInfo = (props: ViewProps) => {
-  const styles = useStyles()
-  return <View {...props} style={styles.descriptionContainer} />
+  const {atoms: ta} = useTheme()
+  return <View {...props} style={ta.bg_color_max} />
 }
 const WalletNameInput = (props: TextInputProps) => {
   return (
@@ -136,8 +129,7 @@ const WalletNameInput = (props: TextInputProps) => {
   )
 }
 const Actions = (props: ViewProps) => {
-  const styles = useStyles()
-  return <View {...props} style={styles.actions} />
+  return <View {...props} style={a.py_lg} />
 }
 
 const messages = defineMessages({
@@ -187,39 +179,4 @@ const useStrings = () => {
     remove: intl.formatMessage(messages.remove),
     hasWrittenDownMnemonic: intl.formatMessage(messages.hasWrittenDownMnemonic),
   }
-}
-
-const useStyles = () => {
-  const {color, atoms} = useTheme()
-  const styles = StyleSheet.create({
-    root: {
-      backgroundColor: color.bg_color_max,
-      ...atoms.flex_1,
-      ...atoms.px_lg,
-      ...atoms.pt_lg,
-    },
-    descriptionContainer: {
-      backgroundColor: color.bg_color_max,
-    },
-    description: {
-      ...atoms.body_1_lg_regular,
-    },
-
-    walletNameLabel: {
-      ...atoms.body_1_lg_medium,
-    },
-    walletName: {
-      ...atoms.body_1_lg_regular,
-    },
-    actions: {
-      ...atoms.py_lg,
-    },
-    safeAreaView: {
-      ...atoms.flex_1,
-    },
-    removeButton: {
-      backgroundColor: color.sys_magenta_500,
-    },
-  })
-  return styles
 }

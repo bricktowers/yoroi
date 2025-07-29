@@ -2,11 +2,11 @@ import {atoms as a, useTheme} from '@yoroi/theme'
 import React, {ReactElement} from 'react'
 import {TouchableOpacity, TouchableOpacityProps, View} from 'react-native'
 
-import {isEmptyString} from '../../kernel/utils'
 import {Hr} from '../../ui/Hr/Hr'
 import {Icon} from '../../ui/Icon'
-import {Spacer} from '../../ui/Spacer/Spacer'
+import {Space, SpaceHeight, SpaceWidth} from '../../ui/Space/Space'
 import {Text} from '../../ui/Text/Text'
+import {isEmptyString} from '../../wallets/utils/string'
 
 const Touchable = (props: TouchableOpacityProps) => (
   <TouchableOpacity {...props} activeOpacity={0.5} />
@@ -28,7 +28,7 @@ export const SettingsSection = ({title, children}: SettingsSectionProps) => {
             {title}
           </Text>
 
-          <Spacer height={5} />
+          <SpaceHeight size={5} />
 
           <Hr style={[{height: 1}, {backgroundColor: p.gray_200}]} />
         </>
@@ -58,26 +58,17 @@ export const SettingsItem = ({
 
   return (
     <View>
-      <View style={[{paddingVertical: 16}]}>
-        <View
-          style={[
-            {
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            },
-          ]}
-        >
+      <View style={a.py_lg}>
+        <View style={[a.flex_row, a.justify_between, a.align_center]}>
           {icon}
 
-          {icon && <Spacer width={10} />}
+          {icon && <SpaceWidth size={10} />}
 
           <Text
             style={[
-              {flex: 1},
+              a.flex_1,
               a.body_1_lg_medium,
-              {color: p.gray_900},
-              disabled && {color: p.gray_500},
+              {color: disabled ? p.gray_500 : p.gray_900},
             ]}
           >
             {label}
@@ -88,7 +79,7 @@ export const SettingsItem = ({
 
         {!isEmptyString(info) && (
           <>
-            <Spacer height={12} />
+            <Space.Height.md />
 
             <Text style={[a.body_3_sm_regular, {color: p.gray_600}]}>
               {info}
@@ -120,14 +111,14 @@ export const NavigatedSettingsItem = ({
   return (
     <Touchable onPress={onNavigate} disabled={disabled}>
       <SettingsItem icon={icon} label={label} disabled={disabled}>
-        <View style={[{flexDirection: 'row', alignItems: 'center'}]}>
+        <View style={[a.flex_row, a.align_center]}>
           {!isEmptyString(selected) && (
             <Text style={[a.body_1_lg_regular, {color: p.gray_500}]}>
               {selected}
             </Text>
           )}
 
-          <Spacer width={16} />
+          <Space.Width.lg />
 
           <Icon.Chevron direction="right" size={28} color={p.el_gray_min} />
         </View>

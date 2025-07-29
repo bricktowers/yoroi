@@ -1,17 +1,17 @@
-import {useTheme} from '@yoroi/theme'
+import {atoms as a, useTheme} from '@yoroi/theme'
 import {App} from '@yoroi/types'
 import React from 'react'
-import {ScrollView, StyleSheet, TextProps, View} from 'react-native'
+import {ScrollView, TextProps, View} from 'react-native'
 
-import {Space} from '../../../../../components/Space/Space'
-import {Text} from '../../../../../components/Text'
 import {logger} from '../../../../../kernel/logger/logger'
+import {Space} from '../../../../../ui/Space/Space'
+import {Text} from '../../../../../ui/Text/Text'
 
 export const SystemLogScreen = () => {
-  const styles = useStyles()
+  const {atoms: ta} = useTheme()
 
   return (
-    <View style={styles.root}>
+    <View style={[a.flex_1, ta.bg_color_max, a.px_lg]}>
       <ScrollView>
         {logger.trail.map((entry) => {
           return (
@@ -30,7 +30,7 @@ export const SystemLogScreen = () => {
 
               <ValueText>{entry.message}</ValueText>
 
-              <Space height="lg" />
+              <Space.Height.lg />
             </View>
           )
         })}
@@ -48,41 +48,39 @@ const LoggerLevelEmoji = {
 } as const
 
 const LabelText = ({style, children, ...props}: TextProps) => {
-  const styles = useStyles()
+  const {palette: p} = useTheme()
 
   return (
-    <Text {...props} style={[styles.labelText, style]}>
+    <Text
+      {...props}
+      style={[
+        {
+          color: p.gray_900,
+        },
+        a.body_1_lg_medium,
+        style,
+      ]}
+    >
       {children}
     </Text>
   )
 }
 
 const ValueText = ({style, children, ...props}: TextProps) => {
-  const styles = useStyles()
+  const {palette: p} = useTheme()
 
   return (
-    <Text {...props} style={[styles.valueText, style]}>
+    <Text
+      {...props}
+      style={[
+        {
+          color: p.gray_500,
+        },
+        a.body_1_lg_regular,
+        style,
+      ]}
+    >
       {children}
     </Text>
   )
-}
-const useStyles = () => {
-  const {color, atoms} = useTheme()
-  const styles = StyleSheet.create({
-    root: {
-      flex: 1,
-      backgroundColor: color.bg_color_max,
-      ...atoms.px_lg,
-    },
-    labelText: {
-      color: color.gray_900,
-      ...atoms.body_1_lg_medium,
-    },
-    valueText: {
-      color: color.gray_500,
-      ...atoms.body_1_lg_regular,
-    },
-  })
-
-  return styles
 }

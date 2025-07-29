@@ -1,27 +1,28 @@
-import {SupportedThemes, useTheme} from '@yoroi/theme'
+import {atoms as a, ThemeName, useTheme} from '@yoroi/theme'
 import React from 'react'
 import {useIntl} from 'react-intl'
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {TouchableOpacity, View} from 'react-native'
 
-import {Icon} from '../../../../../components/Icon'
-import {Text} from '../../../../../components/Text'
 import {themeNames} from '../../../../../kernel/i18n/global-messages'
 import {useMetrics} from '../../../../../kernel/metrics/metricsManager'
+import {Icon} from '../../../../../ui/Icon'
+import {Text} from '../../../../../ui/Text/Text'
 import {useThemeStorageMaker} from '../../../../../wallets/hooks'
 
 type Props = {
-  title: SupportedThemes
-  selectTheme: (name: SupportedThemes) => void
-  setLocalTheme: (name: SupportedThemes) => void
+  title: ThemeName
+  selectTheme: (name: ThemeName) => void
+  setLocalTheme: (name: ThemeName) => void
 }
 
 export const ThemePickerItem = ({title, selectTheme, setLocalTheme}: Props) => {
-  const {colors} = useStyles()
+  const {palette: p} = useTheme()
+
   const strings = useStrings()
   const themeStorage = useThemeStorageMaker()
   const {track} = useMetrics()
 
-  const handleSelectTheme = (theme: SupportedThemes) => {
+  const handleSelectTheme = (theme: ThemeName) => {
     track.themeSelected({
       theme:
         theme === 'default-light'
@@ -45,7 +46,7 @@ export const ThemePickerItem = ({title, selectTheme, setLocalTheme}: Props) => {
 
         <Selected>
           {themeStorage.read() === title && (
-            <Icon.Check size={24} color={colors.checkIcon} />
+            <Icon.Check size={24} color={p.primary_600} />
           )}
         </Selected>
       </Row>
@@ -54,56 +55,65 @@ export const ThemePickerItem = ({title, selectTheme, setLocalTheme}: Props) => {
 }
 
 const Row = ({children}: {children: React.ReactNode}) => {
-  const {styles} = useStyles()
-  return <View style={styles.row}>{children}</View>
+  const {palette: p} = useTheme()
+  return (
+    <View
+      style={[a.flex_row, {borderBottomColor: p.gray_200}, a.border_b, a.py_lg]}
+    >
+      {children}
+    </View>
+  )
 }
 const Description = ({children}: {children: React.ReactNode}) => {
-  const {styles} = useStyles()
-  return <View style={styles.description}>{children}</View>
+  return (
+    <View
+      style={[
+        {
+          flex: 8,
+        },
+        a.flex_col,
+      ]}
+    >
+      {children}
+    </View>
+  )
 }
 const Selected = ({children}: {children: React.ReactNode}) => {
-  const {styles} = useStyles()
-  return <View style={styles.flag}>{children}</View>
+  return (
+    <View
+      style={[
+        a.align_end,
+        a.justify_center,
+        {
+          flex: 2,
+        },
+      ]}
+    >
+      {children}
+    </View>
+  )
 }
 const Title = ({children}: {children: React.ReactNode}) => {
-  const {styles} = useStyles()
-  return <Text style={styles.bodyMedium}>{children}</Text>
-}
-
-const useStyles = () => {
-  const {atoms, color} = useTheme()
-  const styles = StyleSheet.create({
-    row: {
-      flexDirection: 'row',
-      borderBottomColor: color.gray_200,
-      borderBottomWidth: 1,
-      ...atoms.py_lg,
-    },
-    flag: {
-      alignItems: 'flex-end',
-      justifyContent: 'center',
-      flex: 2,
-    },
-    description: {
-      flex: 8,
-      flexDirection: 'column',
-    },
-    bodyMedium: {
-      color: color.gray_900,
-      ...atoms.body_1_lg_medium,
-    },
-  })
-  const colors = {
-    checkIcon: color.primary_600,
-  }
-  return {styles, colors}
+  const {palette: p} = useTheme()
+  return (
+    <Text
+      style={[
+        {
+          color: p.gray_900,
+        },
+        a.body_1_lg_medium,
+      ]}
+    >
+      {children}
+    </Text>
+  )
 }
 
 const useStrings = () => {
   const intl = useIntl()
 
   return {
-    translateThemeName: (theme: SupportedThemes) =>
+    translateThemeName: (theme: ThemeName) =>
       intl.formatMessage(themeNames[theme]),
   }
 }
