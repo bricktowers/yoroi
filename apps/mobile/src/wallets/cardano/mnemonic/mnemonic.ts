@@ -1,33 +1,31 @@
-import {WasmModuleProxy} from '@emurgo/cross-csl-core'
 import {generateMnemonic, mnemonicToEntropy} from 'bip39'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {randomBytes} = require('react-native-randombytes')
 
-import {randomBytes} from 'react-native-randombytes'
-
-import {wrappedCsl} from '../wrappedCsl'
+import {CardanoMobile} from '~/wallets/wallets'
 
 const mnemonicStrengh = 160
 
 export const generateAdaMnemonic = () =>
   generateMnemonic(mnemonicStrengh, randomBytes)
 
-export const generateWalletRootKey = async (
-  mnemonic: string,
-  csl: WasmModuleProxy,
-) => {
+export const generateWalletRootKey = (mnemonic: string) => {
   const bip39entropy = mnemonicToEntropy(mnemonic)
-  const emptyPassword = Buffer.from('')
-  const rootKey = await csl.Bip32PrivateKey.fromBip39Entropy(
-    Buffer.from(bip39entropy, 'hex'),
-    emptyPassword,
-  )
-
-  return rootKey
+  const entropyBuffer = Buffer.from(bip39entropy, 'hex')
+  const entropyUint8 = new Uint8Array(entropyBuffer)
+  const emptyPassword = new Uint8Array()
+  try {
+    const rootKey = CardanoMobile.Bip32PrivateKey.fromBip39Entropy(
+      entropyUint8,
+      emptyPassword,
+    )
+    return rootKey
+  } catch (error) {
+    throw new Error(`Failed to generate wallet root key: ${error}`)
+  }
 }
 
-export const getMasterKeyFromMnemonic = async (mnemonic: string) => {
-  const {csl, release} = wrappedCsl()
-  const rootKeyPtr = await generateWalletRootKey(mnemonic, csl)
-  const rootKey = Buffer.from(await rootKeyPtr.asBytes()).toString('hex')
-  release()
-  return rootKey
+export const getMasterKeyFromMnemonic = (mnemonic: string) => {
+  const rootKeyPtr = generateWalletRootKey(mnemonic)
+  return rootKeyPtr.asBytes()
 }
