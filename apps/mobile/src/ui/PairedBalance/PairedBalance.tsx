@@ -10,7 +10,6 @@ import {usePortfolioTokenActivity} from '~/features/Portfolio/context/PortfolioT
 import {useCurrencyPairing} from '~/features/Settings/useCases/changeAppSettings/Currency/CurrencyContext'
 import {usePrivacyMode} from '~/features/Settings/useCases/changeAppSettings/PrivacyMode/PrivacyMode'
 import {useWalletManager} from '~/features/WalletManager/context/WalletManagerProvider'
-import {CurrencySymbol} from '~/wallets/types/other'
 import {Boundary, ResetError, ResetErrorRef} from '../Boundary/Boundary'
 
 type Props = {
@@ -109,7 +108,11 @@ const Price = ({amount, textStyle, ignorePrivacy, hidePrimaryPair}: Props) => {
   )
 }
 
-export const BalanceError = ({textStyle}: {textStyle?: TextStyle}) => {
+export const BalanceError = ({
+  textStyle,
+}: {
+  textStyle?: TextStyle | TextStyle[]
+}) => {
   const strings = useStrings()
   const {atoms: ta, palette: p} = useTheme()
   const {currency} = useCurrencyPairing()
@@ -132,7 +135,7 @@ const useStrings = () => {
   const intl = useIntl()
 
   return {
-    pairedBalanceError: (currency: CurrencySymbol) =>
+    pairedBalanceError: (currency: Portfolio.Currency.Symbol) =>
       intl.formatMessage(messages.pairedBalanceError, {currency}),
   }
 }
