@@ -1,4 +1,3 @@
-import {useHeaderHeight} from '@react-navigation/elements'
 import {useFocusEffect} from '@react-navigation/native'
 import {atoms as a, useTheme} from '@yoroi/theme'
 import {LinearGradient} from 'expo-linear-gradient'
@@ -8,8 +7,8 @@ import {LayoutAnimation, Text, View} from 'react-native'
 // import {useBuyCryptoBanner} from '~/features/Exchange/common/useBuyCryptoBanner'
 // import {usePoolTransitionModal} from '~/features/Staking/Staking/PoolTransition/usePoolTransitionModal'
 import infoIcon from '~/assets/img/icon/info-light-green.png'
-import {useStrings} from '~/features/Transactions/common/strings'
 import {useSelectedWallet} from '~/features/WalletManager/hooks/useSelectedWallet'
+import {useStrings} from '~/kernel/i18n/useStrings'
 import {useMetrics} from '~/kernel/metrics/metricsManager'
 import {Space} from '~/ui/Space/Space'
 import {useSync} from '~/wallets/hooks'
@@ -44,7 +43,6 @@ export const TxHistory = () => {
   const [showWarning, setShowWarning] = React.useState(
     meta.implementation === 'cardano-bip44',
   )
-  const headerHeight = useHeaderHeight()
 
   const {sync, isPending: isLoadingWallet} = useSync(wallet)
   // const {isLoading: isLoadingPoolTransition} = usePoolTransitionModal()

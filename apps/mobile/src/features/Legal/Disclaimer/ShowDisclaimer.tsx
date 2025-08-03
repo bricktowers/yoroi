@@ -1,22 +1,18 @@
 import {useNavigation} from '@react-navigation/native'
 import {atoms as a, useTheme} from '@yoroi/theme'
 import * as React from 'react'
-import {useIntl} from 'react-intl'
 import {View} from 'react-native'
 
 import Markdown from 'react-native-marked'
-import globalMessages, {
-  actionMessages,
-  confirmationMessages,
-} from '~/kernel/i18n/global-messages'
+import {useDisclaimerState} from '~/features/Legal/Disclaimer/useDisclaimerState'
 import {useLanguage} from '~/kernel/i18n/LanguageProvider'
+import {useStrings} from '~/kernel/i18n/useStrings'
 import {useWalletNavigation} from '~/kernel/navigation'
 import {Button, ButtonType} from '~/ui/Button/Button'
 import {Checkbox} from '~/ui/Checkbox/Checkbox'
 import {useModal} from '~/ui/Modal/ModalContext'
 import {loadText} from './loadText'
 import {Disclaimer} from './types'
-import {useDisclaimerState} from './useDisclaimerState'
 
 type Props = {
   type: Disclaimer
@@ -36,7 +32,7 @@ export const ShowDisclaimer = ({type, disabled}: Props) => {
   React.useEffect(() => {
     if (!disabled && !accepted && showed === false) {
       openModal({
-        title: strings.disclaimer,
+        title: strings.global.disclaimer,
         content: (
           <View style={[a.px_lg, a.pb_lg]}>
             <Markdown
@@ -51,19 +47,19 @@ export const ShowDisclaimer = ({type, disabled}: Props) => {
                 },
               }}
             />
-            <Check text={strings.accept} />
+            <Check text={strings.global.accept} />
           </View>
         ),
         footer: (
           <View style={[a.flex, a.flex_row, a.gap_lg]}>
             <Button
               type={ButtonType.Secondary}
-              title={strings.cancel}
+              title={strings.global.cancel}
               onPress={resetToTxHistory}
             />
 
             <Proceed
-              title={strings.proceed}
+              title={strings.global.proceed}
               onPress={() => {
                 setAccepted(true)
                 closeModal()
@@ -87,10 +83,10 @@ export const ShowDisclaimer = ({type, disabled}: Props) => {
     resetToTxHistory,
     setAccepted,
     showed,
-    strings.accept,
-    strings.cancel,
-    strings.disclaimer,
-    strings.proceed,
+    strings.global.accept,
+    strings.global.cancel,
+    strings.global.disclaimer,
+    strings.global.proceed,
     type,
   ])
   return null
@@ -111,17 +107,4 @@ const Proceed = ({title, onPress}: {title: string; onPress: () => void}) => {
   const {canContinue = false} = useModal()
 
   return <Button title={title} onPress={onPress} disabled={!canContinue} />
-}
-
-const useStrings = () => {
-  const intl = useIntl()
-
-  return {
-    disclaimer: intl.formatMessage(globalMessages.disclaimer),
-    cancel: intl.formatMessage(globalMessages.cancel),
-    proceed: intl.formatMessage(actionMessages.proceed),
-    accept: intl.formatMessage(
-      confirmationMessages.commonButtons.iUnderstandButton,
-    ),
-  }
 }

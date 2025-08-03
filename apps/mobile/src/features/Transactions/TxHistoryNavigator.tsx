@@ -1,9 +1,9 @@
 import {createStackNavigator} from '@react-navigation/stack'
 import {atoms as a, useTheme} from '@yoroi/theme'
 import React from 'react'
-import {defineMessages, useIntl} from 'react-intl'
 
 import {NetworkTag} from '~/features/Settings/useCases/changeAppSettings/ChangeNetwork/NetworkTag'
+import {useStrings} from '~/kernel/i18n/useStrings'
 import {
   defaultStackNavigationOptions,
   TxHistoryRoutes,
@@ -34,7 +34,7 @@ export const TxHistoryNavigator = () => {
       <Stack.Screen
         name="history-list"
         options={{
-          title: strings.historyTitle,
+          title: strings.transactions.history.historyTitle,
           headerRight: () => <HeaderRightHistory />,
         }}
       >
@@ -48,7 +48,7 @@ export const TxHistoryNavigator = () => {
       <Stack.Screen
         name="tx-details"
         options={{
-          title: strings.txDetailsTitle,
+          title: strings.transactions.history.txDetailsTitle,
         }}
       >
         {() => (
@@ -60,23 +60,3 @@ export const TxHistoryNavigator = () => {
     </Stack.Navigator>
   )
 }
-
-const useStrings = () => {
-  const intl = useIntl()
-
-  return {
-    historyTitle: intl.formatMessage(messages.historyTitle),
-    txDetailsTitle: intl.formatMessage(messages.txDetailsTitle),
-  }
-}
-
-const messages = defineMessages({
-  historyTitle: {
-    id: 'global.historyTitle',
-    defaultMessage: '!!!History',
-  },
-  txDetailsTitle: {
-    id: 'global.txDetailsTitle',
-    defaultMessage: '!!!Transaction Details',
-  },
-})

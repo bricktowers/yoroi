@@ -1,126 +1,10 @@
-import {defineMessages, useIntl} from 'react-intl'
+import {defineMessages} from 'react-intl'
 
-import {txLabels} from '~/kernel/i18n/global-messages'
-
-export const useStrings = () => {
-  const intl = useIntl()
-
-  return {
-    adaDescription: intl.formatMessage(messages.adaDescription),
-    signTransaction: intl.formatMessage(txLabels.signingTx),
-    confirm: intl.formatMessage(messages.confirm),
-    title: intl.formatMessage(messages.title),
-    utxosTab: intl.formatMessage(messages.utxosTab),
-    overviewTab: intl.formatMessage(messages.overviewTab),
-    metadataTab: intl.formatMessage(messages.metadataTab),
-    mintTab: intl.formatMessage(messages.mintTab),
-    referenceInputsTab: intl.formatMessage(messages.referenceInputsTab),
-    metadataHash: intl.formatMessage(messages.metadataHash),
-    metadataJsonLabel: intl.formatMessage(messages.metadataJsonLabel),
-    walletLabel: intl.formatMessage(messages.walletLabel),
-    feeLabel: intl.formatMessage(messages.feeLabel),
-    myWalletLabel: intl.formatMessage(messages.myWalletLabel),
-    sendLabel: intl.formatMessage(messages.sendLabel),
-    receiveToLabel: intl.formatMessage(messages.receiveToLabel),
-    receiveToScriptLabel: intl.formatMessage(messages.receiveToScriptLabel),
-    utxosInputsLabel: intl.formatMessage(messages.utxosInputsLabel),
-    utxosOutputsLabel: intl.formatMessage(messages.utxosOutputsLabel),
-    utxosYourAddressLabel: intl.formatMessage(messages.utxosYourAddressLabel),
-    utxosForeignAddressLabel: intl.formatMessage(
-      messages.utxosForeignAddressLabel,
-    ),
-    overview: intl.formatMessage(messages.overview),
-    json: intl.formatMessage(messages.json),
-    metadata: intl.formatMessage(messages.metadata),
-    policyId: intl.formatMessage(messages.policyId),
-    poolId: intl.formatMessage(messages.poolId),
-    poolHash: intl.formatMessage(messages.poolHash),
-    poolSize: intl.formatMessage(messages.poolSize),
-    poolTaxFix: intl.formatMessage(messages.poolTaxFix),
-    poolTaxRatio: intl.formatMessage(messages.poolTaxRatio),
-    poolPledge: intl.formatMessage(messages.poolPledge),
-    poolRoa: intl.formatMessage(messages.poolRoa),
-    poolShare: intl.formatMessage(messages.poolShare),
-    poolSaturation: intl.formatMessage(messages.poolSaturation),
-    fingerprint: intl.formatMessage(messages.fingerprint),
-    name: intl.formatMessage(messages.name),
-    tokenSupply: intl.formatMessage(messages.tokenSupply),
-    symbol: intl.formatMessage(messages.symbol),
-    description: intl.formatMessage(messages.description),
-    details: intl.formatMessage(messages.details),
-    tokenDetailsTitle: intl.formatMessage(messages.tokenDetailsTitle),
-    walletBalanceTitle: intl.formatMessage(messages.walletBalanceTitle),
-    walletBalanceTokensTitle: intl.formatMessage(
-      messages.walletBalanceTokensTitle,
-    ),
-    walletBalanceNFTsTitle: intl.formatMessage(messages.walletBalanceNFTsTitle),
-    poolDetailsTitle: intl.formatMessage(messages.poolDetailsTitle),
-    registerStakingKey: intl.formatMessage(messages.registerStakingKey),
-    poolRegistration: intl.formatMessage(messages.poolRegistration),
-    poolRetirement: intl.formatMessage(messages.poolRetirement),
-    moveInstantaneousRewards: intl.formatMessage(
-      messages.moveInstantaneousRewards,
-    ),
-    committeeHotAuthorization: intl.formatMessage(
-      messages.committeeHotAuthorization,
-    ),
-    committeeColdResign: intl.formatMessage(messages.committeeColdResign),
-    drepUpdate: intl.formatMessage(messages.drepUpdate),
-    drepRegistration: intl.formatMessage(messages.drepRegistration),
-    drepDeregistration: intl.formatMessage(messages.drepDeregistration),
-    selectAbstain: intl.formatMessage(messages.selectAbstain),
-    selectNoConfidence: intl.formatMessage(messages.selectNoConfidence),
-    delegateVotingToDRep: intl.formatMessage(messages.delegateVotingToDRep),
-    delegateVotingToDRepSpecified: intl.formatMessage(
-      messages.delegateVotingToDRepSpecified,
-    ),
-    delegateStake: intl.formatMessage(messages.delegateStake),
-    deregisterStakingKey: intl.formatMessage(messages.deregisterStakingKey),
-    rewardsWithdrawalLabel: intl.formatMessage(messages.rewardsWithdrawalLabel),
-    rewardsWithdrawalText: intl.formatMessage(messages.rewardsWithdrawalText),
-    submittedTxTitle: intl.formatMessage(messages.submittedTxTitle),
-    submittedTxText: intl.formatMessage(messages.submittedTxText),
-    submittedTxButton: intl.formatMessage(messages.submittedTxButton),
-    failedTxTitle: intl.formatMessage(messages.failedTxTitle),
-    infraestructureIssueTitle: intl.formatMessage(
-      messages.infraestructureIssueTitle,
-    ),
-    infraestructureIssueText: intl.formatMessage(
-      messages.infraestructureIssueText,
-    ),
-    infraestructureIssueButton: intl.formatMessage(
-      messages.infraestructureIssueButton,
-    ),
-    failedTxText: intl.formatMessage(messages.failedTxText),
-    failedTxButton: intl.formatMessage(messages.failedTxButton),
-    multiExternalPartiesSectionLabel: intl.formatMessage(
-      messages.multiExternalPartiesSectionLabel,
-    ),
-    multiExternalPartiesSectionNotice: intl.formatMessage(
-      messages.multiExternalPartiesSectionNotice,
-    ),
-    receiveLabel: intl.formatMessage(messages.receiveLabel),
-    operationsLabel: intl.formatMessage(messages.operationsLabel),
-    policyIdLabel: intl.formatMessage(messages.policyIdLabel),
-    createdBy: intl.formatMessage(messages.createdBy),
-    operationsLogTitle: intl.formatMessage(messages.operationsLogTitle),
-    operationsLogWarningText: intl.formatMessage(
-      messages.operationsLogWarningText,
-    ),
-    operationsLogWarningTitle: intl.formatMessage(
-      messages.operationsLogWarningTitle,
-    ),
-    operationsNoticeText: intl.formatMessage(messages.operationsNoticeText),
-    operationsNoticeButton: intl.formatMessage(messages.operationsNoticeButton),
-    operationsNoticeTitle: intl.formatMessage(messages.operationsNoticeTitle),
-  }
-}
-
-const messages = defineMessages({
+export const txReviewMessages = defineMessages({
   adaDescription: {
     id: 'txReview.adaDescription',
     defaultMessage:
-      '!!!ADA is Cardano’s native cryptocurrency that can be used on the Cardano network to pay for transaction fees and earn rewards for helping to secure the blockchain network via staking.',
+      "!!!ADA is Cardano's native cryptocurrency that can be used on the Cardano network to pay for transaction fees and earn rewards for helping to secure the blockchain network via staking.",
   },
   confirm: {
     id: 'txReview.confirm',
@@ -130,147 +14,147 @@ const messages = defineMessages({
     id: 'txReview.title',
     defaultMessage: '!!!UTxOs',
   },
-  utxosTab: {
+  tabLabelUtxos: {
     id: 'txReview.tabLabel.utxos',
     defaultMessage: '!!!UTxOs',
   },
-  overviewTab: {
+  tabLabelOverview: {
     id: 'txReview.tabLabel.overview',
     defaultMessage: '!!!Overview',
   },
-  mintTab: {
+  tabLabelMint: {
     id: 'txReview.tabLabel.mint',
     defaultMessage: '!!!Mint',
   },
-  referenceInputsTab: {
+  tabLabelReferenceInputs: {
     id: 'txReview.tabLabel.referenceInputs',
     defaultMessage: '!!!Reference inputs',
   },
-  metadataTab: {
+  tabLabelMetadataTab: {
     id: 'txReview.tabLabel.metadataTab',
     defaultMessage: '!!!Metadata',
   },
-  metadataHash: {
+  metadataMetadataHash: {
     id: 'txReview.metadata.metadataHash',
     defaultMessage: '!!!Metadata hash',
   },
-  metadataJsonLabel: {
+  metadataMetadataJsonLabel: {
     id: 'txReview.metadata.metadataJsonLabel',
     defaultMessage: '!!!Metadata',
   },
-  walletLabel: {
+  overviewWallet: {
     id: 'txReview.overview.wallet',
     defaultMessage: '!!!Wallet',
   },
-  feeLabel: {
+  fee: {
     id: 'txReview.fee',
     defaultMessage: '!!!Fee',
   },
-  myWalletLabel: {
+  overviewMyWalletLabel: {
     id: 'txReview.overview.myWalletLabel',
     defaultMessage: '!!!Your Wallet',
   },
-  sendLabel: {
+  overviewSendLabel: {
     id: 'txReview.overview.sendLabel',
     defaultMessage: '!!!Send',
   },
-  receiveToLabel: {
+  overviewReceiveToLabel: {
     id: 'txReview.overview.receiveToLabel',
     defaultMessage: '!!!To',
   },
-  receiveToScriptLabel: {
+  overviewReceiveToScriptLabel: {
     id: 'txReview.overview.receiveToScriptLabel',
     defaultMessage: '!!!To script',
   },
-  utxosInputsLabel: {
+  utxosUtxosInputsLabel: {
     id: 'txReview.utxos.utxosInputsLabel',
     defaultMessage: '!!!Inputs',
   },
-  utxosOutputsLabel: {
+  utxosUtxosOutputsLabel: {
     id: 'txReview.utxos.utxosOutputsLabel',
     defaultMessage: '!!!Outputs',
   },
-  utxosYourAddressLabel: {
+  utxosUtxosYourAddressLabel: {
     id: 'txReview.utxos.utxosYourAddressLabel',
     defaultMessage: '!!!Your address',
   },
-  utxosForeignAddressLabel: {
+  utxosUtxosForeignAddressLabel: {
     id: 'txReview.utxos.utxosForeignAddressLabel',
     defaultMessage: '!!!Foreign address',
   },
-  overview: {
+  tokenDetailsOverViewTabTitle: {
     id: 'txReview.tokenDetails.overViewTab.title',
     defaultMessage: '!!!Overview',
   },
-  json: {
+  tokenDetailsJsonTabTitle: {
     id: 'txReview.tokenDetails.jsonTab.title',
     defaultMessage: '!!!JSON',
   },
-  metadata: {
+  tokenDetailsJsonTabMetadata: {
     id: 'txReview.tokenDetails.jsonTab.metadata',
     defaultMessage: '!!!Metadata',
   },
-  policyId: {
+  tokenDetailsPolicyIdLabel: {
     id: 'txReview.tokenDetails.policyId.label',
     defaultMessage: '!!!Policy ID',
   },
-  poolId: {
+  poolDetailsPoolIdLabel: {
     id: 'txReview.poolDetails.poolId.label',
     defaultMessage: '!!!Pool ID',
   },
-  poolHash: {
+  poolDetailsPoolHashLabel: {
     id: 'txReview.poolDetails.poolHash.label',
     defaultMessage: '!!!Hash',
   },
-  poolSize: {
+  poolDetailsPoolSizeLabel: {
     id: 'txReview.poolDetails.poolSize.label',
     defaultMessage: '!!!Pool size',
   },
-  poolRoa: {
+  poolDetailsPoolRoaLabel: {
     id: 'txReview.poolDetails.poolRoa.label',
     defaultMessage: '!!!ROA 30d',
   },
-  poolShare: {
+  poolDetailsPoolShareLabel: {
     id: 'txReview.poolDetails.poolShare.label',
     defaultMessage: '!!!Share',
   },
-  poolSaturation: {
+  poolDetailsPoolSaturationLabel: {
     id: 'txReview.poolDetails.poolSaturation.label',
     defaultMessage: '!!!Saturation',
   },
-  poolTaxFix: {
+  poolDetailsTaxFixLabel: {
     id: 'txReview.poolDetails.taxFix.label',
     defaultMessage: '!!!Tax fix',
   },
-  poolTaxRatio: {
+  poolDetailsTaxRatioLabel: {
     id: 'txReview.poolDetails.taxRatio.label',
     defaultMessage: '!!!Tax ratio',
   },
-  poolPledge: {
+  poolDetailsPledgeLabel: {
     id: 'txReview.poolDetails.pledge.label',
     defaultMessage: '!!!Pledge',
   },
-  fingerprint: {
+  tokenDetailsFingerprintLabel: {
     id: 'txReview.tokenDetails.fingerprint.label',
     defaultMessage: '!!!Fingerprint',
   },
-  name: {
+  tokenDetailsOverViewTabNameLabel: {
     id: 'txReview.tokenDetails.overViewTab.name.label',
     defaultMessage: '!!!Name',
   },
-  tokenSupply: {
+  tokenDetailsOverViewTabTokenSupplyLabel: {
     id: 'txReview.tokenDetails.overViewTab.tokenSupply.label',
     defaultMessage: '!!!Token Supply',
   },
-  symbol: {
+  tokenDetailsOverViewTabSymbolLabel: {
     id: 'txReview.tokenDetails.overViewTab.symbol.label',
     defaultMessage: '!!!Symbol',
   },
-  description: {
+  tokenDetailsOverViewTabDescriptionLabel: {
     id: 'txReview.tokenDetails.overViewTab.description.label',
     defaultMessage: '!!!Description',
   },
-  details: {
+  tokenDetailsOverViewTabDetailsLabel: {
     id: 'txReview.tokenDetails.overViewTab.details.label',
     defaultMessage: '!!!Details on',
   },
@@ -294,55 +178,55 @@ const messages = defineMessages({
     id: 'txReview.poolDetails.title',
     defaultMessage: '!!!Pool Details',
   },
-  registerStakingKey: {
+  operationsRegisterStakingKey: {
     id: 'txReview.operations.registerStakingKey',
     defaultMessage: '!!!Register staking key deposit',
   },
-  drepRegistration: {
+  operationsDrepRegistration: {
     id: 'txReview.operations.drepRegistration',
     defaultMessage: '!!!Register as a DRep deposit',
   },
-  poolRegistration: {
+  operationsPoolRegistration: {
     id: 'txReview.operations.poolRegistration',
     defaultMessage: '!!!Pool registration deposit',
   },
-  poolRetirement: {
+  operationsPoolRetirement: {
     id: 'txReview.operations.poolRetirement',
     defaultMessage: '!!!Pool retirement',
   },
-  drepUpdate: {
+  operationsDrepUpdate: {
     id: 'txReview.operations.drepUpdate',
     defaultMessage: '!!!Drep update',
   },
-  drepDeregistration: {
+  operationsDrepDeregistration: {
     id: 'txReview.operations.drepDeregistration',
     defaultMessage: '!!!Deregister as a DRep',
   },
-  deregisterStakingKey: {
+  operationsDeregisterStakingKey: {
     id: 'txReview.operations.deregisterStakingKey',
     defaultMessage: '!!!Deregister staking key',
   },
-  moveInstantaneousRewards: {
+  operationsMoveInstantaneousRewards: {
     id: 'txReview.operations.moveInstantaneousRewards',
     defaultMessage: '!!!Move instantaneus rewards',
   },
-  committeeHotAuthorization: {
+  operationsCommitteeHotAuthorization: {
     id: 'txReview.operations.committeeHotAuthorization',
     defaultMessage: '!!!Committee hot authorization',
   },
-  committeeColdResign: {
+  operationsCommitteeColdResign: {
     id: 'txReview.operations.committeeColdResign',
     defaultMessage: '!!!Committee cold resign',
   },
-  rewardsWithdrawalLabel: {
+  operationsRewardsWithdrawalLabel: {
     id: 'txReview.operations.rewardsWithdrawal.label',
     defaultMessage: '!!!Staking',
   },
-  rewardsWithdrawalText: {
+  operationsRewardsWithdrawalText: {
     id: 'txReview.operations.rewardsWithdrawal.text',
     defaultMessage: '!!!Rewards withdrawal',
   },
-  selectAbstain: {
+  operationsSelectAbstain: {
     id: 'txReview.operations.selectAbstain',
     defaultMessage: '!!!Select abstain',
   },
@@ -350,28 +234,28 @@ const messages = defineMessages({
     id: 'txReview.operations.log.title',
     defaultMessage: '!!!Operations log',
   },
-  operationsLogWarningTitle: {
+  operationsWarningTitle: {
     id: 'txReview.operations.warning.title',
     defaultMessage: '!!!Unusual operations detected',
   },
-  operationsLogWarningText: {
+  operationsWarningText: {
     id: 'txReview.operations.warning.text',
     defaultMessage:
       '!!!Please check the operations log before confirming this transaction.',
   },
-  selectNoConfidence: {
+  operationsSelectNoConfidence: {
     id: 'txReview.operations.selectNoConfidence',
     defaultMessage: '!!!Select no confidence',
   },
-  delegateVotingToDRep: {
+  operationsDelegateVotingToDRep: {
     id: 'txReview.operations.delegateVotingToDRep',
     defaultMessage: '!!!Delegate voting to',
   },
-  delegateVotingToDRepSpecified: {
+  operationsDelegateVotingToDRepSpecified: {
     id: 'txReview.operations.delegateVotingToDRepSpecified',
     defaultMessage: '!!!Specified as',
   },
-  delegateStake: {
+  operationsDelegateStake: {
     id: 'txReview.operations.delegateStake',
     defaultMessage: '!!!Stake entire wallet balance to',
   },
@@ -414,11 +298,11 @@ const messages = defineMessages({
     id: 'txReview.infraestructureIssueButton',
     defaultMessage: '!!!Go to transactions',
   },
-  multiExternalPartiesSectionLabel: {
+  overviewMultiExternalPartiesSectionLabel: {
     id: 'txReview.overview.multiExternalPartiesSectionLabel',
     defaultMessage: '!!!Other parties',
   },
-  multiExternalPartiesSectionNotice: {
+  overviewMultiExternalPartiesSectionNotice: {
     id: 'txReview.overview.multiExternalPartiesSectionNotice',
     defaultMessage:
       "!!!Here are displayed other parties that are involved into this transaction. They don't affect your wallet balance",
@@ -439,16 +323,16 @@ const messages = defineMessages({
     id: 'txReview.createdBy',
     defaultMessage: '!!!Created by',
   },
-  operationsNoticeText: {
+  overviewOperationsNoticeText: {
     id: 'txReview.overview.operationsNoticeText',
     defaultMessage:
       '!!!You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.',
   },
-  operationsNoticeButton: {
+  overviewOperationsNoticeButton: {
     id: 'txReview.overview.operationsNoticeButton',
     defaultMessage: '!!!Ok',
   },
-  operationsNoticeTitle: {
+  overviewOperationsNoticeTitle: {
     id: 'txReview.overview.operationsNoticeTitle',
     defaultMessage: '!!!What are operations?',
   },

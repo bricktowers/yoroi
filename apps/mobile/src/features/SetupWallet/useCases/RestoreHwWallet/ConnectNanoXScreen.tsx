@@ -13,20 +13,20 @@ import {
 } from '~/features/SetupWallet/common/WalletDuplicatedModal/WalletDuplicatedModal'
 import {useWalletManager} from '~/features/WalletManager/context/WalletManagerProvider'
 import {showErrorDialog} from '~/kernel/dialogs'
-import {errorMessages} from '~/kernel/i18n/global-messages'
+
 import {LocalizableError} from '~/kernel/i18n/LocalizableError'
 import {useMetrics} from '~/kernel/metrics/metricsManager'
 import {SetupWalletRouteNavigation} from '~/kernel/navigation'
 import {useModal} from '~/ui/Modal/ModalContext'
 import {StepperProgress} from '~/ui/StepperProgress/StepperProgress'
 import {getHWDeviceInfo} from '~/wallets/cardano/hw/hw'
-import {useStrings} from '../../common/useStrings'
+import {useStrings} from '~/kernel/i18n/useStrings'
 import {LedgerConnect} from '../legacy/HW'
 
 type Props = {}
 
 export const ConnectNanoXScreen = ({defaultDevices}: Props) => {
-  const intl = useIntl()
+
   const strings = useStrings()
   const {palette: p} = useTheme()
   const {walletManager} = useWalletManager()
@@ -80,14 +80,11 @@ export const ConnectNanoXScreen = ({defaultDevices}: Props) => {
 
   const onError = (error: Error) => {
     if (error instanceof LocalizableError) {
-      showErrorDialog(errorMessages.generalLocalizableError, intl, {
-        message: intl.formatMessage(
-          {id: error.id, defaultMessage: error.defaultMessage},
-          error.values as any,
-        ),
+      showErrorDialog(strings.global.generalLocalizableError, {
+        message: error.defaultMessage,
       })
     } else {
-      showErrorDialog(errorMessages.hwConnectionError, intl, {
+      showErrorDialog(strings.global.hwConnectionError, {
         message: String(error.message),
       })
     }

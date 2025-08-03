@@ -2,6 +2,7 @@ import {freeze} from 'immer'
 import {MessageDescriptor, defineMessages} from 'react-intl'
 
 import {ThemeName} from '@yoroi/theme'
+import {supportedCurrencies} from '~/features/Settings/useCases/changeAppSettings/Currency/CurrencyContext'
 
 export const confirmationMessages = freeze(
   {
@@ -634,7 +635,7 @@ export const actionMessages = freeze(
 )
 
 export const currencyNames: Readonly<
-  Record<keyof typeof supportedCurrencies, MessageDescriptor>
+  Record<(typeof supportedCurrencies)[number], MessageDescriptor>
 > = freeze(
   defineMessages({
     ADA: {
@@ -882,6 +883,46 @@ export default freeze(
     cancel: {
       id: 'global.cancel',
       defaultMessage: '!!!Cancel',
+    },
+    walletSelectionScreenHeader: {
+      id: 'components.walletselection.walletselectionscreen.header',
+      defaultMessage: '!!!Select Wallet',
+    },
+    currentVersion: {
+      id: 'global.currentVersion',
+      defaultMessage: '!!!Current Version',
+    },
+    commit: {
+      id: 'global.commit',
+      defaultMessage: '!!!Commit',
+    },
+    network: {
+      id: 'global.network',
+      defaultMessage: '!!!Network',
+    },
+    singleAddress: {
+      id: 'global.singleAddress',
+      defaultMessage: '!!!Single Address',
+    },
+    yoroiZendesk: {
+      id: 'global.yoroiZendesk',
+      defaultMessage: '!!!Yoroi Zendesk',
+    },
+    collateral: {
+      id: 'global.collateral',
+      defaultMessage: '!!!Collateral',
+    },
+    proceed: {
+      id: 'global.proceed',
+      defaultMessage: '!!!Proceed',
+    },
+    today: {
+      id: 'utils.format.today',
+      defaultMessage: '!!!Today',
+    },
+    yesterday: {
+      id: 'utils.format.yesterday',
+      defaultMessage: '!!!Yesterday',
     },
   }),
   true,
