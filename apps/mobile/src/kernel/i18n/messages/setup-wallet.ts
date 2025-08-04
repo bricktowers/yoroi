@@ -11,7 +11,7 @@ export const setupWalletMessages = defineMessages({
   },
   passwordStrengthRequirement: {
     id: 'components.walletinit.createwallet.createwalletscreen.passwordLengthRequirement',
-    defaultMessage: '!!!Minimum characters',
+    defaultMessage: '!!!Minimum {requiredPasswordLength} characters',
   },
   repeatPasswordInputLabel: {
     id: 'components.walletinit.walletform.repeatPasswordInputLabel',
@@ -158,11 +158,11 @@ export const setupWalletMessages = defineMessages({
     defaultMessage: '!!!Wallet password',
   },
   walletPasswordModalCardFirstItem: {
-    id: 'components.walletinit.createwallet.walletdetailsscreen.walletPasswordModalCardFirstItem',
+    id: 'components.walletinit.walletDetails.walletPasswordModalCardItem.first',
     defaultMessage: '!!!Choose a strong password',
   },
   walletPasswordModalCardSecondItem: {
-    id: 'txReview.overview.wallet',
+    id: 'components.walletinit.walletDetails.walletPasswordModalCardItem.second',
     defaultMessage: '!!!This password will protect your wallet',
   },
   walletChecksumModalCardTitle: {
@@ -230,8 +230,8 @@ export const setupWalletMessages = defineMessages({
     defaultMessage: '!!!24 words',
   },
   restoreWalletScreenTitle: {
-    id: 'components.walletinit.restorewallet.restorewalletscreen.title',
-    defaultMessage: '!!!Restore wallet',
+    id: 'components.walletinit.restorewallet.restorewalletscreen.restoreWalletScreenTitle',
+    defaultMessage: '!!!Add the <b>recovery phrase</b> you received upon your wallet creation process.',
   },
   restoreDuplicatedWalletModalTitle: {
     id: 'components.walletinit.restorewallet.restorewalletscreen.restoreDuplicatedWalletModalTitle',
@@ -406,7 +406,7 @@ export const setupWalletMessages = defineMessages({
     defaultMessage: '!!!About recovery phrase',
   },
   stepAboutRecoveryPhrase: {
-    id: 'components.walletinit.createwallet.aboutrecoveryphrasecard.step',
+    id: 'components.walletinit.aboutRecoveryPhrase.aboutRecoveryStepper.step',
     defaultMessage: '!!!Step 1 of 3',
   },
 }) 
