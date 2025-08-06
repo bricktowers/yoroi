@@ -70,13 +70,14 @@
     "@yoroi/staking": "file:../../packages/staking",
     "@yoroi/swap": "file:../../packages/swap",
     "@yoroi/theme": "file:../../packages/theme",
+    "@yoroi/transfer": "file:../../packages/transfer",
     "@yoroi/types": "file:../../packages/types",
     "axios": "^1.10.0",
     "bignumber.js": "^9.3.0",
     "bip39": "^3.1.0",
     "cbor2": "^2.0.1",
     "d3-shape": "^3.2.0",
-    "expo": "53.0.15",
+    "expo": "53.0.20",
     "expo-blur": "~14.1.5",
     "expo-build-properties": "~0.14.8",
     "expo-camera": "~16.1.10",
@@ -96,6 +97,7 @@
     "expo-notifications": "~0.31.3",
     "expo-screen-capture": "~7.1.5",
     "expo-status-bar": "~2.2.3",
+    "expo-system-ui": "~5.0.10",
     "fast-text-encoding": "^1.0.6",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
@@ -129,12 +131,12 @@
     "react-native-svg": "15.11.2",
     "react-native-svg-charts": "^5.4.0",
     "react-native-url-polyfill": "^2.0.0",
+    "react-native-view-shot": "^4.0.3",
     "react-native-web": "^0.20.0",
     "react-native-webview": "13.13.5",
     "rxjs": "^7.8.2",
     "uuid": "^11.1.0",
-    "zod": "^3.25.17",
-    "expo-system-ui": "~5.0.10"
+    "zod": "^3.25.17"
   },
   "devDependencies": {
     "@amplitude/ampli": "^1.36.2",
@@ -165,6 +167,7 @@
   },
   "private": true,
   "overrides": {
-    "@emurgo/csl-mobile-bridge-jsi": "1.0.0-alpha.6"
+    "@emurgo/csl-mobile-bridge-jsi": "1.0.0-alpha.6",
+    "react-native-svg": "15.11.2"
   }
 }
