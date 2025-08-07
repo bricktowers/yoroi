@@ -8,7 +8,6 @@ import {
   onlineManager,
   useMutation,
   UseMutationOptions,
-  useQueries,
   useQuery,
   UseQueryOptions,
 } from '@tanstack/react-query'
@@ -31,8 +30,6 @@ import {useSelectedWallet} from '../../features/WalletManager/hooks/useSelectedW
 import {isDev, isNightly} from '../../kernel/constants'
 import {logger} from '../../kernel/logger/logger'
 import {deriveAddressFromXPub} from '../cardano/account-manager/derive-address-from-xpub'
-import {getSpendingKey, getStakingKey} from '../cardano/addressInfo/addressInfo'
-import {convertBech32ToHex} from '../cardano/common/signatureUtils'
 import {WalletEvent, YoroiWallet} from '../cardano/types'
 
 import {
@@ -145,40 +142,6 @@ export const useStakingKey = (wallet: YoroiWallet) => {
   })
   if (!result.data) throw new Error('invalid state')
   return result.data
-}
-
-export const useAddressHex = (wallet: YoroiWallet) => {
-  const result = useQuery({
-    queryKey: [wallet.id, 'addressHex'],
-    queryFn: () => convertBech32ToHex(wallet.externalAddresses[0]),
-  })
-  if (!result.data) throw new Error('invalid state')
-  return result.data
-}
-
-export const useKeyHashes = ({address}: {address: string}) => {
-  const [spendingData, stakingData] = useQueries({
-    queries: [
-      {
-        queryKey: [address, 'spendingKeyHash'],
-        queryFn: () => {
-          const spending = getSpendingKey(address)
-          return {spending}
-        },
-      },
-      {
-        queryKey: [address, 'stakingkeyHash'],
-        queryFn: () => {
-          const staking = getStakingKey(address)
-          return {staking}
-        },
-      },
-    ],
-  })
-  return {
-    spending: spendingData.data?.spending,
-    staking: stakingData.data?.staking,
-  }
 }
 
 export const useSync = (

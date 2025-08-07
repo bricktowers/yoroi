@@ -4,7 +4,7 @@ import {
   ResolverProvider,
   resolverStorageMaker,
 } from '@yoroi/resolver'
-import {atoms as a, useTheme} from '@yoroi/theme'
+import {useTheme} from '@yoroi/theme'
 import {Resolver} from '@yoroi/types'
 
 import {createStackNavigator} from '@react-navigation/stack'

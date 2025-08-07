@@ -9,7 +9,8 @@ import {
   View,
 } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
-// import ViewShot, {captureRef} from 'react-native-view-shot'
+import Share from 'react-native-share'
+import ViewShot, {captureRef} from 'react-native-view-shot'
 
 import {Space} from '~/ui/Space/Space'
 import {Text} from '~/ui/Text/Text'
@@ -37,44 +38,62 @@ export const ShareQRCodeCard = ({
   const screenWidth = useWindowDimensions().width
 
   const [isSharing, setIsSharing] = React.useState(false)
-  const ref = React.useRef<any>(null)
+  const ref = React.useRef<ViewShot>(null)
 
-  const handleOnPressShare = () => {
+  const handleOnPressShare = async () => {
     onShare?.()
-    // Temporarily disabled view-shot functionality due to native module issues
-    // Share.open({
-    //   message: shareContent,
-    // })
+
+    if (isSharing) return
+
+    setIsSharing(true)
+
+    try {
+      const uri = await captureRef(ref, {
+        format: 'png',
+        quality: 0.8,
+      })
+
+      await Share.open({
+        url: uri,
+        message: shareContent,
+      })
+    } catch (error) {
+      // User cancelled or error occurred
+      console.log('Share cancelled or error:', error)
+    } finally {
+      setIsSharing(false)
+    }
   }
 
   return (
     <TouchableWithoutFeedback onLongPress={onLongPress}>
-      <View
+      <ViewShot
+        ref={ref}
         style={[
           a.gap_lg,
           a.align_center,
           a.flex_1,
           a.px_lg,
+          a.rounded_lg,
           {
             minHeight: 432,
-            borderRadius: 16,
-            alignItems: 'center',
             width: screenWidth - 32,
-            overflow: 'hidden',
           },
+          a.overflow_hidden,
         ]}
       >
         <LinearGradient
           style={[
             {
-              position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
               opacity: 1,
-              borderRadius: 16,
             },
+            a.absolute,
+            a.inset_0,
+            a.rounded_lg,
           ]}
           start={{x: 0, y: 0}}
           end={{x: 0, y: 1}}
@@ -92,11 +111,7 @@ export const ShareQRCodeCard = ({
 
         <View style={a.align_center}>
           <View
-            style={{
-              padding: 10,
-              borderRadius: 8,
-              backgroundColor: p.white_static,
-            }}
+            style={[a.p_md, a.rounded_lg, {backgroundColor: p.white_static}]}
           >
             <QRCode
               value={qrContent}
@@ -109,11 +124,7 @@ export const ShareQRCodeCard = ({
           <Space.Height.md />
 
           <Text
-            style={[
-              {textAlign: 'center'},
-              a.body_2_md_medium,
-              {color: p.gray_max},
-            ]}
+            style={[a.text_center, a.body_2_md_medium, {color: p.gray_max}]}
           >
             {qrContent}
           </Text>
@@ -126,20 +137,18 @@ export const ShareQRCodeCard = ({
         >
           <Text
             style={[
+              a.button_2_md,
               {
                 height: 32,
                 textAlignVertical: 'center',
-                textTransform: 'uppercase',
-                letterSpacing: 0.5,
+                color: p.gray_900,
               },
-              a.button_2_md,
-              {color: p.gray_900},
             ]}
           >
             {shareLabel}
           </Text>
         </TouchableOpacity>
-      </View>
+      </ViewShot>
     </TouchableWithoutFeedback>
   )
 }
