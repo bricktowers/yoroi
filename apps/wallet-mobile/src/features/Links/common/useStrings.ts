@@ -12,6 +12,11 @@ export const useStrings = () => {
     untrustedPaymentRequestedTitle: intl.formatMessage(messages.untrustedPaymentRequestedTitle),
     untrustedPaymentRequestedDescription: intl.formatMessage(messages.untrustedPaymentRequestedDescription),
 
+    trustedContractSpendTitle: intl.formatMessage(messages.trustedContractSpendTitle),
+    trustedContractSpendDescription: intl.formatMessage(messages.trustedContractSpendDescription),
+    untrustedContractSpendTitle: intl.formatMessage(messages.untrustedContractSpendTitle),
+    untrustedContractSpendDescription: intl.formatMessage(messages.untrustedContractSpendDescription),
+
     trustedBrowserLaunchDappUrlTitle: intl.formatMessage(messages.trustedBrowserLaunchDappUrlTitle),
     trustedBrowserLaunchDappUrlDescription: intl.formatMessage(messages.trustedBrowserLaunchDappUrlDescription),
     untrustedBrowserLaunchDappUrlTitle: intl.formatMessage(messages.untrustedBrowserLaunchDappUrlTitle),
@@ -48,6 +53,23 @@ const messages = Object.freeze(
     untrustedPaymentRequestedDescription: {
       id: 'links.untrusted.paymentRequested.description',
       defaultMessage: '!!!A payment has been requested.',
+    },
+
+    trustedContractSpendTitle: {
+      id: 'links.trusted.contractSpend.title',
+      defaultMessage: '!!!Contract spend requested',
+    },
+    trustedContractSpendDescription: {
+      id: 'links.trusted.contractSpend.description',
+      defaultMessage: '!!!A contract spend has been requested.',
+    },
+    untrustedContractSpendTitle: {
+      id: 'links.untrusted.contractSpend.title',
+      defaultMessage: '!!!Contract spend requested',
+    },
+    untrustedContractSpendDescription: {
+      id: 'links.untrusted.contractSpend.description',
+      defaultMessage: '!!!A contract spend has been requested.',
     },
 
     trustedBrowserLaunchDappUrlTitle: {

@@ -4,14 +4,14 @@
     "defaultMessage": "!!!Payment requested",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 36,
+      "line": 41,
       "column": 34,
-      "index": 1797
+      "index": 2178
     },
     "end": {
-      "line": 39,
+      "line": 44,
       "column": 5,
-      "index": 1900
+      "index": 2281
     }
   },
   {
@@ -19,14 +19,14 @@
     "defaultMessage": "!!!A payment has been requested.",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 40,
+      "line": 45,
       "column": 40,
-      "index": 1942
+      "index": 2323
     },
     "end": {
-      "line": 43,
+      "line": 48,
       "column": 5,
-      "index": 2063
+      "index": 2444
     }
   },
   {
@@ -34,14 +34,14 @@
     "defaultMessage": "!!!Payment requested",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 44,
+      "line": 49,
       "column": 36,
-      "index": 2101
+      "index": 2482
     },
     "end": {
-      "line": 47,
+      "line": 52,
       "column": 5,
-      "index": 2206
+      "index": 2587
     }
   },
   {
@@ -49,14 +49,74 @@
     "defaultMessage": "!!!A payment has been requested.",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 48,
+      "line": 53,
       "column": 42,
-      "index": 2250
+      "index": 2631
     },
     "end": {
-      "line": 51,
+      "line": 56,
       "column": 5,
-      "index": 2373
+      "index": 2754
+    }
+  },
+  {
+    "id": "links.trusted.contractSpend.title",
+    "defaultMessage": "!!!Contract spend requested",
+    "file": "src/features/Links/common/useStrings.ts",
+    "start": {
+      "line": 58,
+      "column": 31,
+      "index": 2788
+    },
+    "end": {
+      "line": 61,
+      "column": 5,
+      "index": 2895
+    }
+  },
+  {
+    "id": "links.trusted.contractSpend.description",
+    "defaultMessage": "!!!A contract spend has been requested.",
+    "file": "src/features/Links/common/useStrings.ts",
+    "start": {
+      "line": 62,
+      "column": 37,
+      "index": 2934
+    },
+    "end": {
+      "line": 65,
+      "column": 5,
+      "index": 3059
+    }
+  },
+  {
+    "id": "links.untrusted.contractSpend.title",
+    "defaultMessage": "!!!Contract spend requested",
+    "file": "src/features/Links/common/useStrings.ts",
+    "start": {
+      "line": 66,
+      "column": 33,
+      "index": 3094
+    },
+    "end": {
+      "line": 69,
+      "column": 5,
+      "index": 3203
+    }
+  },
+  {
+    "id": "links.untrusted.contractSpend.description",
+    "defaultMessage": "!!!A contract spend has been requested.",
+    "file": "src/features/Links/common/useStrings.ts",
+    "start": {
+      "line": 70,
+      "column": 39,
+      "index": 3244
+    },
+    "end": {
+      "line": 73,
+      "column": 5,
+      "index": 3371
     }
   },
   {
@@ -64,14 +124,14 @@
     "defaultMessage": "!!!Launch dApp requested",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 53,
+      "line": 75,
       "column": 38,
-      "index": 2414
+      "index": 3412
     },
     "end": {
-      "line": 56,
+      "line": 78,
       "column": 5,
-      "index": 2525
+      "index": 3523
     }
   },
   {
@@ -79,14 +139,14 @@
     "defaultMessage": "!!!A payment has been requested.",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 57,
+      "line": 79,
       "column": 44,
-      "index": 2571
+      "index": 3569
     },
     "end": {
-      "line": 60,
+      "line": 82,
       "column": 5,
-      "index": 2696
+      "index": 3694
     }
   },
   {
@@ -94,14 +154,14 @@
     "defaultMessage": "!!!Lauch dApp requested",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 61,
+      "line": 83,
       "column": 40,
-      "index": 2738
+      "index": 3736
     },
     "end": {
-      "line": 64,
+      "line": 86,
       "column": 5,
-      "index": 2850
+      "index": 3848
     }
   },
   {
@@ -109,14 +169,14 @@
     "defaultMessage": "!!!A payment has been requested.",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 65,
+      "line": 87,
       "column": 46,
-      "index": 2898
+      "index": 3896
     },
     "end": {
-      "line": 68,
+      "line": 90,
       "column": 5,
-      "index": 3025
+      "index": 4023
     }
   },
   {
@@ -124,14 +184,14 @@
     "defaultMessage": "!!!Open a wallet",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 70,
+      "line": 92,
       "column": 27,
-      "index": 3055
+      "index": 4053
     },
     "end": {
-      "line": 73,
+      "line": 95,
       "column": 5,
-      "index": 3146
+      "index": 4144
     }
   },
   {
@@ -139,14 +199,14 @@
     "defaultMessage": "!!!To continue, open a wallet.",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 74,
+      "line": 96,
       "column": 33,
-      "index": 3181
+      "index": 4179
     },
     "end": {
-      "line": 77,
+      "line": 99,
       "column": 5,
-      "index": 3292
+      "index": 4290
     }
   },
   {
@@ -154,14 +214,14 @@
     "defaultMessage": "!!!Redirect available",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 79,
+      "line": 101,
       "column": 24,
-      "index": 3319
+      "index": 4317
     },
     "end": {
-      "line": 82,
+      "line": 104,
       "column": 5,
-      "index": 3412
+      "index": 4410
     }
   },
   {
@@ -169,14 +229,14 @@
     "defaultMessage": "!!!The caller that request this action has provided a way for Yoroi to return to their application, would you like to be redirected?",
     "file": "src/features/Links/common/useStrings.ts",
     "start": {
-      "line": 83,
+      "line": 105,
       "column": 30,
-      "index": 3444
+      "index": 4442
     },
     "end": {
-      "line": 87,
+      "line": 109,
       "column": 5,
-      "index": 3662
+      "index": 4660
     }
   }
 ]
