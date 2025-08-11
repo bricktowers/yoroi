@@ -33,6 +33,16 @@ describe('convertSearchParamsToObject', () => {
     })
   })
 
+  it('should accumulate JSON values for repeated indexed keys', () => {
+    const params = new URLSearchParams()
+    params.append('arr[0]', JSON.stringify(1))
+    params.append('arr[1]', JSON.stringify(2))
+
+    const result = convertSearchParamsToObject(params)
+
+    expect(result).toEqual({arr: [1, 2]})
+  })
+
   it('should handle non-JSON values', () => {
     const params = new URLSearchParams()
     params.append('key1', 'value1')

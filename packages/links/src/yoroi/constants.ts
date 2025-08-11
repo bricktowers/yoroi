@@ -16,6 +16,14 @@ export const configYoroiTransferRequestAdaWithLink: Readonly<
   path: 'transfer/request/ada-with-link',
 } as const
 
+export const configYoroiTransferRequestContractSpend: Readonly<
+  Omit<Links.YoroiUriConfig, 'scheme'>
+> = {
+  authority: 'yoroi-wallet.com',
+  version: 'w1',
+  path: 'transfer/request/contract-spend',
+} as const
+
 export const configYoroiExchangeOrderShowCreateResult: Readonly<
   Omit<Links.YoroiUriConfig, 'scheme'>
 > = {

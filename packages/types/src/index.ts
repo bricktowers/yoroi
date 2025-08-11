@@ -142,6 +142,7 @@ import {ExchangeApi} from './exchange/api'
 import {ExchangeManager} from './exchange/manager'
 import {
   LinksBrowserLaunchDappUrlParams,
+  LinksContractSpendParams,
   LinksExchangeShowCreateResultParams,
   LinksPartnerInfoParams,
   LinksTransferRequestAdaParams,
@@ -405,6 +406,7 @@ export namespace Links {
     LinksTransferRequestAdaWithLinkParams
   export type TransferRequestAdaParams = LinksTransferRequestAdaParams
   export type BrowserLaunchDappUrlParams = LinksBrowserLaunchDappUrlParams
+  export type ContractSpendParams = LinksContractSpendParams
   export type YoroiActionInfo = LinksYoroiActionInfo
   export type YoroiAction = LinksYoroiAction
 

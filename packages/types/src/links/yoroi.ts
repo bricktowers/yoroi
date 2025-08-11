@@ -6,6 +6,7 @@ export interface LinksYoroiUriConfig {
     | 'exchange/order/show-create-result'
     | 'transfer/request/ada'
     | 'transfer/request/ada-with-link'
+    | 'transfer/request/contract-spend'
     | 'browser/launch'
 }
 
@@ -50,6 +51,33 @@ export type LinksBrowserLaunchDappUrlParams = LinksPartnerInfoParams & {
   dappUrl: string
 }
 
+export type LinksContractSpendParams = LinksPartnerInfoParams & {
+  inputs: ReadonlyArray<{
+    txHash: string
+    outputIndex: number
+    redeemer: {
+      type: 'PlutusV1' | 'PlutusV2' | 'PlutusV3'
+      data: string
+      exUnits?: {
+        mem: string
+        steps: string
+      }
+    }
+    scriptReferenceTxHash: string
+    scriptReferenceOutputIndex: number
+    scriptHash: string
+    scriptSize: number
+  }>
+  targets: ReadonlyArray<{
+    receiver: string
+    datum?: string
+    amounts: ReadonlyArray<{
+      tokenId: string
+      quantity: string
+    }>
+  }>
+}
+
 export type LinksYoroiActionInfo =
   | {
       version: 1
@@ -62,6 +90,12 @@ export type LinksYoroiActionInfo =
       feature: 'transfer'
       useCase: 'request/ada'
       params: LinksTransferRequestAdaParams
+    }
+  | {
+      version: 1
+      feature: 'transfer'
+      useCase: 'request/contract-spend'
+      params: LinksContractSpendParams
     }
   | {
       version: 1
@@ -95,6 +129,7 @@ export type LinksYoroiModule = Readonly<{
       adaWithLink(
         params: Readonly<LinksTransferRequestAdaWithLinkParams>,
       ): string
+      contractSpend(params: Readonly<LinksContractSpendParams>): string
     }
   }
   browser: {

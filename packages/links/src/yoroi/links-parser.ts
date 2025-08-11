@@ -6,6 +6,7 @@ import {
   ExchangeShowCreateResultSchema,
   TransferRequestAdaSchema,
   TransferRequestAdaWithLinkSchema,
+  TransferRequestContractSpendSchema,
 } from './validators'
 import {convertSearchParamsToObject} from './helpers'
 
@@ -37,6 +38,20 @@ export const linksYoroiParser = (
             version: 1,
             feature: 'transfer',
             useCase: 'request/ada-with-link',
+            params,
+          },
+          true,
+        )
+      }
+      case `/w1/transfer/request/contract-spend`: {
+        const objectFromParams = convertSearchParamsToObject(url.searchParams)
+        const params =
+          TransferRequestContractSpendSchema.parse(objectFromParams)
+        return freeze(
+          {
+            version: 1,
+            feature: 'transfer' as const,
+            useCase: 'request/contract-spend' as const,
             params,
           },
           true,

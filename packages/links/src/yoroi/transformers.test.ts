@@ -7,6 +7,8 @@ import {
   encodeExchangeShowCreateResult,
   encodeTransferRequestAda,
   encodeTransferRequestAdaWithLink,
+  encodeTransferRequestContractSpend,
+  decodeTransferRequestContractSpend,
 } from './transformers'
 import {mocks} from './transformers.mocks'
 
@@ -303,6 +305,393 @@ describe('transformers', () => {
           dappUrl: 'invalid',
         }),
       ).toThrow()
+    })
+  })
+
+  describe('encodeTransferRequestContractSpend', () => {
+    it('should encode', () => {
+      const result = encodeTransferRequestContractSpend.parse({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+      })
+
+      expect(result).toEqual({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+      })
+    })
+
+    it('should throw if redirectTo is not a safe URL', () => {
+      expect(() =>
+        encodeTransferRequestContractSpend.parse({
+          inputs: [
+            {
+              txHash:
+                '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+              outputIndex: 0,
+              redeemer: {
+                type: 'PlutusV2',
+                data: 'DEADDEADDEAD',
+                exUnits: {mem: '7000000', steps: '3000000000'},
+              },
+              scriptReferenceTxHash:
+                'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+              scriptReferenceOutputIndex: 0,
+              scriptHash:
+                '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+              scriptSize: 100,
+            },
+          ],
+          targets: [
+            {
+              receiver: 'addr1',
+              amounts: [
+                {
+                  tokenId: 'lovelace',
+                  quantity: '1000000',
+                },
+              ],
+              datum: 'DEADDEAD',
+            },
+          ],
+          redirectTo: 'http://example.com',
+        }),
+      ).toThrow()
+    })
+
+    it('should throw if redirectTo is not a safe URL (correct keys)', () => {
+      expect(() =>
+        encodeTransferRequestContractSpend.parse({
+          inputs: [
+            {
+              txHash:
+                '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+              outputIndex: 0,
+              redeemer: {
+                type: 'PlutusV2',
+                data: 'DEADDEADDEAD',
+              },
+              scriptReferenceTxHash:
+                'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+              scriptReferenceOutputIndex: 0,
+              scriptHash:
+                '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+              scriptSize: 1,
+            },
+          ],
+          targets: [
+            {
+              receiver: 'addr1',
+              amounts: [{tokenId: 'lovelace', quantity: '2'}],
+            },
+          ],
+          redirectTo: 'http://example.com',
+        }),
+      ).toThrow()
+    })
+
+    it('should encode with redirectTo', () => {
+      const result = encodeTransferRequestContractSpend.parse({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+        redirectTo: 'https://example.com',
+      })
+
+      expect(result).toEqual({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+        redirectTo: encodeURIComponent('https://example.com'),
+      })
+    })
+  })
+
+  describe('decodeTransferRequestContractSpend', () => {
+    it('should decode', () => {
+      const result = decodeTransferRequestContractSpend.parse({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+      })
+
+      expect(result).toEqual({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+      })
+    })
+
+    it('should throw if redirectTo is not a safe URL', () => {
+      expect(() =>
+        decodeTransferRequestContractSpend.parse({
+          inputs: [
+            {
+              txHash:
+                '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+              outputIndex: 0,
+              redeemer: {
+                type: 'PlutusV2',
+                data: 'DEADDEADDEAD',
+                exUnits: {mem: '7000000', steps: '3000000000'},
+              },
+              scriptReferenceTxHash:
+                'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+              scriptReferenceOutputIndex: 0,
+              scriptHash:
+                '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+              scriptSize: 100,
+            },
+          ],
+          targets: [
+            {
+              receiver: 'addr1',
+              amounts: [
+                {
+                  tokenId: 'lovelace',
+                  quantity: '1000000',
+                },
+              ],
+              datum: 'DEADDEAD',
+            },
+          ],
+          redirectTo: encodeURIComponent('http://example.com'),
+        }),
+      ).toThrow()
+    })
+
+    it('should decode with redirectTo', () => {
+      const result = decodeTransferRequestContractSpend.parse({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+        redirectTo: encodeURIComponent('https://example.com'),
+      })
+
+      expect(result).toEqual({
+        inputs: [
+          {
+            txHash:
+              '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+            outputIndex: 0,
+            redeemer: {
+              type: 'PlutusV2',
+              data: 'DEADDEADDEAD',
+              exUnits: {mem: '7000000', steps: '3000000000'},
+            },
+            scriptReferenceTxHash:
+              'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+            scriptReferenceOutputIndex: 0,
+            scriptHash:
+              '0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+            scriptSize: 100,
+          },
+        ],
+        targets: [
+          {
+            receiver: 'addr1',
+            amounts: [
+              {
+                tokenId: 'lovelace',
+                quantity: '1000000',
+              },
+            ],
+            datum: 'DEADDEAD',
+          },
+        ],
+        redirectTo: 'https://example.com',
+      })
     })
   })
 })

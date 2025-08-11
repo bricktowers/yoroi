@@ -4,6 +4,7 @@ import {
   ExchangeShowCreateResultSchema,
   TransferRequestAdaSchema,
   TransferRequestAdaWithLinkSchema,
+  TransferRequestContractSpendSchema,
   isUnsafeUrl,
 } from './validators'
 
@@ -65,6 +66,41 @@ export const encodeTransferRequestAdaWithLink =
       ...toTransform,
       link: encodeURIComponent(toTransform.link),
     }
+  })
+
+export const encodeTransferRequestContractSpend =
+  TransferRequestContractSpendSchema.refine((toCheck) => {
+    if (toCheck.redirectTo != null && isUnsafeUrl(toCheck.redirectTo))
+      return false
+
+    return true
+  }).transform((toTransform) => {
+    if (toTransform.redirectTo != null) {
+      return {
+        ...toTransform,
+        redirectTo: encodeURIComponent(toTransform.redirectTo),
+      }
+    }
+    return toTransform
+  })
+
+export const decodeTransferRequestContractSpend =
+  TransferRequestContractSpendSchema.refine((toCheck) => {
+    if (
+      toCheck.redirectTo != null &&
+      isUnsafeUrl(decodeURIComponent(toCheck.redirectTo))
+    )
+      return false
+
+    return true
+  }).transform((toTransform) => {
+    if (toTransform.redirectTo != null) {
+      return {
+        ...toTransform,
+        redirectTo: decodeURIComponent(toTransform.redirectTo),
+      }
+    }
+    return toTransform
   })
 
 export const encodeBrowserLaunchDappUrl = BrowserLaunchDappUrlSchema.refine(

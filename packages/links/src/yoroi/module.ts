@@ -7,12 +7,14 @@ import {
   configYoroiExchangeOrderShowCreateResult,
   configYoroiTransferRequestAda,
   configYoroiTransferRequestAdaWithLink,
+  configYoroiTransferRequestContractSpend,
 } from './constants'
 import {
   encodeBrowserLaunchDappUrl,
   encodeExchangeShowCreateResult,
   encodeTransferRequestAda,
   encodeTransferRequestAdaWithLink,
+  encodeTransferRequestContractSpend,
 } from './transformers'
 
 export const linksYoroiModuleMaker = (
@@ -36,6 +38,11 @@ export const linksYoroiModuleMaker = (
 
       adaWithLink: linksYoroiBuilder(encodeTransferRequestAdaWithLink, {
         ...configYoroiTransferRequestAdaWithLink,
+        scheme,
+      }).create,
+
+      contractSpend: linksYoroiBuilder(encodeTransferRequestContractSpend, {
+        ...configYoroiTransferRequestContractSpend,
         scheme,
       }).create,
     },
