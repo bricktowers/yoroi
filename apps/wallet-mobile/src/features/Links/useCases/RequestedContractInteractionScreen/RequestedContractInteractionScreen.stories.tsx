@@ -3,15 +3,15 @@ import {storiesOf} from '@storybook/react-native'
 import * as React from 'react'
 import {StyleSheet, View} from 'react-native'
 
-import {RequestedAdaPaymentWithLinkScreen} from './RequestedAdaPaymentWithLinkScreen'
+import {RequestedContractInteractionScreen} from './RequestedContractInteractionScreen'
 
 storiesOf('Links ShowDisclaimer', module)
   .addDecorator((story) => <View style={styles.container}>{story()}</View>)
   .add('trusted source', () => (
-    <RequestedAdaPaymentWithLinkScreen message="message" isTrusted onContinue={action('onContinue')} />
+    <RequestedContractInteractionScreen message="message" isTrusted onContinue={action('onContinue')} />
   ))
   .add('untrusted source', () => (
-    <RequestedAdaPaymentWithLinkScreen message="message" onContinue={action('onContinue')} />
+    <RequestedContractInteractionScreen message="message" onContinue={action('onContinue')} />
   ))
 
 const styles = StyleSheet.create({

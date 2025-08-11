@@ -146,6 +146,13 @@ export const getTransactionSigners = async (cbor: string, wallet: YoroiWallet, m
     return [...signers, additionalSigner]
   }
 
+  if (await needsToSignWithPaymentKey(tx)) {
+    const baseAddress = await wallet.getFirstPaymentAddress()
+    const address = await baseAddress.toAddress()
+    const additionalSigner = getDerivationPathForAddress(address.toString(), wallet, meta, partial)
+    return [...signers, additionalSigner]
+  }
+
   return signers
 }
 
@@ -174,4 +181,10 @@ const needsToSignWithStakingKey = async (tx: CSL_TYPES.Transaction) => {
 
   if (withdrawals && (await withdrawals.len()) > 0) return true
   return false
+}
+
+const needsToSignWithPaymentKey = async (tx: CSL_TYPES.Transaction) => {
+  const body = await tx.body()
+  const scriptDataHash = await body.scriptDataHash()
+  return scriptDataHash !== undefined && scriptDataHash !== null
 }

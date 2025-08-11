@@ -7,7 +7,7 @@ import {AppApi} from '@yoroi/api'
 import {bannersManagerMaker} from '@yoroi/banners'
 import {cardanoConfig, derivationConfig, protocolParamsPlaceholder} from '@yoroi/blockchains'
 import {isNonNullable, observableStorageMaker} from '@yoroi/common'
-import {Api, App, Balance, Banners, HW, Network, Portfolio, Wallet} from '@yoroi/types'
+import {Api, App, Balance, Banners, HW, Links, Network, Portfolio, Wallet} from '@yoroi/types'
 import {BigNumber} from 'bignumber.js'
 import {Buffer} from 'buffer'
 import {freeze} from 'immer'
@@ -52,6 +52,7 @@ import {processTxHistoryData} from './processTransactions/processTransactions'
 import {yoroiSignedTx} from './signedTx'
 import {TransactionManager} from './transactionManager/transactionManager'
 import {toLibToken} from './transformers/to-lib-token'
+import {createUnsignedContractLockTx, createUnsignedContractSpendTx} from './tx-builders/contractTxBuilder'
 import {
   CardanoTypes,
   isYoroiWallet,
@@ -1188,6 +1189,144 @@ export const makeCardanoWallet = (networkManager: Network.Manager, implementatio
     private isUsedAddress(address: string) {
       const perAddressTxs = this.transactionManager.perAddressTxs
       return !!perAddressTxs[address] && perAddressTxs[address].length > 0
+    }
+
+    async createUnsignedContractLockTx({
+      entries,
+      metadata,
+      addressMode,
+    }: {
+      entries: YoroiEntry[]
+      metadata?: Array<CardanoTypes.TxMetadata>
+      addressMode: Wallet.AddressMode
+    }): Promise<{
+      cborHex: string
+      txId: string
+    }> {
+      const absSlotNumber = await this.getAbsoluteSlotNumber()
+      const changeAddr = this.getAddressedChangeAddress(addressMode)
+      const addressedUtxos = await this.getAddressedUtxos()
+      const recipients = await toRecipients(entries, this.portfolioPrimaryTokenInfo, this.protocolParams)
+      const containsDatum = recipients.some((recipient) => recipient.datum)
+
+      const {
+        coinsPerUtxoByte,
+        keyDeposit,
+        linearFee: {coefficient, constant},
+        poolDeposit,
+      } = this.protocolParams
+
+      // Create a template transaction to use existing wallet input utxo selection algorithm from YoroiLib
+      const templateTx = await Cardano.createUnsignedTx(
+        absSlotNumber,
+        addressedUtxos,
+        recipients,
+        changeAddr,
+        {
+          keyDeposit,
+          linearFee: {
+            coefficient,
+            constant: containsDatum ? String(BigInt(constant) * 2n) : constant,
+          },
+          minimumUtxoVal: cardanoConfig.params.minUtxoValue.toString(),
+          coinsPerUtxoByte,
+          poolDeposit,
+          networkId: this.networkManager.chainId,
+        },
+        toLibToken(this.portfolioPrimaryTokenInfo),
+        {metadata},
+      )
+
+      const walletInputs = templateTx.senderUtxos.map((input: any) => {
+        return {
+          txHash: input.txHash,
+          outputIndex: input.txIndex,
+          amount: String(input.amount),
+          assets: input.assets.map((a: {assetId: string; amount: string}) => ({
+            assetId: a.assetId,
+            amount: a.amount,
+          })),
+        }
+      })
+      return createUnsignedContractLockTx({
+        wallet: this,
+        changeAddress: changeAddr.address,
+        walletInputs,
+        entries,
+        metadata,
+      })
+    }
+
+    async createUnsignedContractSpendTx({
+      contractSpendParams,
+      metadata,
+      addressMode,
+    }: {
+      contractSpendParams: Links.ContractSpendParams
+      metadata?: Array<CardanoTypes.TxMetadata>
+      addressMode: Wallet.AddressMode
+    }): Promise<{
+      cborHex: string
+      txId: string
+    }> {
+      const absSlotNumber = await this.getAbsoluteSlotNumber()
+      const changeAddr = this.getAddressedChangeAddress(addressMode)
+
+      // Convert contract spend outputs to YoroiEntry format expected by the UI
+      const entries: YoroiEntry[] = contractSpendParams.targets.map((output) => {
+        const amounts: Balance.Amounts = {}
+        output.amounts.forEach((amount) => {
+          const tokenId =
+            amount.tokenId === '.' || amount.tokenId === '' || amount.tokenId === 'lovelace' ? '.' : amount.tokenId
+          amounts[tokenId] = amount.quantity as Balance.Quantity
+        })
+
+        return {
+          address: output.receiver,
+          amounts,
+          datum: output.datum != null && output.datum !== '' ? {data: output.datum} : undefined,
+        }
+      })
+
+      // fetch contract input UTxO data from the blockchain
+      const contractInputs = await Promise.all(
+        contractSpendParams.inputs.map(async (ci) => {
+          const utxoData = await this.networkManager.api.utxoData({txHash: ci.txHash, txIndex: ci.outputIndex})
+          return {
+            txHash: ci.txHash,
+            outputIndex: ci.outputIndex,
+            amount: utxoData.output.amount,
+            assets: utxoData.output.assets.map((a) => ({assetId: a.assetId, amount: a.amount})),
+            redeemer: ci.redeemer as {
+              type: 'PlutusV1' | 'PlutusV2' | 'PlutusV3'
+              data: string
+              exUnits?: {mem: string; steps: string}
+            },
+            scriptReferenceTxHash: ci.scriptReferenceTxHash,
+            scriptReferenceOutputIndex: ci.scriptReferenceOutputIndex,
+            scriptHash: ci.scriptHash,
+            scriptSize: ci.scriptSize,
+          }
+        }),
+      )
+
+      if (!this.collateralId || this.collateralId === '') {
+        throw new Error('No collateral UTxO found')
+      }
+      const collateralIdParts = this.collateralId.split(':')
+      const collateralInput = {txHash: collateralIdParts[0], outputIndex: parseInt(collateralIdParts[1])}
+
+      const cborResult = await createUnsignedContractSpendTx({
+        wallet: this,
+        absSlotNumber: absSlotNumber.toNumber(),
+        changeAddress: changeAddr.address,
+        walletInputs: [],
+        contractInputs,
+        collateralInput,
+        entries,
+        metadata,
+      })
+      return cborResult
     }
   }
 }

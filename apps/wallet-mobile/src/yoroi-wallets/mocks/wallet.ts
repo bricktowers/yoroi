@@ -140,6 +140,12 @@ const wallet: YoroiWallet = {
   createUnsignedTx: () => {
     throw new Error('not implemented: createUnsignedTx')
   },
+  createUnsignedContractLockTx: () => {
+    throw new Error('not implemented: createUnsignedContractLockTx')
+  },
+  createUnsignedContractSpendTx: () => {
+    throw new Error('not implemented: createUnsignedContractSpendTx')
+  },
   createDelegationTx: () => {
     throw new Error('not implemented: createDelegationTx')
   },
@@ -398,6 +404,21 @@ const createUnsignedTx = {
   },
   loading: async (...args: unknown[]) => {
     action('createUnsignedTx')(...args)
+    return new Promise(() => null) as unknown as YoroiUnsignedTx
+  },
+}
+
+const createUnsignedContractSpendTx = {
+  success: async (...args: unknown[]) => {
+    action('createUnsignedContractSpendTx')(...args)
+    return mocks.yoroiUnsignedTx
+  },
+  error: async (...args: unknown[]) => {
+    action('createUnsignedContractSpendTx')(...args)
+    return Promise.reject(new Error('storybook error message'))
+  },
+  loading: async (...args: unknown[]) => {
+    action('createUnsignedContractSpendTx')(...args)
     return new Promise(() => null) as unknown as YoroiUnsignedTx
   },
 }
@@ -794,6 +815,7 @@ export const mocks = {
   getTransactions,
   fetchPoolInfo,
   createUnsignedTx,
+  createUnsignedContractSpendTx,
   createDelegationTx,
   createWithdrawalTx,
   createVotingRegTx,

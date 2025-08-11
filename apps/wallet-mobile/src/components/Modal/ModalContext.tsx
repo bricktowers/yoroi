@@ -102,6 +102,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         isOpen: true,
         isLoading: false,
         full: action.full,
+        canContinue: action.canContinue,
         canDiscard: action.canDiscard,
       }
 

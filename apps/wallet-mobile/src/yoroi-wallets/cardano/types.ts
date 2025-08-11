@@ -10,7 +10,7 @@ import {
   TxMetadata as TxMetadataType,
   UnsignedTx as UnsignedTxType,
 } from '@emurgo/yoroi-lib'
-import {Api, App, Banners, HW, Network, Portfolio, Wallet} from '@yoroi/types'
+import {Api, App, Banners, HW, Links, Network, Portfolio, Wallet} from '@yoroi/types'
 import {BigNumber} from 'bignumber.js'
 
 import {WalletEncryptedStorage} from '../../kernel/storage/EncryptedStorage'
@@ -107,6 +107,22 @@ export interface YoroiWallet {
     metadata?: Array<CardanoTypes.TxMetadata>
     addressMode: Wallet.AddressMode
   }): Promise<YoroiUnsignedTx>
+  createUnsignedContractLockTx(params: {
+    entries: YoroiEntry[]
+    metadata?: Array<CardanoTypes.TxMetadata>
+    addressMode: Wallet.AddressMode
+  }): Promise<{
+    cborHex: string
+    txId: string
+  }>
+  createUnsignedContractSpendTx(params: {
+    contractSpendParams: Links.ContractSpendParams
+    metadata?: Array<CardanoTypes.TxMetadata>
+    addressMode: Wallet.AddressMode
+  }): Promise<{
+    cborHex: string
+    txId: string
+  }>
   signTx(signRequest: YoroiUnsignedTx, rootKey: string): Promise<YoroiSignedTx>
   submitTransaction(signedTx: string): Promise<void>
 
@@ -197,6 +213,8 @@ const yoroiWalletKeys: Array<keyof YoroiWallet> = [
 
   // Sending
   'createUnsignedTx',
+  'createUnsignedContractLockTx',
+  'createUnsignedContractSpendTx',
   'signTxWithLedger',
   'signTx',
   'submitTransaction',

@@ -153,6 +153,8 @@ const getStories = () => {
     "./src/features/Links/useCases/RequestedAdaPaymentWithLinkScreen/ShowDisclaimer/ShowDisclaimer.stories.tsx": require("../src/features/Links/useCases/RequestedAdaPaymentWithLinkScreen/ShowDisclaimer/ShowDisclaimer.stories.tsx"),
     "./src/features/Links/useCases/RequestedBrowserLaunchDappUrlScreen/RequestedBrowserLaunchDappUrlScreen.stories.tsx": require("../src/features/Links/useCases/RequestedBrowserLaunchDappUrlScreen/RequestedBrowserLaunchDappUrlScreen.stories.tsx"),
     "./src/features/Links/useCases/RequestedBrowserLaunchDappUrlScreen/ShowDisclaimer/ShowDisclaimer.stories.tsx": require("../src/features/Links/useCases/RequestedBrowserLaunchDappUrlScreen/ShowDisclaimer/ShowDisclaimer.stories.tsx"),
+    "./src/features/Links/useCases/RequestedContractInteractionScreen/RequestedContractInteractionScreen.stories.tsx": require("../src/features/Links/useCases/RequestedContractInteractionScreen/RequestedContractInteractionScreen.stories.tsx"),
+    "./src/features/Links/useCases/RequestedContractInteractionScreen/ShowDisclaimer/ShowDisclaimer.stories.tsx": require("../src/features/Links/useCases/RequestedContractInteractionScreen/ShowDisclaimer/ShowDisclaimer.stories.tsx"),
     "./src/features/Menu/Menu.stories.tsx": require("../src/features/Menu/Menu.stories.tsx"),
     "./src/features/Portfolio/common/PnlTag/PnlTag.stories.tsx": require("../src/features/Portfolio/common/PnlTag/PnlTag.stories.tsx"),
     "./src/features/Portfolio/common/TokenAmountItem/TokenAmountItem.stories.tsx": require("../src/features/Portfolio/common/TokenAmountItem/TokenAmountItem.stories.tsx"),

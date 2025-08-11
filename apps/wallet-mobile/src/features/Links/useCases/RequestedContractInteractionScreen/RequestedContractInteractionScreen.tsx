@@ -12,7 +12,7 @@ import {isEmptyString} from '../../../../kernel/utils'
 import {useStrings} from '../../common/useStrings'
 import {ShowDisclaimer} from './ShowDisclaimer/ShowDisclaimer'
 
-export const RequestedAdaPaymentWithLinkScreen = ({
+export const RequestedContractInteractionScreen = ({
   message,
   isTrusted,
   onContinue,
@@ -28,9 +28,7 @@ export const RequestedAdaPaymentWithLinkScreen = ({
 
   // TODO: revisit check with product
   const disclaimerStyle = isTrusted ? styles.text : styles.text
-  const description = isTrusted
-    ? strings.trustedPaymentRequestedDescription
-    : strings.untrustedPaymentRequestedDescription
+  const description = isTrusted ? strings.trustedContractSpendDescription : strings.untrustedContractSpendDescription
 
   const handleOnCancel = () => {
     actionFinished()

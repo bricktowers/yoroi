@@ -22,7 +22,11 @@ export const useLinksRequestWallet = () => {
 
   React.useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
-      const isWalletRequested = action?.info.useCase === 'request/ada-with-link' || action?.info.useCase === 'launch'
+      const isWalletRequested =
+        action?.info.useCase === 'request/ada' ||
+        action?.info.useCase === 'request/ada-with-link' ||
+        action?.info.useCase === 'request/contract-spend' ||
+        action?.info.useCase === 'launch'
       if (isWalletRequested && wallet == null) askToOpenAWallet()
     })
   }, [askToOpenAWallet, action?.info.useCase, wallet])
