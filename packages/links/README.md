@@ -221,6 +221,13 @@ console.log(yoroiMobileLink)
 
 Coming soon.
 
+## Mobile dApp integration
+
+For building mobile dApps that ask Yoroi to sign transactions — including spending from
+Plutus scripts with `transfer/request/contract-spend` — see
+[docs/mobile-dapp-integration](../../docs/mobile-dapp-integration/README.md). A working
+example lives in [examples/yoroi-demo](../../examples/yoroi-demo).
+
 ## For more
 
 - [BIP-21](https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki)

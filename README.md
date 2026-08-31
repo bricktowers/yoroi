@@ -7,6 +7,7 @@
 - [Features](#features)
 - [Installation](#installation)
 - [Packages](#packages)
+- [Mobile dApp integration](#mobile-dapp-integration)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -56,6 +57,17 @@ Yoroi is a multi-repository project. Review the packages in the [packages](https
 Standalone apps under [`examples/`](examples/). They are not Lerna workspaces.
 
 - [`examples/yoroi-demo`](examples/yoroi-demo): Expo app that deposits and withdraws preprod ADA through `yoroi://` deep links.
+
+## Mobile dApp integration
+
+This fork adds a way for a mobile dApp to ask Yoroi, running on the same device, to build
+and sign a Cardano transaction — including interactions with Plutus scripts — and then
+return the user with the resulting transaction hash.
+
+- [Documentation](./docs/mobile-dapp-integration/README.md) — the model, a quick start, the
+  full link reference, and recipes
+- [Examples gallery](./examples/README.md) — runnable applications and request recipes,
+  including an Expo app that locks ADA into a preprod savings script and spends it back out
 
 ## Contributing
 
