@@ -51,6 +51,12 @@ To install the Yoroi wallet on your mobile device:
 
 Yoroi is a multi-repository project. Review the packages in the [packages](https://github.com/Emurgo/yoroi/tree/develop/packages) folder.
 
+## Examples
+
+Standalone apps under [`examples/`](examples/). They are not Lerna workspaces.
+
+- [`examples/yoroi-demo`](examples/yoroi-demo): Expo app that deposits and withdraws preprod ADA through `yoroi://` deep links.
+
 ## Contributing
 
 See the [contributing guide](https://github.com/Emurgo/yoroi/blob/develop/CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.

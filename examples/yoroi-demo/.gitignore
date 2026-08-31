@@ -1,0 +1,6 @@
+node_modules/
+expo-env.d.ts
+.expo/
+.yarn/
+/android
+/ios
