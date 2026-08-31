@@ -38,6 +38,12 @@ Every runnable example and request recipe is listed in the
 - [Request a simple ADA payment](./recipes/simple-ada-transfer.md)
 - [Open a dApp in the wallet browser](./recipes/open-a-dapp.md)
 
+## Project close-out report
+
+This integration was built under Project Catalyst Fund 13, project 1300099. The close-out
+report covering the whole project is in this repository:
+[PCR.pdf](../PCR.pdf) · [PCR.md](../PCR.md).
+
 ## Working example
 
 [`examples/yoroi-demo`](../../examples/yoroi-demo) is a small Expo app that does the whole
